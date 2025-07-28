@@ -1,2 +1,4 @@
-fastapi[all]
-uvicorn
+fastapi
+uvicorn[standard]
+msgspec
+beautifulsoup4

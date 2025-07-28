@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from lib import Logger, MsgSpecJSONResponse
+from src.lib import Logger, MsgSpecJSONResponse
 from urllib import parse
 from urllib.request import Request, urlopen
 from typing import Dict, List

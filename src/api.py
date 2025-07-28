@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from lib import Logger, MsgSpecJSONResponse
-from search import search_dramas
+from src.lib import Logger, MsgSpecJSONResponse
+from src.search import search_dramas
 from typing import Any, Dict
 
 
