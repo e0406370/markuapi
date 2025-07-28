@@ -1,8 +1,3 @@
-"""
-Run using Powershell:
-  fastapi dev api.py
-"""
-
 from datetime import datetime, timezone
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,13 +35,13 @@ def search(query: str, response: Response) -> Dict[str, Any]:
         return {
             "query": query,
             "dramas": dramas,
-            "scrape_date": datetime.now(timezone.utc),
+            "scrape_date": datetime.now(timezone.utc).isoformat(),
         }
 
     except Exception as e:
-        Logger.err(e)
+        Logger.exception("Failed to search dramas.")
 
-        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {
-          "message": "An unexpected error occurred."
+            "message": "An unexpected error occurred."
         }

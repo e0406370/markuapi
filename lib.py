@@ -14,18 +14,27 @@ class Logger:
     logger = logging.getLogger(__name__)
 
     @classmethod
-    def info(cls, message):
+    def info(cls, message: str):
         cls.logger.info(message)
 
     @classmethod
-    def warn(cls, message):
+    def warn(cls, message: str):
         cls.logger.warning(message)
 
     @classmethod
-    def err(cls, message):
+    def err(cls, message: str):
         cls.logger.error(message)
+
+    @classmethod
+    def exception(cls, message: str):
+        cls.logger.exception(message)
 
 
 class MsgSpecJSONResponse(JSONResponse):
-    def render(self, content: Any) -> bytes:
+    @classmethod
+    def render(cls, content: Any) -> bytes:
         return msgspec.json.encode(content)
+
+    @classmethod
+    def parse(cls, content: Any) -> Any:
+        return msgspec.json.decode(content)
