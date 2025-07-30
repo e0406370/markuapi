@@ -23,12 +23,21 @@ def test_index() -> None:
         },
     ],
 )
-def test_search_dramas(test_data) -> None:
-    drama = "あなたの番です"
-    resp = client.get(f"/search/dramas/{drama}")
+def test_search_with_results(test_data) -> None:
+    query = "あなたの番です"
+    resp = client.get(f"/search/dramas/{query}")
     resp_dramas = resp.json()["dramas"]
 
     assert resp.status_code == 200
     assert resp_dramas[0]["title"] == test_data["title"]
     assert float(resp_dramas[0]["rating"]) == pytest.approx(test_data["rating"], abs=0.5)
     assert resp_dramas[0]["link"] == test_data["link"]
+
+
+def test_search_without_results() -> None:
+    query = "\".*&^"
+    resp = client.get(f"/search/dramas/{query}")
+    resp_dramas = resp.json()["dramas"]
+
+    assert resp.status_code == 200
+    assert len(resp_dramas) == 0
