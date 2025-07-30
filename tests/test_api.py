@@ -1,0 +1,34 @@
+from fastapi.testclient import TestClient
+from src.api import api
+import pytest
+
+
+client = TestClient(api)
+
+
+def test_index() -> None:
+    resp = client.get("/")
+
+    assert resp.status_code == 200
+    assert resp.json()["message"] == "A basic web scraper API for Filmarks Dramas."
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "あなたの番です",
+            "rating": 4.0,
+            "link": "https://filmarks.com/dramas/6055/8586",
+        },
+    ],
+)
+def test_search_dramas(test_data) -> None:
+    drama = "あなたの番です"
+    resp = client.get(f"/search/dramas/{drama}")
+    resp_dramas = resp.json()["dramas"]
+
+    assert resp.status_code == 200
+    assert resp_dramas[0]["title"] == test_data["title"]
+    assert float(resp_dramas[0]["rating"]) == pytest.approx(test_data["rating"], abs=0.5)
+    assert resp_dramas[0]["link"] == test_data["link"]
