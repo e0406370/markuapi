@@ -18,19 +18,19 @@ class Logger:
     logger.setLevel(logging.INFO)
 
     @classmethod
-    def info(cls, message: str):
+    def info(cls, message: str) -> None:
         cls.logger.info(message)
 
     @classmethod
-    def warn(cls, message: str):
+    def warn(cls, message: str) -> None:
         cls.logger.warning(message)
 
     @classmethod
-    def err(cls, message: str):
+    def err(cls, message: str) -> None:
         cls.logger.error(message)
 
     @classmethod
-    def exception(cls, message: str):
+    def exception(cls, message: str) -> None:
         cls.logger.exception(message)
 
 
