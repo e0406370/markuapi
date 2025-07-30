@@ -48,12 +48,13 @@ def search(query: str, response: Response) -> Dict[str, Any]:
         return {
             "message": "An unexpected error occurred."
         }
-        
+
+
 @crontab("*/15 * * * *")
-async def heartbeat():
+async def heartbeat() -> None:
     try:
         async with AsyncClient() as client:
-            await client.get(environ.get("BASE"))
+            await client.get(environ.get("BASE", "http://127.0.0.1:8000"))
             Logger.info("Self-ping succeeded.")
 
     except Exception:
