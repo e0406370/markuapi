@@ -29,14 +29,14 @@ def index() -> Dict[str, Any]:
     }
 
 
-@api.get("/search/dramas/{query}")
-def search(query: str, response: Response) -> Dict[str, Any]:
+@api.get("/search/dramas")
+def search(q: str, response: Response) -> Dict[str, Any]:
     try:
-        dramas = search_dramas(query)
+        dramas = search_dramas(q)
 
         response.status_code = status.HTTP_200_OK
         return {
-            "query": query,
+            "query": q,
             "dramas": dramas,
             "scrape_date": datetime.now(timezone.utc).isoformat(),
         }
