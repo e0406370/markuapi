@@ -10,7 +10,14 @@ def test_index() -> None:
     resp = client.get("/")
 
     assert resp.status_code == 200
-    assert resp.json()["message"] == "A basic web scraper API for Filmarks Dramas."
+    assert resp.json() == {"message": "A basic web scraper API for Filmarks Dramas."}
+
+
+def test_invalid_endpoint() -> None:
+    resp = client.get("/unknown")
+
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": "Not Found"}
 
 
 @pytest.mark.parametrize(
@@ -35,7 +42,7 @@ def test_search_with_results(test_data) -> None:
 
 
 def test_search_without_results() -> None:
-    query = "\".*&^"
+    query = '".*&^'
     resp = client.get(f"/search/dramas/{query}")
     resp_dramas = resp.json()["dramas"]
 
