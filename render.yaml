@@ -1,8 +1,9 @@
 services:
   - type: web
     name: markuapi
-    env: python
+    repo: https://github.com/e0406370/markuapi
+    runtime: python
     plan: free
     autoDeploy: false
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.api:api --host 0.0.0.0 --port 80
+    buildCommand: poetry install
+    startCommand: uvicorn src.api:api --host 0.0.0.0 --port $PORT

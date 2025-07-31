@@ -1,0 +1,40 @@
+name: Run unit tests using Pytest
+
+on:
+  push:
+    branches: ["main"]
+
+  pull_request:
+    branches: ["main"]
+
+  schedule:
+    - cron: "0 18 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Setup Python via uv
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Setup dependencies via uv
+        run: uv sync --all-extras --dev
+
+      - name: Lint with Ruff
+        run: uv run ruff check
+
+      - name: Test with Pytest
+        run: uv run coverage run -m pytest
+
+      - name: Generate report with Coverage
+        run: uv run coverage report -m

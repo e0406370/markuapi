@@ -32,7 +32,7 @@ def test_invalid_endpoint() -> None:
 )
 def test_search_with_results(test_data) -> None:
     query = "あなたの番です"
-    resp = client.get(f"/search/dramas/{query}")
+    resp = client.get(f"/search/dramas?q={query}")
     resp_dramas = resp.json()["dramas"]
 
     assert resp.status_code == 200
@@ -43,7 +43,7 @@ def test_search_with_results(test_data) -> None:
 
 def test_search_without_results() -> None:
     query = '".*&^'
-    resp = client.get(f"/search/dramas/{query}")
+    resp = client.get(f"/search/dramas?q={query}")
     resp_dramas = resp.json()["dramas"]
 
     assert resp.status_code == 200
