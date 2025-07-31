@@ -2,7 +2,7 @@ name: Run unit tests using Pytest
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
 
   pull_request:
     branches: ["main"]
