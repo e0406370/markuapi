@@ -1,4 +1,5 @@
-import logging, msgspec
+import logging
+import msgspec
 from fastapi.responses import JSONResponse
 from typing import Any
 
