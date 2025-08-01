@@ -31,6 +31,9 @@ def test_invalid_endpoint() -> None:
             "series_id": 6055,
             "season_id": 8586,
             "link": "https://filmarks.com/dramas/6055/8586",
+            "release_date": "2019年04月14日",
+            "country_origin": "日本",
+            "playback_time": "46分",
         },
     ],
 )
@@ -47,6 +50,10 @@ def test_search_with_results(test_data) -> None:
     assert resp_dramas[0]["series_id"] == test_data["series_id"]
     assert resp_dramas[0]["season_id"] == test_data["season_id"]
     assert resp_dramas[0]["link"] == test_data["link"]
+    assert resp_dramas[0]["release_date"] == test_data["release_date"]
+    assert resp_dramas[0]["country_origin"] == test_data["country_origin"]
+    assert resp_dramas[0]["playback_time"] == test_data["playback_time"]
+    assert resp_dramas[0]["synopsis"]
 
 
 def test_search_without_results() -> None:

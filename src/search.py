@@ -36,6 +36,18 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         drama_series_id = data_clip_elem["drama_series_id"]
         drama_season_id = data_clip_elem["drama_season_id"]
         clip_count = data_clip_elem["count"]
+        
+        other_info_elem = result.find("div", class_="p-content-cassette__other-info")
+        release_date_title_elem = other_info_elem.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
+        release_date_elem = release_date_title_elem.find_next_sibling("span") if release_date_title_elem else None
+
+        country_origin_title_elem = other_info_elem.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
+        country_origin_elem = country_origin_title_elem.find_next("a") if country_origin_title_elem else None
+        
+        playback_time_title_elem = other_info_elem.find("h4", class_="p-content-cassette__other-info-title", string="再生時間：")
+        playback_time_elem = playback_time_title_elem.find_next_sibling("span") if playback_time_title_elem else None
+        
+        synopsis_elem = result.find("p", class_="p-content-cassette__synopsis-desc-text")
 
         d = {}
         d["title"] = title_elem.string
@@ -45,6 +57,10 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         d["series_id"] = drama_series_id
         d["season_id"] = drama_season_id
         d["link"] = FILMARKS_DRAMA.format(drama_series_id=drama_series_id, drama_season_id=drama_season_id)
+        if release_date_elem: d["release_date"] = release_date_elem.string
+        if country_origin_elem: d["country_origin"] = country_origin_elem.string
+        if playback_time_elem: d["playback_time"] = playback_time_elem.string
+        if synopsis_elem: d["synopsis"] = synopsis_elem.string
 
         Logger.info(f"[{ctr + 1} | Query: {query}] {str(d)}")
         dramas.append(d)
