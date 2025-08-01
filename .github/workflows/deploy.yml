@@ -1,8 +1,8 @@
-name: Deploy application to Render
+name: Deploy-application-to-Render
 
 on:
   workflow_run:
-    workflows: [Run unit tests using Pytest]
+    workflows: [Run-unit-tests-using-Pytest]
     types: [completed]
 
 env:
@@ -10,12 +10,8 @@ env:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.event == 'push' }} && ${{ github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
-
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'schedule'}}
     steps:
-      - name: Checkout source branch
-        uses: actions/checkout@v4
-
       - name: Deploy application to Render
         run: curl "$RENDER_DEPLOY_HOOK"
