@@ -14,5 +14,4 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'schedule'}}
     steps:
       - name: Deploy application to Render
-        run: |
-          echo 'The triggering workflow passed'
+        run: curl "$RENDER_DEPLOY_HOOK"
