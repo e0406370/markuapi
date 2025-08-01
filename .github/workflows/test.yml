@@ -1,4 +1,4 @@
-name: Run unit tests using Pytest
+name: Run-unit-tests-using-Pytest
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches: ["main"]
 
   schedule:
-    - cron: "0 18 * * *"
+    - cron: "*/5 * * * *"
 
 jobs:
   test:
