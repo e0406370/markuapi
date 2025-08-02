@@ -37,8 +37,12 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         drama_season_id = data_clip_elem["drama_season_id"]
         clip_count = data_clip_elem["count"]
 
+        poster_elem = result.find("div", class_="c2-poster-m").find("img")
+
         release_date_title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
         release_date_elem = release_date_title_elem.find_next_sibling("span") if release_date_title_elem else None
+
+        is_airing_elem = result.find("div", class_="c2-tag-broadcasting-now")
 
         country_origin_title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
         country_origin_elem = country_origin_title_elem.find_next("a") if country_origin_title_elem else None
@@ -68,7 +72,9 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         d["series_id"] = drama_series_id
         d["season_id"] = drama_season_id
         d["link"] = FILMARKS_DRAMA.format(drama_series_id=drama_series_id, drama_season_id=drama_season_id)
+        if poster_elem: d["poster"] = poster_elem.attrs["src"]
         if release_date_elem: d["release_date"] = release_date_elem.string
+        d["is_airing"] = True if is_airing_elem else False
         if country_origin_elem: d["country_origin"] = country_origin_elem.string
         if playback_time_elem: d["playback_time"] = playback_time_elem.string
         if genre_elem: d["genre"] = [genre.string for genre in genre_elem.find_all("a")]

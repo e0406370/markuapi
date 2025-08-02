@@ -53,7 +53,9 @@ def test_search_with_results(test_data) -> None:
     assert resp_dramas[0]["series_id"] == test_data["series_id"]
     assert resp_dramas[0]["season_id"] == test_data["season_id"]
     assert resp_dramas[0]["link"] == test_data["link"]
+    assert "poster" in resp_dramas[0]
     assert resp_dramas[0]["release_date"] == test_data["release_date"]
+    assert resp_dramas[0]["is_airing"] is False
     assert resp_dramas[0]["country_origin"] == test_data["country_origin"]
     assert resp_dramas[0]["playback_time"] == test_data["playback_time"]
     assert resp_dramas[0]["genre"] == test_data["genre"]
