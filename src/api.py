@@ -30,7 +30,7 @@ def index() -> Dict[str, Any]:
 
 
 @api.get("/search/dramas")
-def search(q: str, response: Response) -> Dict[str, Any]:
+def search(response: Response, q: str = "") -> Dict[str, Any]:
     try:
         dramas = search_dramas(q)
 
