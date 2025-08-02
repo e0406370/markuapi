@@ -40,28 +40,68 @@ def test_invalid_endpoint() -> None:
         },
     ],
 )
-def test_search_with_results(test_data) -> None:
+def test_search_with_results_single(test_data) -> None:
     query = "あなたの番です"
     resp = client.get(f"/search/dramas?q={query}")
     resp_dramas = resp.json()["dramas"]
+    drama = resp_dramas[0]
 
     assert resp.status_code == 200
-    assert resp_dramas[0]["title"] == test_data["title"]
-    assert float(resp_dramas[0]["rating"]) == pytest.approx(test_data["rating"], abs=0.5)
-    assert resp_dramas[0]["mark_count"] == pytest.approx(test_data["mark_count"], abs=1000)
-    assert resp_dramas[0]["clip_count"] == pytest.approx(test_data["clip_count"], abs=1000)
-    assert resp_dramas[0]["series_id"] == test_data["series_id"]
-    assert resp_dramas[0]["season_id"] == test_data["season_id"]
-    assert resp_dramas[0]["link"] == test_data["link"]
-    assert "poster" in resp_dramas[0]
-    assert resp_dramas[0]["release_date"] == test_data["release_date"]
-    assert resp_dramas[0]["is_airing"] is False
-    assert resp_dramas[0]["country_origin"] == test_data["country_origin"]
-    assert resp_dramas[0]["playback_time"] == test_data["playback_time"]
-    assert resp_dramas[0]["genre"] == test_data["genre"]
-    assert "director" not in resp_dramas[0]
-    assert resp_dramas[0]["scriptwriter"] == test_data["scriptwriter"]
-    assert resp_dramas[0]["cast"] == test_data["cast"]
+    assert drama["title"] == test_data["title"]
+    assert float(drama["rating"]) == pytest.approx(test_data["rating"], abs=0.5)
+    assert drama["mark_count"] == pytest.approx(test_data["mark_count"], abs=1000)
+    assert drama["clip_count"] == pytest.approx(test_data["clip_count"], abs=1000)
+    assert drama["series_id"] == test_data["series_id"]
+    assert drama["season_id"] == test_data["season_id"]
+    assert drama["link"] == test_data["link"]
+    assert "poster" in drama
+    assert drama["release_date"] == test_data["release_date"]
+    assert drama["is_airing"] is False
+    assert drama["country_origin"] == test_data["country_origin"]
+    assert drama["playback_time"] == test_data["playback_time"]
+    assert drama["genre"] == test_data["genre"]
+    assert "director" not in drama
+    assert drama["scriptwriter"] == test_data["scriptwriter"]
+    assert drama["cast"] == test_data["cast"]
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "ちはやふる－めぐり－",
+            "series_id": 16234,
+            "season_id": 21896,
+            "link": "https://filmarks.com/dramas/16234/21896",
+            "release_date": "2025年07月09日",
+            "country_origin": "日本",
+            "playback_time": "49分",
+        },
+        {
+            "title": "ちはやふる ー繋ぐー",
+            "series_id": 973,
+            "season_id": 2117,
+            "link": "https://filmarks.com/dramas/973/2117",
+            "release_date": "2018年02月20日",
+            "country_origin": "日本",
+            "playback_time": "10分",
+        },
+    ],
+)
+def test_search_with_results_multiple(test_data) -> None:
+    query = "ちはやふる"
+    resp = client.get(f"/search/dramas?q={query}")
+    resp_dramas = resp.json()["dramas"]
+    drama = next(drama for drama in resp_dramas if drama["title"] == test_data["title"])
+
+    assert resp.status_code == 200
+    assert drama["title"] == test_data["title"]
+    assert drama["series_id"] == test_data["series_id"]
+    assert drama["season_id"] == test_data["season_id"]
+    assert drama["link"] == test_data["link"]
+    assert drama["release_date"] == test_data["release_date"]
+    assert drama["country_origin"] == test_data["country_origin"]
+    assert drama["playback_time"] == test_data["playback_time"]
 
 
 def test_search_without_results() -> None:
