@@ -120,3 +120,13 @@ def test_search_error(mocker) -> None:
 
     assert resp.status_code == 500
     assert resp.json() == {"message": "An unexpected error occurred."}
+
+
+@pytest.mark.parametrize("query", ["", "?", "?q", "?q="])
+def test_search_empty_query(query) -> None:
+    resp = client.get(f"/search/dramas{query}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert resp_data["query"] == ""
+    assert len(resp_data["dramas"]) == 0
