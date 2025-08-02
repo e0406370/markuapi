@@ -12,7 +12,7 @@ FILMARKS_DRAMA = "https://filmarks.com/dramas/{drama_series_id}/{drama_season_id
 def search_dramas(query: str) -> List[Dict[str, str]]:
     req = Request(FILMARKS_SEARCH.format(query=parse.quote(query)))
     html = urlopen(req).read()
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, "lxml")
     dramas = []
 
     if soup.find("div", class_="p-timeline__zero"):
@@ -62,8 +62,6 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         cast_title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="出演者")
         cast_elem = cast_title_elem.find_next_sibling("ul") if cast_title_elem else None
 
-        synopsis_elem = result.find("p", class_="p-content-cassette__synopsis-desc-text")
-
         d = {}
         d["title"] = title_elem.string
         d["rating"] = rating_elem.string
@@ -81,7 +79,6 @@ def search_dramas(query: str) -> List[Dict[str, str]]:
         if director_elem: d["director"] = [director.string for director in director_elem.find_all("a")]
         if scriptwriter_elem: d["scriptwriter"] = [scriptwriter.string for scriptwriter in scriptwriter_elem.find_all("a")]
         if cast_elem: d["cast"] = [cast.string for cast in cast_elem.find_all("a")]
-        if synopsis_elem: d["synopsis"] = synopsis_elem.string
 
         Logger.info(f"[{ctr + 1} | Query: {query}] {str(d)}")
         dramas.append(d)

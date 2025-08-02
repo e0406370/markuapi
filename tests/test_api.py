@@ -62,7 +62,6 @@ def test_search_with_results(test_data) -> None:
     assert "director" not in resp_dramas[0]
     assert resp_dramas[0]["scriptwriter"] == test_data["scriptwriter"]
     assert resp_dramas[0]["cast"] == test_data["cast"]
-    assert resp_dramas[0]["synopsis"]
 
 
 def test_search_without_results() -> None:
