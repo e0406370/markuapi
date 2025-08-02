@@ -71,3 +71,12 @@ def test_search_without_results() -> None:
 
     assert resp.status_code == 200
     assert len(resp_dramas) == 0
+
+
+def test_search_error(mocker) -> None:
+    mocker.patch("src.api.search_dramas", side_effect=Exception("Testing - 500 Internal Server Error"))
+    query = "test"
+    resp = client.get(f"/search/dramas?q={query}")
+
+    assert resp.status_code == 500
+    assert resp.json() == {"message": "An unexpected error occurred."}
