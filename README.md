@@ -13,5 +13,5 @@ Only one endpoint has been implemented thus far.
 - Search for dramas
 
 ```sh
-GET /search/dramas/{query}
+GET /search/dramas?q={query}
 ```
