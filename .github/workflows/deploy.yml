@@ -2,7 +2,7 @@ name: Deploy-application-to-Render
 
 on:
   workflow_run:
-    workflows: [Run-unit-tests-using-Pytest]
+    workflows: [Run-tests-using-Pytest]
     types: [completed]
 
 env:

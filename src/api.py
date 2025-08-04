@@ -41,6 +41,9 @@ def search(req: Request) -> Dict[str, Any]:
 
         return scraper.get_response()
 
+    except HTTPException:
+        raise
+
     except Exception:
         Logger.exception("Failed to search dramas.")
 
