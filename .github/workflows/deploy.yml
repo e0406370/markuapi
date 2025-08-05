@@ -2,16 +2,84 @@ name: Deploy-application-to-Render
 
 on:
   workflow_run:
-    workflows: [Run-unit-tests-using-Pytest]
+    workflows: [Run-tests-using-Pytest]
     types: [completed]
 
 env:
+  RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
   RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+  RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'schedule' &&  github.event.workflow_run.event != 'pull_request'}}
     steps:
       - name: Deploy application to Render
-        run: curl "$RENDER_DEPLOY_HOOK"
+        run: |
+          DEPLOY_ID=$(curl -s $RENDER_DEPLOY_HOOK | jq -r '.deploy.id')
+          echo "::add-mask::$DEPLOY_ID"
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+
+      - name: Install the required dependencies
+        run: |
+          pip install polling
+
+      - name: Check deployment status in Render
+        id: status_step
+        shell: python
+        run: |
+          import json
+          import os
+          import polling
+          import requests
+
+          deploy_id = os.environ["DEPLOY_ID"]
+          service_id = os.environ["RENDER_SERVICE_ID"]
+          api_key = os.environ["RENDER_API_KEY"]
+
+          url = f"https://api.render.com/v1/services/{service_id}/deploys/{deploy_id}"
+          headers = {
+              "accept": "application/json",
+              "authorization": f"Bearer {api_key}"
+          }
+
+          completed_statuses = ["live", "deactivated", "build_failed", "update_failed", "canceled"]
+          final_status = ["timeout"]
+
+          def target_fn():
+              resp = requests.get(url=url, headers=headers, timeout=15)
+              code = resp.status_code
+
+              if code != 200:
+                print(f"code: {code}") 
+                return False
+
+              status = json.loads(resp.text)["status"]
+              print(f"status: {status}")
+
+              if status not in completed_statuses:
+                return False
+
+              final_status[0] = status
+              return True
+
+          polling.poll(
+            target=target_fn, 
+            step=15,
+            poll_forever=True,
+            max_attempts=30
+          )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"final_status={final_status[0]}\n")
+
+      - name: Verify deployment status is live
+        run: |
+          FINAL_STATUS=${{ steps.status_step.outputs.final_status }}
+          echo "Deployment status: $FINAL_STATUS"
+
+          if [[ "$FINAL_STATUS" == 'live' ]]; then
+              exit 0
+          else
+              exit 1
+          fi

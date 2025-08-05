@@ -1,11 +1,11 @@
 from aiocron import crontab
-from datetime import datetime, timezone
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 from os import environ
-from src.lib import Logger, MsgSpecJSONResponse
-from src.search import search_dramas
+from src.scrape.search_drama_scraper import SearchDramaScraper
+from src.utility.lib import Logger, MsgSpecJSONResponse
+from src.utility.models import Filmarks
 from typing import Any, Dict
 
 
@@ -25,29 +25,32 @@ api.add_middleware(
 @api.get("/")
 def index() -> Dict[str, Any]:
     return {
-        "message": "A basic web scraper API for Filmarks Dramas.",
+        "detail": "A basic web scraper API for Filmarks Dramas.",
     }
 
 
 @api.get("/search/dramas")
-def search(response: Response, q: str = "") -> Dict[str, Any]:
+def search(req: Request) -> Dict[str, Any]:
     try:
-        dramas = search_dramas(q)
+        scraper = SearchDramaScraper.scrape(
+            endpoint=Filmarks.SearchEP.DRAMAS.value,
+            params=req.query_params
+        )
 
-        response.status_code = status.HTTP_200_OK
-        return {
-            "query": q,
-            "dramas": dramas,
-            "scrape_date": datetime.now(timezone.utc).isoformat(),
-        }
+        scraper.set_search_results()
+
+        return scraper.get_response()
+
+    except HTTPException:
+        raise
 
     except Exception:
         Logger.exception("Failed to search dramas.")
 
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {
-            "message": "An unexpected error occurred."
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="The server encountered an unexpected error.",
+        )
 
 
 @crontab("*/15 * * * *")

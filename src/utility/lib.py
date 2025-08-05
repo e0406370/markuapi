@@ -41,5 +41,5 @@ class MsgSpecJSONResponse(JSONResponse):
         return msgspec.json.encode(content)
 
     @classmethod
-    def parse(cls, content: Any) -> Any:
-        return msgspec.json.decode(content)
+    def parse(cls, content: Any, type: Any) -> Any:
+        return msgspec.json.decode(content, type=type)
