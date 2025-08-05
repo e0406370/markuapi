@@ -8,7 +8,10 @@ class SearchScraper(BaseScraper):
     def __init__(self, soup: BeautifulSoup, params: dict) -> None:
         super().__init__(soup, params)
 
+        self.results_limit = self.params.get("limit", 10)
+        self.page_number = self.params.get("page", 1)
         self.search_query = self.params.get("q", "")
+
         self.search_results = {}
 
     def get_response(self) -> Dict[str, Any]:

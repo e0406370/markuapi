@@ -13,7 +13,7 @@ class SearchDramaScraper(SearchScraper):
 
     def _is_results_empty(self) -> bool:
         condition = bool(self.soup.find("div", class_="p-timeline__zero"))
-        if condition: Logger.warn(f"[0 | Query: {self.search_query}] 一致する情報は見つかりませんでした。")
+        if condition: Logger.warn(f"[0 | Query: {self.search_query} | Page: {self.page_number}] 一致する情報は見つかりませんでした。")
 
         return condition
 
@@ -90,7 +90,7 @@ class SearchDramaScraper(SearchScraper):
 
         results = self._get_results_container()
 
-        for ctr, result in enumerate(results[:10]):
+        for ctr, result in enumerate(results[:int(self.results_limit)]):
             d = {}
 
             d["title"] = self._get_title(result)
@@ -135,7 +135,7 @@ class SearchDramaScraper(SearchScraper):
             if cast := self._get_cast(result):
                 d["cast"] = cast
 
-            Logger.info(f"[{ctr + 1} | Query: {self.search_query}] {str(d)}")
+            Logger.info(f"[{ctr + 1} | Query: {self.search_query} | Page: {self.page_number}] {str(d)}")
             dramas.append(d)
 
         self.search_results["dramas"] = dramas
