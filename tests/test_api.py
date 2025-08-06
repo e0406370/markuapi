@@ -66,7 +66,7 @@ def test_scrape_error_500(mocker) -> None:
 
 def test_scrape_error_503(mocker) -> None:
     mocker.patch(
-        target="src.scrape.base_scraper.requests.get", 
+        target="src.scrape.base_scraper.requests.Session", 
         side_effect=RequestException("Testing - 503 Service Unavailable")
     )
 

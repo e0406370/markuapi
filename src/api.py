@@ -35,7 +35,7 @@ def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request)
     try:
         scraper = SearchDramaScraper.scrape(
             endpoint=Filmarks.SearchEP.DRAMAS.value,
-            params=req.query_params,
+            params=req.query_params
         )
         scraper.set_search_results()
 

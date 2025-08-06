@@ -9,6 +9,11 @@ T = TypeVar("T", bound="BaseScraper")
 
 
 class BaseScraper:
+    headers = {
+        "Referer": Filmarks.FILMARKS_BASE,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",        
+    }
+
     def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         self.soup = soup
         self.params = params
@@ -27,10 +32,11 @@ class BaseScraper:
             raise CustomException.not_found()
 
         try:
-            resp = requests.get(url)
-            soup = BeautifulSoup(resp.text, "lxml")
+            with requests.Session() as session:
+                resp = session.get(url=url, headers=BaseScraper.headers)
+                soup = BeautifulSoup(resp.text, "lxml")
 
-            return cls(soup, params)
+                return cls(soup, params)
 
         except requests.exceptions.RequestException as e:
             Logger.err(f"Request to Filmarks failed: '{e}'")
