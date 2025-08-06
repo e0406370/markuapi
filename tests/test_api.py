@@ -218,7 +218,6 @@ def test_search_with_results_single(test_data) -> None:
     assert get_json_val(dramas[0], "$.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=1000)
 
     assert get_json_val(dramas[0], "$.poster") is not None
-    assert get_json_val(dramas[0], "$.is_airing") is False
     assert get_json_val(dramas[0], "$.director") is None
 
 

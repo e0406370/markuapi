@@ -48,9 +48,6 @@ class SearchDramaScraper(SearchScraper):
 
         return title_elem.find_next_sibling("span").string if title_elem else None
 
-    def _is_airing(self, result: PageElement) -> bool:
-        return bool(result.find("div", class_="c2-tag-broadcasting-now"))
-
     def _get_country_of_origin(self, result: PageElement) -> str | None:
         title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
 
@@ -114,8 +111,6 @@ class SearchDramaScraper(SearchScraper):
 
             if release_date := self._get_release_date(result):
                 d["release_date"] = release_date  
-
-            d["is_airing"] = self._is_airing(result)
 
             if country_of_origin := self._get_country_of_origin(result):
                 d["country_of_origin"] = country_of_origin
