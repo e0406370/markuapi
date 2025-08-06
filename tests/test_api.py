@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from random import choice
 from requests.exceptions import RequestException
 from src.api import api
 from src.scrape.base_scraper import BaseScraper
@@ -61,7 +62,68 @@ def test_scrape_error_503(mocker) -> None:
     assert resp.json() == {"detail": "The service is currently unavailable."}
 
 
-@pytest.mark.parametrize("query", ["", "?", "?q", "?q="])
+@pytest.mark.parametrize("query", [
+    "?limit",
+    "?limit=", 
+    "?limit=abc123",
+    "?limit=１"
+    "?page",
+    "?page=", 
+    "?page=def456",
+    "?page=２"
+    "?q=あなたの番です&limit=a",
+    "?q=ちはやふる&page=z",
+    "?q=コード・ブルー&limit=1&page=@",
+    "?q=&limit=/&page=1",
+])
+def test_search_input_not_valid_integer(query) -> None:
+    resp = client.get(f"/search/dramas{query}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    assert resp_data["detail"][0]["msg"] == "Input should be a valid integer, unable to parse string as an integer" 
+    
+    
+@pytest.mark.parametrize("query", [
+    "?limit=-1",
+    "?limit=0",
+    "?page=-5", 
+    "?page=0",
+    "?q=test1&limit=-1",
+    "?q=test2&page=-2",
+    "?q=test3&limit=1&page=0",
+])
+def test_search_input_less_than_min_threshold(query) -> None:
+    resp = client.get(f"/search/dramas{query}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    assert resp_data["detail"][0]["msg"] == "Input should be greater than 0" 
+
+
+@pytest.mark.parametrize("query", [
+    "?limit=1001",
+    "?page=1005",
+    "?q=test1&limit=1001",
+    "?q=test2&page=1002",
+    "?q=test3&limit=1001&page=3",
+])
+def test_search_input_more_than_max_threshold(query) -> None:
+    resp = client.get(f"/search/dramas{query}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    assert resp_data["detail"][0]["msg"] == "Input should be less than or equal to 1000"
+
+
+@pytest.mark.parametrize("query", [
+    "",
+    "?",
+    "?q",
+    "?q&page=2",
+    "?q=",
+    "?q=&limit=1",
+])
 def test_search_empty_query(query) -> None:
     resp = client.get(f"/search/dramas{query}")
     resp_data = resp.json()
@@ -71,7 +133,7 @@ def test_search_empty_query(query) -> None:
     assert len(resp_data["results"]["dramas"]) == 0
 
 
-def test_search_without_results() -> None:
+def test_search_without_results_page_1() -> None:
     query = '".*&^'
     resp = client.get(f"/search/dramas?q={query}")
     resp_data = resp.json()
@@ -80,6 +142,15 @@ def test_search_without_results() -> None:
     assert resp_data["query"] == '".*'
     assert len(resp_data["results"]["dramas"]) == 0
 
+
+def test_search_without_results_page_2() -> None:
+    query = "ちはやふる" # page 1 returns results, refer to 'test_search_with_results_multiple'
+    resp = client.get(f"/search/dramas?q={query}&page=2")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert resp_data["query"] == query
+    assert len(resp_data["results"]["dramas"]) == 0
 
 @pytest.mark.parametrize(
     "test_data",
@@ -103,12 +174,13 @@ def test_search_without_results() -> None:
 )
 def test_search_with_results_single(test_data) -> None:
     query = "あなたの番です"
-    resp = client.get(f"/search/dramas?q={query}")
+    resp = client.get(f"/search/dramas?q={query}&limit=5")
     resp_data = resp.json()
     drama = resp_data["results"]["dramas"][0]
 
     assert resp.status_code == 200
     assert resp_data["query"] == query
+    assert len(resp_data["results"]["dramas"]) == 5
     assert drama["title"] == test_data["title"]
     assert float(drama["rating"]) == pytest.approx(test_data["rating"], abs=0.5)
     assert drama["mark_count"] == pytest.approx(test_data["mark_count"], abs=1000)
@@ -152,7 +224,7 @@ def test_search_with_results_single(test_data) -> None:
 )
 def test_search_with_results_multiple(test_data) -> None:
     query = "ちはやふる"
-    resp = client.get(f"/search/dramas?q={query}")
+    resp = client.get(f"/search/dramas?q={query}&page=1")
     resp_data = resp.json()
     drama = next(drama for drama in resp_data["results"]["dramas"] if drama["title"] == test_data["title"])
 
@@ -165,3 +237,15 @@ def test_search_with_results_multiple(test_data) -> None:
     assert drama["release_date"] == test_data["release_date"]
     assert drama["country_of_origin"] == test_data["country_origin"]
     assert drama["playback_time"] == test_data["playback_time"]
+
+
+def test_search_with_results_random() -> None:
+    with open(file="tests/__100_dramas.txt", mode="r", encoding="utf-8") as f:
+        query = choice(f.readlines()).strip()
+
+    resp = client.get(f"/search/dramas?q={query}&limit=1")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert resp_data["query"] == query
+    assert resp_data["results"]["dramas"][0]["title"] == query
