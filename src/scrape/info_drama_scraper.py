@@ -32,7 +32,9 @@ class InfoDramaScraper(BaseScraper):
         return title_elem.text if title_elem else None
 
     def _get_rating(self) -> float:
-        return float(self.soup.select_one("div.c2-rating-l__text").text)
+        rating = self.soup.select_one("div.c2-rating-l__text").text
+
+        return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self) -> DataMark:
         data_elem = self.soup.select_one("div.c-content__counts > div.js-btn-mark")

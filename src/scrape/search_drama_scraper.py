@@ -29,7 +29,9 @@ class SearchDramaScraper(SearchScraper):
         return result.find("h3", class_="p-content-cassette__title").text
 
     def _get_rating(self, result: PageElement) -> float:
-        return float(result.find("div", class_="c-rating__score").text)
+        rating = result.find("div", class_="c-rating__score").text
+
+        return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self, result: PageElement) -> DataMark:
         return MsgSpecJSONResponse.parse(content=result.attrs["data-mark"], type=DataMark)
