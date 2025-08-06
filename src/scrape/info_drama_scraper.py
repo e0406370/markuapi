@@ -120,7 +120,7 @@ class InfoDramaScraper(BaseScraper):
             Filmarks.create_person_info(
                 name=cast.select_one("div.c2-button-tertiary-s-multi-text__text").text,
                 link=cast.select_one("a").attrs["href"],
-                character=cast.select_one("div.c2-button-tertiary-s-multi-text__subtext").text,
+                character=character.text if (character := cast.select_one("div.c2-button-tertiary-s-multi-text__subtext")) else ""
             )
             for cast
             in title_elem.select("h4.p-people-list__item")
