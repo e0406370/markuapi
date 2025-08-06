@@ -1,10 +1,10 @@
 from aiocron import crontab
-from fastapi import FastAPI, HTTPException, Query, Request, status
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 from os import environ
 from src.scrape.search_drama_scraper import SearchDramaScraper
-from src.utility.lib import Logger, MsgSpecJSONResponse
+from src.utility.lib import CustomException, Logger, MsgSpecJSONResponse
 from src.utility.models import Filmarks, SearchParams
 from typing import Annotated, Any, Dict
 
@@ -30,13 +30,12 @@ def index() -> Dict[str, Any]:
 
 
 @api.get("/search/dramas")
-def search(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
     try:
         scraper = SearchDramaScraper.scrape(
             endpoint=Filmarks.SearchEP.DRAMAS.value,
             params=req.query_params
         )
-
         scraper.set_search_results()
 
         return scraper.get_response()
@@ -47,10 +46,7 @@ def search(search_params: Annotated[SearchParams, Query()], req: Request) -> Dic
     except Exception:
         Logger.exception("Failed to search dramas.")
 
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="The server encountered an unexpected error.",
-        )
+        raise CustomException.server_error()
 
 
 @crontab("*/15 * * * *")

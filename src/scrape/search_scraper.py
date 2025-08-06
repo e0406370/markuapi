@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 
 class SearchScraper(BaseScraper):
-    def __init__(self, soup: BeautifulSoup, params: dict) -> None:
+    def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         super().__init__(soup, params)
 
         self.results_limit = self.params.get("limit", 10)

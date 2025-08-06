@@ -4,11 +4,11 @@ from src.scrape.search_scraper import SearchScraper
 from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import DataClip, DataMark, Filmarks
 from urllib.parse import urljoin
-from typing import List
+from typing import Dict, List
 
 
 class SearchDramaScraper(SearchScraper):
-    def __init__(self, soup: BeautifulSoup, params: dict) -> None:
+    def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         super().__init__(soup, params)
 
     def _is_results_empty(self) -> bool:

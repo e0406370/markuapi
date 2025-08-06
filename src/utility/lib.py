@@ -1,7 +1,31 @@
 import logging
 import msgspec
+from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from typing import Any
+
+
+class CustomException:
+    @staticmethod
+    def not_found(detail: str = "The requested resource could not be found.") -> HTTPException:
+        return HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=detail,
+        )
+
+    @staticmethod
+    def server_error(detail: str = "The server encountered an unexpected error.") -> HTTPException:
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=detail,
+        )
+
+    @staticmethod
+    def service_unavailable(detail: str = "The service is currently unavailable.") -> HTTPException:
+        return HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=detail,
+        )
 
 
 class Logger:
