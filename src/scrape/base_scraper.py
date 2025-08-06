@@ -36,3 +36,11 @@ class BaseScraper:
             Logger.err(f"Request to Filmarks failed: '{e}'")
 
             raise CustomException.service_unavailable()
+
+    def _raise_if_page_not_found(self) -> None:
+        status = self.soup.select_one("p.main__status-ja")
+
+        if status and status.text.strip() == "お探しのページは見つかりません。":
+            Logger.err(f"Invalid Filmarks page requested")
+
+            raise CustomException.not_found()

@@ -127,6 +127,8 @@ class InfoDramaScraper(BaseScraper):
         ] if title_elem else None
 
     def set_info_data(self) -> None:
+        self._raise_if_page_not_found()
+
         self.data["title"] = self._get_title()
 
         if original_title := self._get_original_title():
