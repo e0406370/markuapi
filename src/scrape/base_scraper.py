@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
 from src.utility.lib import CustomException, Logger
 from src.utility.models import Filmarks
-from urllib.parse import urlencode, urljoin
 from typing import Dict, Type, TypeVar
+from urllib.parse import urlencode
 import requests
 
 T = TypeVar("T", bound="BaseScraper")
@@ -16,10 +16,10 @@ class BaseScraper:
     @classmethod
     def scrape(cls: Type[T], endpoint: str, params: Dict) -> T | None:
         if endpoint in Filmarks.SEARCH_ENDPOINTS:
-            url = urljoin(base=Filmarks.FILMARKS_BASE, url=endpoint + "?" + urlencode(params))
+            url = Filmarks.create_filmarks_link(endpoint + "?" + urlencode(params))
 
         elif endpoint in Filmarks.INFO_ENDPOINTS:
-            url = urljoin(base=Filmarks.FILMARKS_BASE, url=endpoint.format(**params))
+            url = Filmarks.create_filmarks_link(endpoint.format(**params))
 
         else:
             Logger.err(f"Invalid endpoint requested: '{endpoint}'")
