@@ -1,10 +1,11 @@
 from fastapi.testclient import TestClient
 from jsonpath_ng import parse
-from random import choice
+from random import randint
 from requests.exceptions import RequestException
 from src.api import api
 from src.scrape.base_scraper import BaseScraper
 from typing import Any, Optional
+import json
 import pytest
 
 
@@ -267,8 +268,9 @@ def test_search_with_results_multiple(test_data) -> None:
 
 
 def test_search_with_results_random() -> None:
-    with open(file="tests/__100_dramas.txt", mode="r", encoding="utf-8") as f:
-        query = choice(f.readlines()).strip()
+    with open(file="tests/__100_dramas.json", mode="r", encoding="utf-8") as f:
+        test_data = json.load(f)
+        query = get_json_val(test_data, f"$[{randint(0, 99)}].title")
 
     resp = client.get(f"/search/dramas?q={query}&limit=1")
     resp_data = resp.json()
