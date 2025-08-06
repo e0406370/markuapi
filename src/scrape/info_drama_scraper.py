@@ -10,8 +10,8 @@ class InfoDramaScraper(BaseScraper):
     def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         super().__init__(soup, params)
 
-        self.series_id = self.params.get("drama_series_id")
-        self.season_id = self.params.get("drama_season_id")
+        self.series_id = int(self.params.get("drama_series_id"))
+        self.season_id = int(self.params.get("drama_season_id"))
 
         self.data = {}
 
@@ -31,8 +31,8 @@ class InfoDramaScraper(BaseScraper):
 
         return title_elem.text if title_elem else None
 
-    def _get_rating(self) -> str:
-        return self.soup.select_one("div.c2-rating-l__text").text
+    def _get_rating(self) -> float:
+        return float(self.soup.select_one("div.c2-rating-l__text").text)
 
     def _get_data_mark(self) -> DataMark:
         data_elem = self.soup.select_one("div.c-content__counts > div.js-btn-mark")
@@ -77,7 +77,7 @@ class InfoDramaScraper(BaseScraper):
         
         return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
-    def _get_creator(self) -> List[str] | None:
+    def _get_creator(self) -> List[Dict[str, Any]] | None:
         title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="原作")
 
         return [
@@ -86,7 +86,7 @@ class InfoDramaScraper(BaseScraper):
             in title_elem.find_next_sibling("ul").find_all("li")
         ] if title_elem else None
     
-    def _get_scriptwriter(self) -> List[str] | None:
+    def _get_scriptwriter(self) -> List[Dict[str, Any]] | None:
         title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="脚本")
 
         return [
@@ -95,7 +95,7 @@ class InfoDramaScraper(BaseScraper):
             in title_elem.find_next_sibling("ul").find_all("li")
         ] if title_elem else None
 
-    def _get_director(self) -> List[str] | None:
+    def _get_director(self) -> List[Dict[str, Any]] | None:
         title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="監督")
 
         return [
@@ -104,7 +104,7 @@ class InfoDramaScraper(BaseScraper):
             in title_elem.find_next_sibling("ul").find_all("li")
         ] if title_elem else None
 
-    def _get_artist(self) -> List[str] | None:
+    def _get_artist(self) -> List[Dict[str, Any]] | None:
         title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="主題歌／挿入歌")
 
         return [
@@ -113,7 +113,7 @@ class InfoDramaScraper(BaseScraper):
             in title_elem.find_next_sibling("ul").find_all("li")
         ] if title_elem else None
 
-    def _get_cast(self) -> List[str] | None:
+    def _get_cast(self) -> List[Dict[str, Any]] | None:
         title_elem = self.soup.select_one("div.p-people-list__casts")
 
         return [

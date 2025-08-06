@@ -41,6 +41,6 @@ class BaseScraper:
         status = self.soup.select_one("p.main__status-ja")
 
         if status and status.text.strip() == "お探しのページは見つかりません。":
-            Logger.err(f"Invalid Filmarks page requested")
+            Logger.err("Invalid Filmarks page requested")
 
             raise CustomException.not_found()

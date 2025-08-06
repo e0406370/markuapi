@@ -140,7 +140,7 @@ def test_search_with_results_single(test_data) -> None:
     for field in fields:
         assert get_json_val(dramas[0], f"$.{field}") == get_json_val(test_data, f"$.{field}")
 
-    assert float(get_json_val(dramas[0], "$.rating")) == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(dramas[0], "$.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(dramas[0], "$.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=1000)
     assert get_json_val(dramas[0], "$.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=1000)
 

@@ -45,7 +45,7 @@ class Filmarks:
         if character: person_info["character"] = character
 
         link = Filmarks.create_filmarks_link(link)
-        person_info["people_id"] = link.split("people/")[1]
+        person_info["people_id"] = int(link.split("people/")[1])
         person_info["link"] = link
 
         return person_info
