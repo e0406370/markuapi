@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 from os import environ
+from src.scrape.info_drama_scraper import InfoDramaScraper
 from src.scrape.search_drama_scraper import SearchDramaScraper
 from src.utility.lib import CustomException, Logger, MsgSpecJSONResponse
 from src.utility.models import Filmarks, SearchParams
@@ -45,6 +46,26 @@ def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request)
 
     except Exception:
         Logger.exception("Failed to search dramas.")
+
+        raise CustomException.server_error()
+
+
+@api.get("/dramas/{drama_series_id}/{drama_season_id}")
+def info_dramas(drama_series_id: int, drama_season_id: int, req: Request) -> Dict[str, Any]:
+    try:
+        scraper = InfoDramaScraper.scrape(
+            endpoint=Filmarks.InfoEP.DRAMAS.value,
+            params=req.path_params
+        )
+        scraper.set_info_data()
+
+        return scraper.get_response()
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        Logger.exception("Failed to retrieve drama information.")
 
         raise CustomException.server_error()
 

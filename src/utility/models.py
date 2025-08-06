@@ -1,6 +1,8 @@
 from enum import Enum
 from msgspec import Struct
 from pydantic import BaseModel, Field
+from typing import Dict
+from urllib.parse import urljoin
 
 
 class DataClip(Struct):
@@ -30,6 +32,23 @@ class Filmarks:
 
     SEARCH_ENDPOINTS = {e.value for e in SearchEP}
     INFO_ENDPOINTS = {e.value for e in InfoEP}
+
+    @staticmethod
+    def create_filmarks_link(url: str) -> str:
+        return urljoin(base=Filmarks.FILMARKS_BASE, url=url)
+
+    @staticmethod
+    def create_person_info(name: str, link: str, character: str = "") -> Dict[str, str]:
+        person_info = {}
+
+        person_info["name"] = name
+        if character: person_info["character"] = character
+
+        link = Filmarks.create_filmarks_link(link)
+        person_info["people_id"] = int(link.split("people/")[1])
+        person_info["link"] = link
+
+        return person_info
 
 
 class SearchParams(BaseModel):

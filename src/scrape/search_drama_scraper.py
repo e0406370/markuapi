@@ -3,7 +3,6 @@ from bs4.element import PageElement, ResultSet
 from src.scrape.search_scraper import SearchScraper
 from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import DataClip, DataMark, Filmarks
-from urllib.parse import urljoin
 from typing import Dict, List
 
 
@@ -27,10 +26,12 @@ class SearchDramaScraper(SearchScraper):
         return container
 
     def _get_title(self, result: PageElement) -> str:
-        return result.find("h3", class_="p-content-cassette__title").string
+        return result.find("h3", class_="p-content-cassette__title").text
 
-    def _get_rating(self, result: PageElement) -> str:
-        return result.find("div", class_="c-rating__score").string
+    def _get_rating(self, result: PageElement) -> float:
+        rating = result.find("div", class_="c-rating__score").text
+
+        return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self, result: PageElement) -> DataMark:
         return MsgSpecJSONResponse.parse(content=result.attrs["data-mark"], type=DataMark)
@@ -46,40 +47,37 @@ class SearchDramaScraper(SearchScraper):
     def _get_release_date(self, result: PageElement) -> str | None:
         title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
 
-        return title_elem.find_next_sibling("span").string if title_elem else None
-
-    def _is_airing(self, result: PageElement) -> bool:
-        return bool(result.find("div", class_="c2-tag-broadcasting-now"))
+        return title_elem.find_next_sibling("span").text if title_elem else None
 
     def _get_country_of_origin(self, result: PageElement) -> str | None:
         title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
 
-        return title_elem.find_next("a").string if title_elem else None
+        return title_elem.find_next("a").text if title_elem else None
 
     def _get_playback_time(self, result: PageElement) -> str | None:
         title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="再生時間：")
 
-        return title_elem.find_next_sibling("span").string if title_elem else None
+        return title_elem.find_next_sibling("span").text if title_elem else None
 
     def _get_genre(self, result: PageElement) -> List[str] | None:
         title_elem = result.find("h4", class_="p-content-cassette__genre-title")
         
-        return [genre.string for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def _get_director(self, result: PageElement) -> List[str] | None:
         title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="監督")
 
-        return [director.string for director in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [director.text for director in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def _get_scriptwriter(self, result: PageElement) -> List[str] | None:
         title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="脚本")
 
-        return [scriptwriter.string for scriptwriter in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [scriptwriter.text for scriptwriter in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def _get_cast(self, result) -> List[str] | None:
         title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="出演者")
 
-        return [cast.string for cast in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [cast.text for cast in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def set_search_results(self) -> None:
         dramas = []
@@ -104,7 +102,7 @@ class SearchDramaScraper(SearchScraper):
             d["series_id"] = data_clip.drama_series_id
             d["season_id"] = data_clip.drama_season_id
 
-            d["link"] = urljoin(base=Filmarks.FILMARKS_BASE, url=Filmarks.InfoEP.DRAMAS.value.format(
+            d["link"] = Filmarks.create_filmarks_link(Filmarks.InfoEP.DRAMAS.value.format(
                 drama_series_id=data_clip.drama_series_id, 
                 drama_season_id=data_clip.drama_season_id,
             ))
@@ -114,8 +112,6 @@ class SearchDramaScraper(SearchScraper):
 
             if release_date := self._get_release_date(result):
                 d["release_date"] = release_date  
-
-            d["is_airing"] = self._is_airing(result)
 
             if country_of_origin := self._get_country_of_origin(result):
                 d["country_of_origin"] = country_of_origin
