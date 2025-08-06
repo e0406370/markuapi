@@ -1,5 +1,6 @@
 from enum import Enum
 from msgspec import Struct
+from pydantic import BaseModel, Field
 
 
 class DataClip(Struct):
@@ -29,3 +30,9 @@ class Filmarks:
 
     SEARCH_ENDPOINTS = {e.value for e in SearchEP}
     INFO_ENDPOINTS = {e.value for e in InfoEP}
+
+
+class SearchParams(BaseModel):
+    limit: int = Field(10, gt=0, le=1000)
+    page: int = Field(1, gt=0, le=1000)
+    query: str = ""
