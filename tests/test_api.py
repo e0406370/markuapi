@@ -1,6 +1,7 @@
 from requests.exceptions import RequestException
 from src.scrape.base_scraper import BaseScraper
 from tests.test_utils import client, get_json_val
+import pytest
 
 
 def test_index() -> None:
@@ -11,8 +12,14 @@ def test_index() -> None:
     assert get_json_val(resp_data, "$.detail") == "A basic web scraper API for Filmarks Dramas."
 
 
-def test_invalid_endpoint_base() -> None:
-    resp = client.get("/unknown")
+@pytest.mark.parametrize("path", [
+    "/unknown",
+    "/dramas",
+    "/dramas/1",
+    "/dramas//1"
+])
+def test_invalid_endpoint_base(path) -> None:
+    resp = client.get(path)
     resp_data = resp.json()
 
     assert resp.status_code == 404

@@ -1,4 +1,4 @@
-from random import randint
+from random import choice
 from tests.test_utils import client, get_json_val
 import json
 import pytest
@@ -196,7 +196,9 @@ def test_search_with_results_multiple(test_data) -> None:
 def test_search_with_results_random() -> None:
     with open(file="tests/__100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
-        query = get_json_val(test_data, f"$[{randint(0, 99)}].title")
+        drama = choice(test_data)
+
+        query = get_json_val(drama, "$.title")
 
     resp = client.get(f"/search/dramas?q={query}&limit=1")
     resp_data = resp.json()
