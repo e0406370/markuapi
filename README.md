@@ -1,14 +1,28 @@
 ### Purpose
 
-A basic web scraper API for [Filmarks Dramas](https://filmarks.com/dramas).
+A basic web scraper API for [Filmarks Dramas (フィルマークス・ドラマ)](https://filmarks.com/dramas).
 
 Note:
-This API is currently under development. 
-Only one endpoint has been implemented thus far.
+This API is currently under development.
+Only two endpoints have been implemented thus far.
 
 ---
 
-### API
+### API Base URL
+
+```sh
+https://markuapi.onrender.com/
+```
+
+---
+
+### API Endpoints
+
+- Retrieve drama information
+
+```sh
+GET /dramas/{series_id}/{season_id}
+```
 
 - Search for dramas
 
@@ -17,7 +31,9 @@ GET /search/dramas?q={query}
 ```
 
 Optional parameters:
+
 - `limit`
+
   - Default: `10`
   - Range: `1` to `1000`
   - Limits the number of results returned.
