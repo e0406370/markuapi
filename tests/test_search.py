@@ -192,17 +192,30 @@ def test_search_with_results_multiple(test_data) -> None:
     for field in fields:
         assert get_json_val(drama, f"$.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(drama, "$.rating") is not None
+    assert get_json_val(drama, "$.mark_count") is not None
+    assert get_json_val(drama, "$.clip_count") is not None
+    assert get_json_val(drama, "$.series_id") is not None
+    assert get_json_val(drama, "$.season_id") is not None
+    assert get_json_val(drama, "$.link") is not None
+
 
 def test_search_with_results_random() -> None:
     with open(file="tests/__100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
 
-        query = get_json_val(drama, "$.title")
-
+    query = get_json_val(drama, "$.title")
     resp = client.get(f"/search/dramas?q={query}&limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.results.dramas[0].title") == query
+
+    assert get_json_val(resp_data, "$.results.dramas[0].rating") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].mark_count") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].clip_count") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].series_id") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].season_id") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].link") is not None
