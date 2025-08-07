@@ -40,44 +40,49 @@ class SearchDramaScraper(SearchScraper):
         return MsgSpecJSONResponse.parse(content=result.attrs["data-clip"], type=DataClip)
 
     def _get_poster(self, result: PageElement) -> str | None:
-        poster_elem = result.find("div", class_="c2-poster-m").find("img")
+        poster = result.find("div", class_="c2-poster-m").find("img")
 
-        return poster_elem.attrs["src"] if poster_elem else None
+        return poster.attrs["src"] if poster else None
+    
+    def _get_other_info(self, result: PageElement, type: str) -> str | None:
+        match type:
+            case "release_date":
+                title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
 
-    def _get_release_date(self, result: PageElement) -> str | None:
-        title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
+            case "country_of_origin":
+                title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
 
-        return title_elem.find_next_sibling("span").text if title_elem else None
+            case "playback_time":
+                title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="再生時間：")
 
-    def _get_country_of_origin(self, result: PageElement) -> str | None:
-        title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="製作国：")
+            case _:
+                raise ValueError("type can only be 'release_date', 'country_of_origin', or 'playback_time'!")
 
-        return title_elem.find_next("a").text if title_elem else None
+        match type:
+            case "release_date" | "playback_time":
+                return title_elem.find_next_sibling("span").text if title_elem else None
 
-    def _get_playback_time(self, result: PageElement) -> str | None:
-        title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="再生時間：")
+            case "country_of_origin":
+                return title_elem.find_next("a").text if title_elem else None
 
-        return title_elem.find_next_sibling("span").text if title_elem else None
+    def _get_named_list(self, result: PageElement, type: str) -> List[str] | None:
+        match type:
+            case "genre":
+                title_elem = result.find("h4", class_="p-content-cassette__genre-title")
 
-    def _get_genre(self, result: PageElement) -> List[str] | None:
-        title_elem = result.find("h4", class_="p-content-cassette__genre-title")
-        
-        return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+            case "director":
+                title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="監督")
 
-    def _get_director(self, result: PageElement) -> List[str] | None:
-        title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="監督")
+            case "scriptwriter":
+                title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="脚本")
 
-        return [director.text for director in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+            case "cast":
+                title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="出演者")
 
-    def _get_scriptwriter(self, result: PageElement) -> List[str] | None:
-        title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="脚本")
+            case _:
+                raise ValueError("type can only be 'genre', 'director', 'scriptwriter', or 'cast'!")
 
-        return [scriptwriter.text for scriptwriter in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
-
-    def _get_cast(self, result) -> List[str] | None:
-        title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string="出演者")
-
-        return [cast.text for cast in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def set_search_results(self) -> None:
         dramas = []
@@ -110,25 +115,25 @@ class SearchDramaScraper(SearchScraper):
             if poster := self._get_poster(result):
                 d["poster"] = poster
 
-            if release_date := self._get_release_date(result):
+            if release_date := self._get_other_info(result, "release_date"):
                 d["release_date"] = release_date  
 
-            if country_of_origin := self._get_country_of_origin(result):
+            if country_of_origin := self._get_other_info(result, "country_of_origin"):
                 d["country_of_origin"] = country_of_origin
 
-            if playback_time := self._get_playback_time(result):
+            if playback_time := self._get_other_info(result, "playback_time"):
                 d["playback_time"] = playback_time
 
-            if genre := self._get_genre(result):
+            if genre := self._get_named_list(result, "genre"):
                 d["genre"] = genre
 
-            if director := self._get_director(result):
+            if director := self._get_named_list(result, "director"):
                 d["director"] = director
 
-            if scriptwriter := self._get_scriptwriter(result):
+            if scriptwriter := self._get_named_list(result, "scriptwriter"):
                 d["scriptwriter"] = scriptwriter
 
-            if cast := self._get_cast(result):
+            if cast := self._get_named_list(result, "cast"):
                 d["cast"] = cast
 
             Logger.info(f"[{ctr + 1} | Query: {self.search_query} | Page: {self.page_number}] {str(d)}")
