@@ -32,6 +32,8 @@ def test_info_input_not_valid_integer(path) -> None:
             "series_id": 11358,
             "season_id": 15763,
             "link": "https://filmarks.com/dramas/11358/15763",
+            "production_year_series": "https://filmarks.com/list-drama/year/2000s/2007",
+            "production_year": "2007年",
             "country_of_origin": "韓国",
             "cast": [
                 {
@@ -104,6 +106,8 @@ def test_info_with_results_single(test_data) -> None:
       "title",
       "original_title",
       "link",
+      "production_year_series",
+      "production_year",
       "country_of_origin",
       "cast"
     ]

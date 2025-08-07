@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from src.scrape.base_scraper import BaseScraper
 from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import DataClip, DataMark, Filmarks
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Tuple
 
 
 class InfoDramaScraper(BaseScraper):
@@ -54,6 +54,11 @@ class InfoDramaScraper(BaseScraper):
 
         return poster_elem.attrs["src"] if poster_elem else None
     
+    def _get_production_year(self) -> Tuple[str]:
+        title_elem = self.soup.select_one("h2.p-content-detail__title a")
+
+        return Filmarks.create_filmarks_link(title_elem.attrs["href"]), title_elem.text
+
     def _get_other_info(self, type: str) -> str | None: 
         match type:
             case "release_date":
@@ -83,8 +88,8 @@ class InfoDramaScraper(BaseScraper):
         return title_elem.select_one("content-detail-synopsis").get(":outline").strip('"') if title_elem else None
 
     def _get_genre(self) -> List[str] | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__genre-title")
-        
+        title_elem = self.soup.select_one("h3.p-content-detail__genre-title")
+
         return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def _get_people_list(self, type: str) -> List[Dict[str, Any]] | None:
@@ -146,6 +151,8 @@ class InfoDramaScraper(BaseScraper):
 
         if poster := self._get_poster():
             self.data["poster"] = poster
+
+        self.data["production_year_series"], self.data["production_year"] = self._get_production_year()
 
         if release_date := self._get_other_info("release_date"):
             self.data["release_date"] = release_date  
