@@ -1,12 +1,11 @@
 from aiocron import crontab
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 from os import environ
-from src.scrape.info_drama_scraper import InfoDramaScraper
-from src.scrape.search_drama_scraper import SearchDramaScraper
-from src.utility.lib import CustomException, Logger, MsgSpecJSONResponse
+from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import Filmarks, SearchParams
+from src.scrape.scrape_service import search_scrape_drama, info_scrape_drama
 from typing import Annotated, Any, Dict
 
 
@@ -25,6 +24,7 @@ api.add_middleware(
 
 @api.get("/")
 def index() -> Dict[str, Any]:
+
     return {
         "detail": "A basic web scraper API for Filmarks Dramas.",
     }
@@ -32,46 +32,37 @@ def index() -> Dict[str, Any]:
 
 @api.get("/search/dramas")
 def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
-    try:
-        scraper = SearchDramaScraper.scrape(
-            endpoint=Filmarks.SearchEP.DRAMAS.value,
-            params=req.query_params
-        )
-        scraper.set_search_results()
 
-        return scraper.get_response()
-
-    except HTTPException:
-        raise
-
-    except Exception:
-        Logger.exception("Failed to search dramas.")
-
-        raise CustomException.server_error()
+    return search_scrape_drama(
+        endpoint=Filmarks.SearchEP.DRAMAS.value,
+        params=req.query_params,
+        message="Failed to search dramas.",
+    )
 
 
 @api.get("/dramas/{drama_series_id}/{drama_season_id}")
 def info_dramas(drama_series_id: int, drama_season_id: int, req: Request) -> Dict[str, Any]:
-    try:
-        scraper = InfoDramaScraper.scrape(
-            endpoint=Filmarks.InfoEP.DRAMAS.value,
-            params=req.path_params
-        )
-        scraper.set_info_data()
 
-        return scraper.get_response()
+    return info_scrape_drama(
+        endpoint=Filmarks.InfoEP.DRAMAS.value,
+        params=req.path_params,
+        message="Failed to retrieve drama information.",
+    )
 
-    except HTTPException:
-        raise
 
-    except Exception:
-        Logger.exception("Failed to retrieve drama information.")
+@api.get("/list-drama/trend")
+def list_dramas_trending(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
 
-        raise CustomException.server_error()
+    return search_scrape_drama(
+        endpoint=Filmarks.SearchEP.DRAMAS_TRENDING.value,
+        params=req.query_params,
+        message="Failed to list trending dramas.",
+    )
 
 
 @crontab("*/15 * * * *")
 async def heartbeat() -> None:
+
     try:
         async with AsyncClient() as client:
             await client.get(environ.get("BASE", "http://127.0.0.1:8000"))

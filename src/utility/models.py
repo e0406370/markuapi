@@ -22,11 +22,14 @@ class Filmarks:
 
     class SearchEP(Enum):
         DRAMAS = "search/dramas"
+        DRAMAS_TRENDING = "list-drama/trend"
+
         CAST = "search/people"
         USERS = "search/users"
 
     class InfoEP(Enum):
         DRAMAS = "dramas/{drama_series_id}/{drama_season_id}"
+
         CAST = "people/{person_id}"
         USERS = "users/{user_id}"
 
@@ -54,4 +57,3 @@ class Filmarks:
 class SearchParams(BaseModel):
     limit: int = Field(10, gt=0, le=1000)
     page: int = Field(1, gt=0, le=1000)
-    query: str = ""
