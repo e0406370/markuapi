@@ -53,21 +53,29 @@ class InfoDramaScraper(BaseScraper):
         poster_elem = self.soup.select_one("div.c2-poster-l > img")
 
         return poster_elem.attrs["src"] if poster_elem else None
+    
+    def _get_other_info(self, type: str) -> str | None: 
+        match type:
+            case "release_date":
+                string_filter = "公開日："
 
-    def _get_release_date(self) -> str | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith("公開日："))
+            case "country_of_origin":
+                string_filter = "製作国："
 
-        return title_elem.text.split("公開日：")[1] if title_elem else None
+            case "playback_time":
+                string_filter = "再生時間："
 
-    def _get_country_of_origin(self) -> str | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith("製作国："))
+            case _:
+                raise ValueError("type can only be 'release_date', 'country_of_origin', or 'playback_time'!")
 
-        return title_elem.find_next("a").text if title_elem else None
+        title_elem = self.soup.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith(string_filter))
 
-    def _get_playback_time(self) -> str | None:
-        title_elem =  self.soup.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith("再生時間："))
+        match type:
+            case "release_date" | "playback_time":
+                return title_elem.text.split(string_filter)[1] if title_elem else None
 
-        return title_elem.text.split("再生時間：")[1] if title_elem else None
+            case "country_of_origin":
+                return title_elem.find_next("a").text if title_elem else None
 
     def _get_synopsis(self) -> str | None:
         title_elem = self.soup.select_one("#js-content-detail-synopsis")
@@ -79,39 +87,29 @@ class InfoDramaScraper(BaseScraper):
         
         return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
-    def _get_creator(self) -> List[Dict[str, Any]] | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="原作")
+    def _get_people_list(self, type: str) -> List[Dict[str, Any]] | None:
+        match type:
+            case "creator":
+                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="原作")
+
+            case "director":
+                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="監督")
+
+            case "scriptwriter":
+                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="脚本")
+
+            case "artist":
+                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="主題歌／挿入歌")
+
+            case _:
+                raise ValueError("type can only be 'creator', 'director', 'scriptwriter', or 'artist'!")
 
         return [
-            Filmarks.create_person_info(name=creator.find("div").text, link=creator.find("a").attrs["href"])
-            for creator
-            in title_elem.find_next_sibling("ul").find_all("li")
-        ] if title_elem else None
-    
-    def _get_scriptwriter(self) -> List[Dict[str, Any]] | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="脚本")
-
-        return [
-            Filmarks.create_person_info(name=scriptwriter.find("div").text, link=scriptwriter.find("a").attrs["href"])
-            for scriptwriter 
-            in title_elem.find_next_sibling("ul").find_all("li")
-        ] if title_elem else None
-
-    def _get_director(self) -> List[Dict[str, Any]] | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="監督")
-
-        return [
-            Filmarks.create_person_info(name=director.find("div").text, link=director.find("a").attrs["href"])
-            for director
-            in title_elem.find_next_sibling("ul").find_all("li")
-        ] if title_elem else None
-
-    def _get_artist(self) -> List[Dict[str, Any]] | None:
-        title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="主題歌／挿入歌")
-
-        return [
-            Filmarks.create_person_info(name=artist.find("div").text, link=artist.find("a").attrs["href"])
-            for artist
+            Filmarks.create_person_info(
+                name=person.find("div").text, 
+                link=person.find("a").attrs["href"]
+            )
+            for person
             in title_elem.find_next_sibling("ul").find_all("li")
         ] if title_elem else None
 
@@ -149,13 +147,13 @@ class InfoDramaScraper(BaseScraper):
         if poster := self._get_poster():
             self.data["poster"] = poster
 
-        if release_date := self._get_release_date():
+        if release_date := self._get_other_info("release_date"):
             self.data["release_date"] = release_date  
 
-        if country_of_origin := self._get_country_of_origin():
+        if country_of_origin := self._get_other_info("country_of_origin"):
             self.data["country_of_origin"] = country_of_origin
 
-        if playback_time := self._get_playback_time():
+        if playback_time := self._get_other_info("playback_time"):
             self.data["playback_time"] = playback_time
             
         if synopsis := self._get_synopsis():
@@ -164,16 +162,16 @@ class InfoDramaScraper(BaseScraper):
         if genre := self._get_genre():
             self.data["genre"] = genre
 
-        if creator := self._get_creator():
+        if creator := self._get_people_list("creator"):
             self.data["creator"] = creator
 
-        if director := self._get_director():
+        if director := self._get_people_list("director"):
             self.data["director"] = director
 
-        if scriptwriter := self._get_scriptwriter():
+        if scriptwriter := self._get_people_list("scriptwriter"):
             self.data["scriptwriter"] = scriptwriter
 
-        if artist := self._get_artist():
+        if artist := self._get_people_list("artist"):
             self.data["artist"] = artist
 
         if cast := self._get_cast():
