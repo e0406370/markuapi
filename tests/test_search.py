@@ -8,11 +8,11 @@ import pytest
     "?limit",
     "?limit=", 
     "?limit=abc123",
-    "?limit=１"
+    "?limit=１",
     "?page",
     "?page=", 
     "?page=def456",
-    "?page=２"
+    "?page=２",
     "?q=あなたの番です&limit=a",
     "?q=ちはやふる&page=z",
     "?q=コード・ブルー&limit=1&page=@",

@@ -9,7 +9,7 @@ import pytest
     "6055/t",
     "hi/8586",
     "８０４２/11683",
-    "8042/１１６８３"
+    "8042/１１６８３",
 ])
 def test_info_input_not_valid_integer(path) -> None:
     resp = client.get(f"/dramas/{path}")

@@ -14,9 +14,11 @@ def test_index() -> None:
 
 @pytest.mark.parametrize("path", [
     "/unknown",
+    "/search",
     "/dramas",
     "/dramas/1",
-    "/dramas//1"
+    "/dramas//1",
+    "/list-drama",
 ])
 def test_invalid_endpoint_base(path) -> None:
     resp = client.get(path)
