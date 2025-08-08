@@ -85,8 +85,10 @@ class SearchDramaScraper(SearchScraper):
         return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def set_search_results(self) -> None:
+        self._raise_if_page_not_found()    
+
         dramas = []
-        
+
         if self._is_results_empty():
             self.search_results["dramas"] = dramas
             return
@@ -107,7 +109,7 @@ class SearchDramaScraper(SearchScraper):
             d["series_id"] = data_clip.drama_series_id
             d["season_id"] = data_clip.drama_season_id
 
-            d["link"] = Filmarks.create_filmarks_link(Filmarks.InfoEP.DRAMAS.value.format(
+            d["link"] = Filmarks.create_filmarks_link(Filmarks.Endpoints.INFO_DRAMAS.value["path"].format(
                 drama_series_id=data_clip.drama_series_id, 
                 drama_season_id=data_clip.drama_season_id,
             ))

@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from fastapi import Request
 from src.utility.lib import CustomException, Logger
 from src.utility.models import Filmarks
 from typing import Dict, Type, TypeVar
@@ -19,17 +20,26 @@ class BaseScraper:
         self.params = params
 
     @classmethod
-    def scrape(cls: Type[T], endpoint: str, params: Dict) -> T | None:
-        if endpoint in Filmarks.SEARCH_ENDPOINTS:
-            url = Filmarks.create_filmarks_link(endpoint + "?" + urlencode(params))
-
-        elif endpoint in Filmarks.INFO_ENDPOINTS:
-            url = Filmarks.create_filmarks_link(endpoint.format(**params))
-
-        else:
+    def scrape(cls: Type[T], endpoint: Dict[str, str], req: Request) -> T | None:
+        if endpoint not in Filmarks.Endpoints:
             Logger.err(f"Invalid endpoint requested: '{endpoint}'")
 
             raise CustomException.not_found()
+
+        if endpoint["type"] == "query":
+            params = req.query_params
+            url = Filmarks.create_filmarks_link(endpoint["path"] + "?" + urlencode(params))
+
+        elif endpoint["type"] == "path":
+            params = req.path_params
+            url = Filmarks.create_filmarks_link(endpoint["path"].format(**params))
+
+        elif endpoint["type"] == "path+query":
+            params = {**req.query_params, **req.path_params}
+            url = Filmarks.create_filmarks_link(endpoint["path"].format(**req.path_params) + "?" + urlencode(req.query_params))
+
+        else:
+            raise ValueError("type can only be 'path', 'query', or 'path+query'!")
 
         try:
             with requests.Session() as session:

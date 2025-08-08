@@ -34,8 +34,8 @@ def index() -> Dict[str, Any]:
 def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
 
     return search_scrape_drama(
-        endpoint=Filmarks.SearchEP.DRAMAS.value,
-        params=req.query_params,
+        endpoint=Filmarks.Endpoints.SEARCH_DRAMAS.value,
+        req=req,
         message="Failed to search dramas.",
     )
 
@@ -44,9 +44,9 @@ def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request)
 def info_dramas(drama_series_id: int, drama_season_id: int, req: Request) -> Dict[str, Any]:
 
     return info_scrape_drama(
-        endpoint=Filmarks.InfoEP.DRAMAS.value,
-        params=req.path_params,
-        message="Failed to retrieve drama information.",
+        endpoint=Filmarks.Endpoints.INFO_DRAMAS.value,
+        req=req,
+        message=f"Failed to retrieve drama information with series ID: {drama_series_id} and season ID: {drama_season_id}.",
     )
 
 
@@ -54,9 +54,19 @@ def info_dramas(drama_series_id: int, drama_season_id: int, req: Request) -> Dic
 def list_dramas_trending(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
 
     return search_scrape_drama(
-        endpoint=Filmarks.SearchEP.DRAMAS_TRENDING.value,
-        params=req.query_params,
+        endpoint=Filmarks.Endpoints.LIST_DRAMAS_TRENDING.value,
+        req=req,
         message="Failed to list trending dramas.",
+    )
+
+
+@api.get("/list-drama/country/{country_id}")
+def list_dramas_country(country_id: int, search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+
+    return search_scrape_drama(
+        endpoint=Filmarks.Endpoints.LIST_DRAMAS_COUNTRY.value,
+        req=req,
+        message=f"Failed to list dramas from country with ID: {country_id}.",
     )
 
 
