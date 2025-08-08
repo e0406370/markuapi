@@ -1,0 +1,367 @@
+[
+  {
+    "jp": "日本",
+    "en": "Japan",
+    "id": 144
+  },
+  {
+    "jp": "アメリカ",
+    "en": "United States",
+    "id": 5
+  },
+  {
+    "jp": "フランス",
+    "en": "France",
+    "id": 98
+  },
+  {
+    "jp": "韓国",
+    "en": "South Korea",
+    "id": 147
+  },
+  {
+    "jp": "イギリス",
+    "en": "United Kingdom",
+    "id": 11
+  },
+  {
+    "jp": "インド",
+    "en": "India",
+    "id": 16
+  },
+  {
+    "jp": "イタリア",
+    "en": "Italy",
+    "id": 13
+  },
+  {
+    "jp": "ドイツ",
+    "en": "Germany",
+    "id": 79
+  },
+  {
+    "jp": "スウェーデン",
+    "en": "Sweden",
+    "id": 57
+  },
+  {
+    "jp": "スペイン",
+    "en": "Spain",
+    "id": 58
+  },
+  {
+    "jp": "中国",
+    "en": "China",
+    "id": 140
+  },
+  {
+    "jp": "アイルランド",
+    "en": "Ireland",
+    "id": 2
+  },
+  {
+    "jp": "香港",
+    "en": "Hong Kong",
+    "id": 148
+  },
+  {
+    "jp": "フィンランド",
+    "en": "Finland",
+    "id": 97
+  },
+  {
+    "jp": "台湾",
+    "en": "Taiwan",
+    "id": 143
+  },
+  {
+    "jp": "アイスランド",
+    "en": "Iceland",
+    "id": 1
+  },
+  {
+    "jp": "オーストラリア",
+    "en": "Australia",
+    "id": 27
+  },
+  {
+    "jp": "カナダ",
+    "en": "Canada",
+    "id": 31
+  },
+  {
+    "jp": "西ドイツ",
+    "en": "West Germany",
+    "id": 146
+  },
+  {
+    "jp": "チェコ",
+    "en": "Czech Republic",
+    "id": 72
+  },
+  {
+    "jp": "ノルウェー",
+    "en": "Norway",
+    "id": 86
+  },
+  {
+    "jp": "デンマーク",
+    "en": "Denmark",
+    "id": 77
+  },
+  {
+    "jp": "ポーランド",
+    "en": "Poland",
+    "id": 115
+  },
+  {
+    "jp": "アラブ首長国連邦",
+    "en": "United Arab Emirates",
+    "id": 6
+  },
+  {
+    "jp": "ロシア",
+    "en": "Russia",
+    "id": 139
+  },
+  {
+    "jp": "イスラエル",
+    "en": "Israel",
+    "id": 12
+  },
+  {
+    "jp": "スイス",
+    "en": "Switzerland",
+    "id": 56
+  },
+  {
+    "jp": "アルゼンチン",
+    "en": "Argentina",
+    "id": 8
+  },
+  {
+    "jp": "オランダ",
+    "en": "Netherlands",
+    "id": 26
+  },
+  {
+    "jp": "タイ",
+    "en": "Thailand",
+    "id": 68
+  },
+  {
+    "jp": "インドネシア",
+    "en": "Indonesia",
+    "id": 17
+  },
+  {
+    "jp": "メキシコ",
+    "en": "Mexico",
+    "id": 121
+  },
+  {
+    "jp": "ベルギー",
+    "en": "Belgium",
+    "id": 109
+  },
+  {
+    "jp": "エジプト",
+    "en": "Egypt",
+    "id": 23
+  },
+  {
+    "jp": "ギリシャ",
+    "en": "Greece",
+    "id": 40
+  },
+  {
+    "jp": "トルコ",
+    "en": "Turkey",
+    "id": 78
+  },
+  {
+    "jp": "ブラジル",
+    "en": "Brazil",
+    "id": 99
+  },
+  {
+    "jp": "シリア",
+    "en": "Syria",
+    "id": 52
+  },
+  {
+    "jp": "オーストリア",
+    "en": "Austria",
+    "id": 28
+  },
+  {
+    "jp": "シンガポール",
+    "en": "Singapore",
+    "id": 53
+  },
+  {
+    "jp": "ウルグアイ",
+    "en": "Uruguay",
+    "id": 21
+  },
+  {
+    "jp": "南アフリカ",
+    "en": "South Africa",
+    "id": 142
+  },
+  {
+    "jp": "コロンビア",
+    "en": "Colombia",
+    "id": 48
+  },
+  {
+    "jp": "エストニア",
+    "en": "Estonia",
+    "id": 24
+  },
+  {
+    "jp": "ルーマニア",
+    "en": "Romania",
+    "id": 137
+  },
+  {
+    "jp": "ポルトガル",
+    "en": "Portugal",
+    "id": 114
+  },
+  {
+    "jp": "ベトナム",
+    "en": "Vietnam",
+    "id": 105
+  },
+  {
+    "jp": "クロアチア",
+    "en": "Croatia",
+    "id": 42
+  },
+  {
+    "jp": "ヨルダン",
+    "en": "Jordan",
+    "id": 128
+  },
+  {
+    "jp": "ウクライナ",
+    "en": "Ukraine",
+    "id": 19
+  },
+  {
+    "jp": "フィリピン",
+    "en": "Philippines",
+    "id": 96
+  },
+  {
+    "jp": "マレーシア",
+    "en": "Malaysia",
+    "id": 119
+  },
+  {
+    "jp": "レバノン",
+    "en": "Lebanon",
+    "id": 138
+  },
+  {
+    "jp": "チリ",
+    "en": "Chile",
+    "id": 76
+  },
+  {
+    "jp": "ルクセンブルク",
+    "en": "Luxembourg",
+    "id": 135
+  },
+  {
+    "jp": "スロバキア",
+    "en": "Slovakia",
+    "id": 60
+  },
+  {
+    "jp": "ハンガリー",
+    "en": "Hungary",
+    "id": 88
+  },
+  {
+    "jp": "リトアニア",
+    "en": "Lithuania",
+    "id": 131
+  },
+  {
+    "jp": "サウジアラビア",
+    "en": "Saudi Arabia",
+    "id": 51
+  },
+  {
+    "jp": "ニュージーランド",
+    "en": "New Zealand",
+    "id": 84
+  },
+  {
+    "jp": "ボツワナ",
+    "en": "Botswana",
+    "id": 112
+  },
+  {
+    "jp": "バングラデシュ",
+    "en": "Bangladesh",
+    "id": 90
+  },
+  {
+    "jp": "モンゴル",
+    "en": "Mongolia",
+    "id": 125
+  },
+  {
+    "jp": "ペルー",
+    "en": "Peru",
+    "id": 110
+  },
+  {
+    "jp": "ラトビア",
+    "en": "Latvia",
+    "id": 130
+  },
+  {
+    "jp": "プエルトリコ",
+    "en": "Puerto Rico",
+    "id": 104
+  },
+  {
+    "jp": "ベネズエラ",
+    "en": "Venezuela",
+    "id": 107
+  },
+  {
+    "jp": "クウェート",
+    "en": "Kuwait",
+    "id": 41
+  },
+  {
+    "jp": "ケニア",
+    "en": "Kenya",
+    "id": 45
+  },
+  {
+    "jp": "ドミニカ共和国",
+    "en": "Dominican Republic",
+    "id": 80
+  },
+  {
+    "jp": "ナイジェリア",
+    "en": "Nigeria",
+    "id": 81
+  },
+  {
+    "jp": "ブータン",
+    "en": "Bhutan",
+    "id": 103
+  },
+  {
+    "jp": "マルタ共和国",
+    "en": "Malta",
+    "id": 118
+  }
+]
