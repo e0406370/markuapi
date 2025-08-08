@@ -51,14 +51,19 @@ class Filmarks:
             "type": "path",
         }
 
+        LIST_DRAMAS_TRENDING: Dict[str, str] = {
+            "path": "list-drama/trend",
+            "type": "query",
+        }
+
         LIST_DRAMAS_COUNTRY: Dict[str, str] = {
             "path": "list-drama/country/{country_id}",
             "type": "path+query",
         }
 
-        LIST_DRAMAS_TRENDING: Dict[str, str] = {
-            "path": "list-drama/trend",
-            "type": "query",
+        LIST_DRAMAS_YEAR: Dict[str, str] = {
+            "path": "list-drama/year/{year_series}s/{year}",
+            "type": "path+query",
         }
 
     @staticmethod

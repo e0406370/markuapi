@@ -87,7 +87,7 @@ def test_info_input_not_valid_integer(path) -> None:
                     "name": "パク・ボヨン",
                     "people_id": 85588,
                     "link": "https://filmarks.com/people/85588",
-                }
+                },
             ],
         },
     ],

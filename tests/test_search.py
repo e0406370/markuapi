@@ -23,7 +23,8 @@ def test_search_input_not_valid_integer(query) -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 422
-    assert get_json_val(resp_data, "$.detail[0].msg") == "Input should be a valid integer, unable to parse string as an integer"
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
 
 
 @pytest.mark.parametrize("query", [
@@ -40,7 +41,8 @@ def test_search_input_less_than_min_threshold(query) -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 422
-    assert get_json_val(resp_data, "$.detail[0].msg") == "Input should be greater than 0"
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be greater than 0"
 
 
 @pytest.mark.parametrize("query", [
@@ -55,7 +57,8 @@ def test_search_input_more_than_max_threshold(query) -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 422
-    assert get_json_val(resp_data, "$.detail[0].msg") == "Input should be less than or equal to 1000"
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 1000"
 
 
 @pytest.mark.parametrize("query", [

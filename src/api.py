@@ -2,10 +2,11 @@ from aiocron import crontab
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
+from math import floor
 from os import environ
+from src.scrape.scrape_service import search_scrape_drama, info_scrape_drama
 from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import Filmarks, SearchParams
-from src.scrape.scrape_service import search_scrape_drama, info_scrape_drama
 from typing import Annotated, Any, Dict
 
 
@@ -56,7 +57,7 @@ def list_dramas_trending(search_params: Annotated[SearchParams, Query()], req: R
     return search_scrape_drama(
         endpoint=Filmarks.Endpoints.LIST_DRAMAS_TRENDING.value,
         req=req,
-        message="Failed to list trending dramas.",
+        message="Failed to fetch trending dramas.",
     )
 
 
@@ -66,7 +67,18 @@ def list_dramas_country(country_id: int, search_params: Annotated[SearchParams, 
     return search_scrape_drama(
         endpoint=Filmarks.Endpoints.LIST_DRAMAS_COUNTRY.value,
         req=req,
-        message=f"Failed to list dramas from country with ID: {country_id}.",
+        message=f"Failed to fetch dramas from country with ID: {country_id}.",
+    )
+
+
+@api.get("/list-drama/year/{year}")
+def list_dramas_year(year: int, search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+    req.path_params["year_series"] = floor(year / 10) * 10
+
+    return search_scrape_drama(
+        endpoint=Filmarks.Endpoints.LIST_DRAMAS_YEAR.value,
+        req=req,
+        message=f"Failed to fetch dramas from year: {year}.",
     )
 
 
