@@ -2,14 +2,7 @@
 
 A basic web scraper API for [Filmarks Dramas (フィルマークス・ドラマ)](https://filmarks.com/dramas).
 
-Note:
-This API is currently under development.
-Only two endpoints have been implemented thus far.
-
----
-
-### API Base URL
-
+- Base URL:
 ```sh
 https://markuapi.onrender.com/
 ```
@@ -18,29 +11,70 @@ https://markuapi.onrender.com/
 
 ### API Endpoints
 
-- Retrieve drama information
-
-```sh
-GET /dramas/{series_id}/{season_id}
-```
-
 - Search for dramas
 
 ```sh
 GET /search/dramas?q={query}
 ```
 
-Optional parameters:
+Searches for dramas on Filmarks, by title or keyword.
 
-- `limit`
+Supports optional query parameters: `limit` and `page`.
 
-  - Default: `10`
-  - Range: `1` to `1000`
-  - Limits the number of results returned.
-    - If the specified limit exceeds the number of available results, only the available results are returned.
+<br />
 
-- `page`
-  - Default: `1`
-  - Range: `1` to `1000`
-  - Fetches results from the corresponding page of search results.
-    - If the specified page has no results, an empty list will be returned.
+- Retrieve drama information
+
+```sh
+GET /dramas/{series_id}/{season_id}
+```
+
+Retrieves details for a specific drama on Filmarks, given the Series ID and Season ID.
+
+<br />
+
+- Fetch trending dramas
+
+```sh
+GET /list-drama/trend
+```
+
+Fetches dramas that are currently trending on Filmarks.
+
+Supports optional query parameters: `limit` and `page`.
+
+<br />
+
+- Fetch trending dramas produced in a specific country
+
+```sh
+GET /list-drama/country/{country_id}
+```
+
+Fetches dramas that are currently trending on Filmarks, produced in the specified country.
+
+A list mapping `country_id` to countries can be found [here](./tests/__country_id.json).
+
+Supports optional query parameters: `limit` and `page`.
+
+<br />
+
+- Fetch trending dramas released in a specific year
+
+```sh
+GET /list-drama/year/{year}
+```
+
+Fetches dramas that are currently trending on Filmarks, released in the specified year.
+
+Supports optional query parameters: `limit` and `page`.
+
+<br />
+
+#### Optional Query Parameters
+
+- `limit` (default `10`, range: `1` - `1000`): 
+  - Specifies the **maximum** number of results to return.
+
+- `page` (default `1`, range: `1` - `1000`):
+  - Specifies the **page number** used for pagination.
