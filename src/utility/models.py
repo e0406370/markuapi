@@ -20,18 +20,51 @@ class DataMark(Struct):
 class Filmarks:
     FILMARKS_BASE = "https://filmarks.com/"
 
-    class SearchEP(Enum):
-        DRAMAS = "search/dramas"
-        CAST = "search/people"
-        USERS = "search/users"
+    class Endpoints(Enum):
+        SEARCH_DRAMAS: Dict[str, str] = {
+            "path": "search/dramas",
+            "type": "query",
+        }
 
-    class InfoEP(Enum):
-        DRAMAS = "dramas/{drama_series_id}/{drama_season_id}"
-        CAST = "people/{person_id}"
-        USERS = "users/{user_id}"
+        SEARCH_CAST: Dict[str, str] = {
+            "path": "search/people",
+            "type": "query",
+        }
+ 
+        SEARCH_USERS: Dict[str, str] = {
+            "path": "search/users",
+            "type": "query",
+        }
 
-    SEARCH_ENDPOINTS = {e.value for e in SearchEP}
-    INFO_ENDPOINTS = {e.value for e in InfoEP}
+        INFO_DRAMAS: Dict[str, str] = {
+            "path": "dramas/{drama_series_id}/{drama_season_id}",
+            "type": "path",
+        }
+
+        INFO_CAST: Dict[str, str] = {
+            "path": "people/{person_id}",
+            "type": "path",
+        }
+
+        INFO_USERS: Dict[str, str] = {
+            "path": "users/{user_id}",
+            "type": "path",
+        }
+
+        LIST_DRAMAS_TRENDING: Dict[str, str] = {
+            "path": "list-drama/trend",
+            "type": "query",
+        }
+
+        LIST_DRAMAS_COUNTRY: Dict[str, str] = {
+            "path": "list-drama/country/{country_id}",
+            "type": "path+query",
+        }
+
+        LIST_DRAMAS_YEAR: Dict[str, str] = {
+            "path": "list-drama/year/{year_series}s/{year}",
+            "type": "path+query",
+        }
 
     @staticmethod
     def create_filmarks_link(url: str) -> str:
@@ -54,4 +87,3 @@ class Filmarks:
 class SearchParams(BaseModel):
     limit: int = Field(10, gt=0, le=1000)
     page: int = Field(1, gt=0, le=1000)
-    query: str = ""
