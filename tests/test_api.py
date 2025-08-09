@@ -21,6 +21,7 @@ def test_index() -> None:
     "/list-drama",
     "/list-drama/country",
     "/list-drama/year",
+    "/list-drama/year/2010s/2019"
 ])
 def test_invalid_endpoint_base(path) -> None:
     resp = client.get(path)
@@ -45,16 +46,24 @@ def test_invalid_endpoint_filmarks(path) -> None:
 
 @pytest.mark.parametrize("test_data", [
     (
-        "/search/dramas?q=test503", 
+        "/search/dramas",
         {},
     ),
     (
+        "/search/dramas?q=test503", 
+        {"path": "search/dramas"},
+    ),
+    (
         "/dramas/404/404", 
-        {"type": "query" , "path": "404"},
+        {"path": "404", "type": "query"},
     ),
     (
         "/list-drama/trend", 
-        {"type": "404", "path": "list-drama/trend"},
+        {"path": "list-drama/trend", "type": "404"},
+    ),
+    (
+        "/list-drama/country/144",
+        '"path": "list-drama/country/{country_id}", "type": "path+query"',
     ),
     (
         "/list-drama/country/404", 
@@ -62,7 +71,7 @@ def test_invalid_endpoint_filmarks(path) -> None:
     ),
     (
         "/list-drama/year/404", 
-        {"type": "path+query", "path": "404"},
+        {"path": "404", "type": "path+query"},
     ),
 ])
 def test_scrape_error_404(mocker, test_data) -> None:

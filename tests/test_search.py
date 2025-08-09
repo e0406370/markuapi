@@ -75,6 +75,7 @@ def test_search_empty_query(query) -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == ""
+    assert get_json_val(resp_data, "$.heading") == ""
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -85,6 +86,7 @@ def test_search_without_results_page_1() -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == '".*'
+    assert get_json_val(resp_data, "$.heading") == ""
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -95,6 +97,7 @@ def test_search_without_results_page_2() -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
+    assert get_json_val(resp_data, "$.heading") == ""
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -126,6 +129,7 @@ def test_search_with_results_single(test_data) -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
+    assert get_json_val(resp_data, "$.heading").startswith(query)
     assert len(dramas) == 5
 
     fields = [
@@ -182,6 +186,7 @@ def test_search_with_results_multiple(test_data) -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
+    assert get_json_val(resp_data, "$.heading").startswith(query)
 
     fields = [
         "title",
@@ -204,7 +209,7 @@ def test_search_with_results_multiple(test_data) -> None:
 
 
 def test_search_with_results_random() -> None:
-    with open(file="tests/__100_dramas.json", mode="r", encoding="utf-8") as f:
+    with open(file="tests/___100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
 
@@ -214,6 +219,7 @@ def test_search_with_results_random() -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
+    assert get_json_val(resp_data, "$.heading").startswith(query)
     assert get_json_val(resp_data, "$.results.dramas[0].title") == query
 
     assert get_json_val(resp_data, "$.results.dramas[0].rating") is not None

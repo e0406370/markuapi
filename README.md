@@ -53,7 +53,7 @@ GET /list-drama/country/{country_id}
 
 Fetches dramas that are currently trending on Filmarks, produced in the specified country.
 
-A list mapping `country_id` to countries can be found [here](./tests/__country_id.json).
+A list mapping `country_id` to countries can be found [here](./tests/___country_id.json).
 
 Supports optional query parameters: `limit` and `page`.
 
@@ -66,6 +66,8 @@ GET /list-drama/year/{year}
 ```
 
 Fetches dramas that are currently trending on Filmarks, released in the specified year.
+
+A list of all available years can be found [here](./tests/___year_id.txt).
 
 Supports optional query parameters: `limit` and `page`.
 
