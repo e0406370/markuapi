@@ -1,5 +1,5 @@
 from aiocron import crontab
-from fastapi import FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 from math import floor
@@ -32,7 +32,7 @@ def index() -> Dict[str, Any]:
 
 
 @api.get("/search/dramas")
-def search_dramas(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+def search_dramas(search_params: Annotated[SearchParams, Depends()], req: Request) -> Dict[str, Any]:
 
     return search_scrape_drama(
         endpoint=Filmarks.Endpoints.SEARCH_DRAMAS.value,
@@ -52,7 +52,7 @@ def info_dramas(drama_series_id: int, drama_season_id: int, req: Request) -> Dic
 
 
 @api.get("/list-drama/trend")
-def list_dramas_trending(search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+def list_dramas_trending(search_params: Annotated[SearchParams, Depends()], req: Request) -> Dict[str, Any]:
 
     return search_scrape_drama(
         endpoint=Filmarks.Endpoints.LIST_DRAMAS_TRENDING.value,
@@ -62,7 +62,7 @@ def list_dramas_trending(search_params: Annotated[SearchParams, Query()], req: R
 
 
 @api.get("/list-drama/country/{country_id}")
-def list_dramas_country(country_id: int, search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+def list_dramas_country(country_id: int, search_params: Annotated[SearchParams, Depends()], req: Request) -> Dict[str, Any]:
 
     return search_scrape_drama(
         endpoint=Filmarks.Endpoints.LIST_DRAMAS_COUNTRY.value,
@@ -72,7 +72,7 @@ def list_dramas_country(country_id: int, search_params: Annotated[SearchParams, 
 
 
 @api.get("/list-drama/year/{year}")
-def list_dramas_year(year: int, search_params: Annotated[SearchParams, Query()], req: Request) -> Dict[str, Any]:
+def list_dramas_year(year: int, search_params: Annotated[SearchParams, Depends()], req: Request) -> Dict[str, Any]:
     req.path_params["year_series"] = floor(year / 10) * 10
 
     return search_scrape_drama(
@@ -87,7 +87,7 @@ async def heartbeat() -> None:
 
     try:
         async with AsyncClient() as client:
-            await client.get(environ.get("BASE", "http://127.0.0.1:8000"))
+            await client.get(environ.get("BASE"))
             Logger.info("Self-ping succeeded.")
 
     except Exception:
