@@ -16,6 +16,9 @@ class SearchDramaScraper(SearchScraper):
 
         return condition
 
+    def _get_heading(self) -> str:
+        return self.soup.select_one("h1.c-heading-1").text
+
     def _get_results_container(self) -> ResultSet[PageElement]:
         container = self.soup.find(
           "div", class_="p-contents-grid"
@@ -85,7 +88,7 @@ class SearchDramaScraper(SearchScraper):
         return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def set_search_results(self) -> None:
-        self._raise_if_page_not_found()    
+        self._raise_if_page_not_found()
 
         dramas = []
 
@@ -142,3 +145,4 @@ class SearchDramaScraper(SearchScraper):
             dramas.append(d)
 
         self.search_results["dramas"] = dramas
+        self.search_heading = self._get_heading()
