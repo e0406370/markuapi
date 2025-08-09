@@ -112,7 +112,7 @@ def test_info_with_results_single(test_data) -> None:
         "cast",
     ]
     for field in fields:
-      assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=500)
@@ -130,7 +130,7 @@ def test_info_with_results_single(test_data) -> None:
 
 
 def test_info_with_results_random() -> None:
-    with open(file="tests/__100_dramas.json", mode="r", encoding="utf-8") as f:
+    with open(file="tests/___100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
 

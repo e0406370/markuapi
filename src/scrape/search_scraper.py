@@ -13,10 +13,12 @@ class SearchScraper(BaseScraper):
         self.search_query = self.params.get("q", "")
 
         self.search_results = {}
+        self.search_heading = ""
 
     def get_response(self) -> Dict[str, Any]:
         return {
             "query": self.search_query,
             "results": self.search_results,
             "scrape_date": datetime.now(timezone.utc).isoformat(),
+            "heading": self.search_heading,
         }
