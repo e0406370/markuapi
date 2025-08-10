@@ -1,0 +1,11 @@
+# dirs
+__pycache__/
+.github/
+tests/
+
+# files
+.gitignore
+.pytest.ini
+Dockerfile
+README.md
+uv.lock
