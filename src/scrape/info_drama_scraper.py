@@ -9,6 +9,8 @@ from typing import Any, List, Dict, Tuple
 class InfoDramaScraper(BaseScraper):
     def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         super().__init__(soup, params)
+        
+        self.detail_head = self.soup.select_one("div.p-content-detail__head")
 
         self.series_id = int(self.params.get("drama_series_id"))
         self.season_id = int(self.params.get("drama_season_id"))
@@ -20,29 +22,29 @@ class InfoDramaScraper(BaseScraper):
             "series_id": self.series_id,
             "season_id": self.season_id,
             "data": self.data,
-            "scrape_date": datetime.now(timezone.utc).isoformat(),
+            "scrape_date": datetime.now(timezone.utc).isoformat(sep=" ", timespec="seconds"),
         }
 
     def _get_title(self) -> str:
-        return self.soup.select_one("h2.p-content-detail__title > span").text
+        return self.detail_head.select_one("h2.p-content-detail__title > span").text
 
     def _get_original_title(self) -> str | None:
-        title_elem = self.soup.select_one("p.p-content-detail__original")
+        title_elem = self.detail_head.select_one("p.p-content-detail__original")
 
         return title_elem.text if title_elem else None
 
     def _get_rating(self) -> float:
-        rating = self.soup.select_one("div.c2-rating-l__text").text
+        rating = self.detail_head.select_one("div.c2-rating-l__text").text
 
         return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self) -> DataMark:
-        data_elem = self.soup.select_one("div.c-content__counts > div.js-btn-mark")
+        data_elem = self.detail_head.select_one("div.c-content__counts > div.js-btn-mark")
 
         return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-mark"], type=DataMark)
 
     def _get_data_clip(self) -> DataClip:
-        data_elem = self.soup.select_one("div.c-content__counts > div.js-btn-clip")
+        data_elem = self.detail_head.select_one("div.c-content__counts > div.js-btn-clip")
 
         return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-clip"], type=DataClip)
 
@@ -50,12 +52,12 @@ class InfoDramaScraper(BaseScraper):
         return self.soup.select_one("link").attrs["href"]
 
     def _get_poster(self) -> str | None:
-        poster_elem = self.soup.select_one("div.c2-poster-l > img")
+        poster_elem = self.detail_head.select_one("div.c2-poster-l > img")
 
         return poster_elem.attrs["src"] if poster_elem else None
     
     def _get_production_year(self) -> Tuple[str]:
-        title_elem = self.soup.select_one("h2.p-content-detail__title a")
+        title_elem = self.detail_head.select_one("h2.p-content-detail__title a")
 
         return Filmarks.create_filmarks_link(title_elem.attrs["href"]), title_elem.text
 
@@ -73,7 +75,7 @@ class InfoDramaScraper(BaseScraper):
             case _:
                 raise ValueError("type can only be 'release_date', 'country_of_origin', or 'playback_time'!")
 
-        title_elem = self.soup.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith(string_filter))
+        title_elem = self.detail_head.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s and s.startswith(string_filter))
 
         match type:
             case "release_date" | "playback_time":
@@ -83,31 +85,33 @@ class InfoDramaScraper(BaseScraper):
                 return title_elem.find_next("a").text if title_elem else None
 
     def _get_synopsis(self) -> str | None:
-        title_elem = self.soup.select_one("#js-content-detail-synopsis")
+        title_elem = self.detail_head.select_one("#js-content-detail-synopsis")
 
         return title_elem.select_one("content-detail-synopsis").get(":outline").strip('"') if title_elem else None
 
     def _get_genre(self) -> List[str] | None:
-        title_elem = self.soup.select_one("h3.p-content-detail__genre-title")
+        title_elem = self.detail_head.select_one("h3.p-content-detail__genre-title")
 
         return [genre.text for genre in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def _get_people_list(self, type: str) -> List[Dict[str, Any]] | None:
         match type:
             case "creator":
-                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="原作")
+                string_filter = "原作"
 
             case "director":
-                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="監督")
+                string_filter = "監督"
 
             case "scriptwriter":
-                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="脚本")
+                string_filter = "脚本"
 
             case "artist":
-                title_elem = self.soup.find("h3", class_="p-content-detail__people-list-term", string="主題歌／挿入歌")
+                string_filter = "主題歌／挿入歌"
 
             case _:
                 raise ValueError("type can only be 'creator', 'director', 'scriptwriter', or 'artist'!")
+            
+        title_elem = self.detail_head.find("h3", class_="p-content-detail__people-list-term", string=string_filter)
 
         return [
             Filmarks.create_person_info(
@@ -119,7 +123,7 @@ class InfoDramaScraper(BaseScraper):
         ] if title_elem else None
 
     def _get_cast(self) -> List[Dict[str, Any]] | None:
-        title_elem = self.soup.select_one("div.p-people-list__casts")
+        title_elem = self.detail_head.select_one("div.p-people-list__casts")
 
         return [
             Filmarks.create_person_info(
@@ -132,8 +136,6 @@ class InfoDramaScraper(BaseScraper):
         ] if title_elem else None
 
     def set_info_data(self) -> None:
-        self._raise_if_page_not_found()
-
         self.data["title"] = self._get_title()
 
         if original_title := self._get_original_title():
@@ -184,4 +186,4 @@ class InfoDramaScraper(BaseScraper):
         if cast := self._get_cast():
             self.data["cast"] = cast
 
-        Logger.info(f"[Series ID: {self.series_id}, Season ID: {self.season_id}] {str(self.data)}")
+        Logger.info(f"[Series ID: {self.series_id}, Season ID: {self.season_id}] {self.data}")
