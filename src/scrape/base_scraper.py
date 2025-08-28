@@ -21,10 +21,7 @@ class BaseScraper:
 
     @classmethod
     def scrape(cls: Type[T], endpoint: Dict[str, str], req: Request) -> T | None:
-        if endpoint not in Filmarks.Endpoints:
-            Logger.err(f"Invalid endpoint requested: '{endpoint}'")
-
-            raise CustomException.not_found()
+        cls._raise_if_invalid_endpoint(endpoint)
 
         if endpoint["type"] == "query":
             params = req.query_params
@@ -46,6 +43,8 @@ class BaseScraper:
                 resp = session.get(url=url, headers=BaseScraper.headers)
                 soup = BeautifulSoup(resp.text, "lxml")
 
+                cls._raise_if_page_not_found(soup)
+
                 return cls(soup, params)
 
         except requests.exceptions.RequestException as e:
@@ -53,8 +52,16 @@ class BaseScraper:
 
             raise CustomException.service_unavailable()
 
-    def _raise_if_page_not_found(self) -> None:
-        status = self.soup.select_one("p.main__status-ja")
+    @staticmethod
+    def _raise_if_invalid_endpoint(endpoint: Dict[str, str]) -> None:
+        if endpoint not in Filmarks.Endpoints:
+            Logger.err(f"Invalid endpoint requested: '{endpoint}'")
+
+            raise CustomException.not_found()
+
+    @staticmethod
+    def _raise_if_page_not_found(soup: BeautifulSoup) -> None:
+        status = soup.select_one("p.main__status-ja")
 
         if status and status.text.strip() == "お探しのページは見つかりません。":
             Logger.err("Invalid Filmarks page requested")
