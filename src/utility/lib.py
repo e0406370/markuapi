@@ -1,8 +1,8 @@
-import logging
-import msgspec
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from typing import Any
+import logging
+import msgspec
 
 
 class CustomException:
@@ -60,10 +60,10 @@ class Logger:
 
 
 class MsgSpecJSONResponse(JSONResponse):
-    @classmethod
-    def render(cls, content: Any) -> bytes:
+    @staticmethod
+    def render(content: Any) -> bytes:
         return msgspec.json.encode(content)
 
-    @classmethod
-    def parse(cls, content: Any, type: Any) -> Any:
+    @staticmethod
+    def parse(content: Any, type: Any) -> Any:
         return msgspec.json.decode(content, type=type)

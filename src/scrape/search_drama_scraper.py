@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from bs4.element import PageElement, ResultSet
+from bs4.element import Tag
 from src.scrape.search_scraper import SearchScraper
 from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.models import DataClip, DataMark, Filmarks
@@ -10,44 +10,26 @@ class SearchDramaScraper(SearchScraper):
     def __init__(self, soup: BeautifulSoup, params: Dict) -> None:
         super().__init__(soup, params)
 
-    def _is_results_empty(self) -> bool:
-        condition = bool(self.soup.find("div", class_="p-timeline__zero"))
-        if condition: Logger.warn(f"[0 | Query: {self.search_query} | Page: {self.page_number}] 一致する情報は見つかりませんでした。")
+    def _get_title(self, result: Tag) -> str:
+        return result.select_one("h3.p-content-cassette__title").text
 
-        return condition
-
-    def _get_heading(self) -> str:
-        return self.soup.select_one("h1.c-heading-1").text
-
-    def _get_results_container(self) -> ResultSet[PageElement]:
-        container = self.soup.find(
-          "div", class_="p-contents-grid"
-        ).find_all(
-          "div", class_="js-cassette"
-        )
-
-        return container
-
-    def _get_title(self, result: PageElement) -> str:
-        return result.find("h3", class_="p-content-cassette__title").text
-
-    def _get_rating(self, result: PageElement) -> float:
-        rating = result.find("div", class_="c-rating__score").text
+    def _get_rating(self, result: Tag) -> float:
+        rating = result.select_one("div.c-rating__score").text
 
         return float(rating) if rating != "-" else rating
 
-    def _get_data_mark(self, result: PageElement) -> DataMark:
+    def _get_data_mark(self, result: Tag) -> DataMark:
         return MsgSpecJSONResponse.parse(content=result.attrs["data-mark"], type=DataMark)
 
-    def _get_data_clip(self, result: PageElement) -> DataClip:
+    def _get_data_clip(self, result: Tag) -> DataClip:
         return MsgSpecJSONResponse.parse(content=result.attrs["data-clip"], type=DataClip)
 
-    def _get_poster(self, result: PageElement) -> str | None:
-        poster = result.find("div", class_="c2-poster-m").find("img")
+    def _get_poster(self, result: Tag) -> str | None:
+        poster = result.select_one("div.c2-poster-m > img")
 
         return poster.attrs["src"] if poster else None
     
-    def _get_other_info(self, result: PageElement, type: str) -> str | None:
+    def _get_other_info(self, result: Tag, type: str) -> str | None:
         match type:
             case "release_date":
                 title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string="公開日：")
@@ -68,7 +50,7 @@ class SearchDramaScraper(SearchScraper):
             case "country_of_origin":
                 return title_elem.find_next("a").text if title_elem else None
 
-    def _get_named_list(self, result: PageElement, type: str) -> List[str] | None:
+    def _get_named_list(self, result: Tag, type: str) -> List[str] | None:
         match type:
             case "genre":
                 title_elem = result.find("h4", class_="p-content-cassette__genre-title")
@@ -88,8 +70,6 @@ class SearchDramaScraper(SearchScraper):
         return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
 
     def set_search_results(self) -> None:
-        self._raise_if_page_not_found()
-
         dramas = []
 
         if self._is_results_empty():
@@ -141,7 +121,7 @@ class SearchDramaScraper(SearchScraper):
             if cast := self._get_named_list(result, "cast"):
                 d["cast"] = cast
 
-            Logger.info(f"[{ctr + 1} | Query: {self.search_query} | Page: {self.page_number}] {str(d)}")
+            Logger.info(self.get_logging_result(idx=ctr + 1, text=str(d)))
             dramas.append(d)
 
         self.search_results["dramas"] = dramas

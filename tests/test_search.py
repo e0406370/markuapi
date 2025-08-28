@@ -206,6 +206,7 @@ def test_search_with_results_multiple(test_data) -> None:
     assert get_json_val(drama, "$.series_id") is not None
     assert get_json_val(drama, "$.season_id") is not None
     assert get_json_val(drama, "$.link") is not None
+    assert get_json_val(drama, "$.poster") is not None
 
 
 def test_search_with_results_random() -> None:
