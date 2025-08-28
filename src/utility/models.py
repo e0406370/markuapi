@@ -1,7 +1,7 @@
 from enum import Enum
 from msgspec import Struct
-from pydantic import BaseModel, Field
-from typing import Dict
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
+from typing import Dict, TypedDict, override
 from urllib.parse import urljoin
 
 
@@ -15,6 +15,17 @@ class DataMark(Struct):
     drama_series_id: int
     drama_season_id: int
     count: int
+
+
+class SearchParams(BaseModel):
+    limit: int = Field(10, gt=0, le=1000)
+    page: int = Field(1, gt=0, le=1000)
+
+
+class Endpoint(TypedDict):
+    __pydantic_config__ = ConfigDict(extra="forbid")  
+    path: str
+    type: str
 
 
 class Filmarks:
@@ -66,6 +77,20 @@ class Filmarks:
             "type": "path+query",
         }
 
+        @override
+        def __new__(cls, endpoint: Dict[str, str]) -> object:
+            ta = TypeAdapter(Endpoint)
+
+            try:
+                ta.validate_python(endpoint)
+                
+                obj = object.__new__(cls)
+                obj._value_ = endpoint
+                return obj
+
+            except ValidationError as e:
+                raise ValueError(e)
+
     @staticmethod
     def create_filmarks_link(url: str) -> str:
         return urljoin(base=Filmarks.FILMARKS_BASE, url=url)
@@ -82,8 +107,3 @@ class Filmarks:
         person_info["link"] = link
 
         return person_info
-
-
-class SearchParams(BaseModel):
-    limit: int = Field(10, gt=0, le=1000)
-    page: int = Field(1, gt=0, le=1000)
