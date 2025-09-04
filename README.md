@@ -1,10 +1,13 @@
 ### Purpose
 
-A basic web scraper API for [Filmarks Dramas (フィルマークス・ドラマ)](https://filmarks.com/dramas).
+A web scraper API covering **info**, **list**, and **search** endpoints for:
+- [Filmarks Animes (フィルマークス・アニメ)](https://filmarks.com/animes)
+- [Filmarks Dramas (フィルマークス・ドラマ)](https://filmarks.com/dramas)
+- [Filmarks Movies (フィルマークス・映画)](https://filmarks.com)
 
-- Base URL:
+Base URL:
 ```sh
-https://markuapi.onrender.com/
+https://markuapiz.onrender.com/
 ```
 
 ---

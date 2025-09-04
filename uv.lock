@@ -286,15 +286,14 @@ wheels = [
 ]
 
 [[package]]
-name = "markuapi"
-version = "0.1.0"
+name = "markuapiz"
+version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiocron" },
     { name = "beautifulsoup4" },
     { name = "fastapi" },
     { name = "httpx" },
-    { name = "jsonpath-ng" },
     { name = "lxml" },
     { name = "msgspec" },
     { name = "requests" },
@@ -304,6 +303,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "coverage" },
+    { name = "jsonpath-ng" },
     { name = "pytest" },
     { name = "pytest-mock" },
     { name = "ruff" },
@@ -316,7 +316,7 @@ requires-dist = [
     { name = "coverage", marker = "extra == 'dev'", specifier = ">=7.10.1" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "jsonpath-ng", specifier = ">=1.6.1" },
+    { name = "jsonpath-ng", marker = "extra == 'dev'", specifier = ">=1.6.1" },
     { name = "lxml", specifier = ">=6.0.0" },
     { name = "msgspec", specifier = ">=0.19.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.4.1" },
