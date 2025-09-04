@@ -1,7 +1,7 @@
 [project]
-name = "markuapi"
-version = "0.1.0"
-description = "A basic web scraper API for Filmarks Dramas"
+name = "markuapiz"
+version = "1.0.0"
+description = "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
