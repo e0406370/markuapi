@@ -2,11 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers import anime, drama, movie
 from src.utility.lib import MsgSpecJSONResponse
+from tomllib import load
 from typing import Any, Dict
 
 
 api = FastAPI(
     title="MarkuAPI",
+    version=load(open(file="./pyproject.toml", mode="rb"))["project"]["version"],
     default_response_class=MsgSpecJSONResponse,
 )
 api.add_middleware(
