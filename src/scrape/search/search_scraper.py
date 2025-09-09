@@ -27,7 +27,7 @@ class SearchScraper(BaseScraper):
         }
 
     def get_logging(self, idx: int, text: str) -> str:
-        return f"[{idx} | Query: {self.search_query} | Page: {self.page_number}] {text}"
+        return f"[{idx} | Query: {self.search_query} | Heading: {self.search_heading} | Page: {self.page_number}] {text}"
 
     def _get_heading(self) -> str:
         selectors = ["h1.c-heading-1", "h1.c-page-title__title"]
