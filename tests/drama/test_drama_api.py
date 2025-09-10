@@ -207,3 +207,5 @@ def test_scrape_error_503_service_unavailable_filmarks(path) -> None:
 
     assert resp.status_code == 503
     assert get_json_val(resp_data, "$.detail") == "The service is currently unavailable."
+
+    del api.dependency_overrides[SearchParams]
