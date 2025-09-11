@@ -37,7 +37,7 @@ class Endpoints(Enum):
     }
 
     LIST_ANIMES_YEAR_SPECIFIC: Dict[str, str] = {
-        "path": "list-anime/year/{year}",
+        "path": "list-anime/year/{year_series}s/{year}",
         "type": Constants.TYPE_COMBINED,
         "view": Constants.VIEW_ANIME,
     }
