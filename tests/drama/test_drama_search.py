@@ -164,7 +164,7 @@ def test_search_with_results_single(test_data) -> None:
             "season_id": 21896,
             "link": "https://filmarks.com/dramas/16234/21896",
             "release_date": "2025年07月09日",
-            "playback_time": "49分",
+            "playback_time": "50分",
             "country_of_origin": ["日本"],
             "director": ["藤田直哉", "本田大介"],
             "cast": ["當真あみ", "上白石萌音"],

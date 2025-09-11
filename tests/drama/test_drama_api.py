@@ -68,11 +68,11 @@ def test_invalid_endpoint_filmarks(path) -> None:
         {"path": "list-drama/vod/{vod_name}", "type": "path", "view": "drama"},
     ),
     (
-        "/list-drama/year/2020s", 
+        "/list-drama/year/2020s",
         {"path": "list-drama/year/{year}s", "type": "path+query", "view": "drama"},
     ),
     (
-        "/list-drama/year/2020", 
+        "/list-drama/year/2020",
         {"path": "list-drama/year/{year}", "type": "path+query", "view": "drama"},
     ),
     (
@@ -80,16 +80,16 @@ def test_invalid_endpoint_filmarks(path) -> None:
         '"path": "list-drama/country/{country_id}", "type": "path+query", "view": "drama"',
     ),
     (
-        "/list-drama/genre/9", 
+        "/list-drama/genre/9",
         {"type": "path+query"},
     ),
     (
-        "/list-drama/tag/駄作", 
+        "/list-drama/tag/駄作",
         {"path": "list-drama/tag/{tag_id}", "type": "path+query", "view": "drama"},
     ),
     (
-        "/list-drama/person/25499", 
-        {"path": "list-drama/tag/{person}", "type": "path+query", "view": "drama"},
+        "/list-drama/person/25499",
+        {"path": "list-drama/person/{person}", "type": "path+query", "view": "drama"},
     ),
 ])
 def test_scrape_error_404_not_found(mocker, test_data) -> None:
