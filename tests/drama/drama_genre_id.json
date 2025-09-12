@@ -1,0 +1,152 @@
+[
+  {
+    "jp": "ドラマ",
+    "en": "Drama",
+    "id": 9
+  },
+  {
+    "jp": "恋愛",
+    "en": "Romance",
+    "id": 17
+  },
+  {
+    "jp": "ホラー",
+    "en": "Horror",
+    "id": 12
+  },
+  {
+    "jp": "戦争",
+    "en": "War",
+    "id": 20
+  },
+  {
+    "jp": "音楽",
+    "en": "Music",
+    "id": 6
+  },
+  {
+    "jp": "ミュージカル",
+    "en": "Musical",
+    "id": 14
+  },
+  {
+    "jp": "スポーツ",
+    "en": "Sports",
+    "id": 21
+  },
+  {
+    "jp": "SF",
+    "en": "Sci-Fi",
+    "id": 4
+  },
+  {
+    "jp": "青春",
+    "en": "Youth",
+    "id": 22
+  },
+  {
+    "jp": "コメディ",
+    "en": "Comedy",
+    "id": 7
+  },
+  {
+    "jp": "アクション",
+    "en": "Action",
+    "id": 1
+  },
+  {
+    "jp": "アドベンチャー・冒険",
+    "en": "Adventure",
+    "id": 2
+  },
+  {
+    "jp": "クライム",
+    "en": "Crime",
+    "id": 23
+  },
+  {
+    "jp": "バイオレンス",
+    "en": "Violence",
+    "id": 24
+  },
+  {
+    "jp": "ヤクザ",
+    "en": "Yakuza",
+    "id": 25
+  },
+  {
+    "jp": "ミステリー",
+    "en": "Mystery",
+    "id": 13
+  },
+  {
+    "jp": "単発",
+    "en": "One-Shot",
+    "id": 33
+  },
+  {
+    "jp": "サスペンス",
+    "en": "Suspense",
+    "id": 8
+  },
+  {
+    "jp": "スリラー",
+    "en": "Thriller",
+    "id": 28
+  },
+  {
+    "jp": "ファンタジー",
+    "en": "Fantasy",
+    "id": 11
+  },
+  {
+    "jp": "ファミリー",
+    "en": "Family",
+    "id": 10
+  },
+  {
+    "jp": "歴史",
+    "en": "History",
+    "id": 16
+  },
+  {
+    "jp": "時代劇",
+    "en": "Period-Drama",
+    "id": 29
+  },
+  {
+    "jp": "オムニバス",
+    "en": "Omnibus",
+    "id": 32
+  },
+  {
+    "jp": "伝記",
+    "en": "Biography",
+    "id": 30
+  },
+  {
+    "jp": "ドキュメンタリー",
+    "en": "Documentary",
+    "id": 18
+  },
+  {
+    "jp": "ギャング・マフィア",
+    "en": "Mafia",
+    "id": 26
+  },
+  {
+    "jp": "西部劇",
+    "en": "Western",
+    "id": 3
+  },
+  {
+    "jp": "ショートフィルム・短編",
+    "en": "Short-Film",
+    "id": 31
+  },
+  {
+    "jp": "パニック",
+    "en": "Panic",
+    "id": 27
+  }
+]

@@ -32,3 +32,9 @@ jobs:
 
       - name: Lint with Ruff
         run: uv run ruff check --ignore E701
+
+      - name: Test with Pytest
+        run: uv run coverage run -m pytest
+
+      - name: Generate report with Coverage
+        run: uv run coverage report -m

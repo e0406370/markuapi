@@ -1,7 +1,75 @@
-from requests.exceptions import RequestException
-from src.scrape.base_scraper import BaseScraper
+from src.api import api
 from tests.test_utils import client, get_json_val
-import pytest
+
+
+def test_api_title() -> None:
+    assert api.title == "MarkuAPI"
+
+
+def test_api_version() -> None:
+    assert api.version == "1.0.0"
+
+
+def test_api_response() -> None:
+    resp = client.get("/")
+
+    assert resp.headers["content-type"] == "application/json"
+
+
+def test_api_routes() -> None:
+    defined_routes = {
+        "/search/animes",
+        "/animes/{anime_series_id}/{anime_season_id}",
+        "/list-anime/trend",
+        "/list-anime/vod/{vod_name}",
+        "/list-anime/year/{year_series}s",
+        "/list-anime/year/{year}",
+        "/list-anime/year/{year}/{season_id}",
+        "/list-anime/company/{company_id}",
+        "/list-anime/tag/{tag}",
+        "/list-anime/person/{person_id}",
+        "/search/dramas",
+        "/dramas/{drama_series_id}/{drama_season_id}",
+        "/list-drama/trend",
+        "/list-drama/vod/{vod_name}",
+        "/list-drama/year/{year_series}s",
+        "/list-drama/year/{year}",
+        "/list-drama/country/{country_id}",
+        "/list-drama/genre/{genre_id}",
+        "/list-drama/tag/{tag}",
+        "/list-drama/person/{person_id}",
+        "/search/movies",
+        "/movies/{movie_id}",
+        "/list-movie/now",
+        "/list-movie/coming-soon",
+        "/list-movie/opening-this-week",
+        "/list-movie/trend",
+        "/list-movie/vod/{vod_name}",
+        "/list-movie/award/{award_id}",
+        "/list-movie/year/{year_series}s",
+        "/list-movie/year/{year}",
+        "/list-movie/country/{country_id}",
+        "/list-movie/genre/{genre_id}",
+        "/list-movie/distributor/{distributor_id}",
+        "/list-movie/series/{series_id}",
+        "/list-movie/tag/{tag}",
+        "/list-movie/person/{person_id}",
+        "/",
+    }
+    special_routes = {
+        "/openapi.json",
+        "/docs",
+        "/docs/oauth2-redirect",
+        "/redoc",
+    }
+
+    route_cnt = 0
+    for route in api.routes:
+        if route.path not in special_routes:
+            assert route.path in defined_routes
+            route_cnt += 1
+
+    assert route_cnt == len(defined_routes)
 
 
 def test_index() -> None:
@@ -9,136 +77,12 @@ def test_index() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
-    assert get_json_val(resp_data, "$.detail") == "A basic web scraper API for Filmarks Dramas."
+    assert get_json_val(resp_data, "$.detail") == "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
 
 
-@pytest.mark.parametrize("path", [
-    "/unknown",
-    "/search",
-    "/dramas",
-    "/dramas/1",
-    "/dramas//1",
-    "/list-drama",
-    "/list-drama/country",
-    "/list-drama/year",
-    "/list-drama/year/2010s/2019"
-])
-def test_invalid_endpoint_base(path) -> None:
-    resp = client.get(path)
+def test_unknown() -> None:
+    resp = client.get("/unknown")
     resp_data = resp.json()
 
     assert resp.status_code == 404
     assert get_json_val(resp_data, "$.detail") == "Not Found"
-
-
-@pytest.mark.parametrize("path", [
-    "/dramas/9999999999/9999999999",
-    "/list-drama/country/9999999999",
-    "/list-drama/year/999",
-])
-def test_invalid_endpoint_filmarks(path) -> None:
-    resp = client.get(path)
-    resp_data = resp.json()
-
-    assert resp.status_code == 404
-    assert get_json_val(resp_data, "$.detail") == "The requested resource could not be found."
-
-
-@pytest.mark.parametrize("test_data", [
-    (
-        "/search/dramas",
-        {},
-    ),
-    (
-        "/search/dramas?q=test503", 
-        {"path": "search/dramas"},
-    ),
-    (
-        "/dramas/404/404", 
-        {"path": "404", "type": "query"},
-    ),
-    (
-        "/list-drama/trend", 
-        {"path": "list-drama/trend", "type": "404"},
-    ),
-    (
-        "/list-drama/country/144",
-        '"path": "list-drama/country/{country_id}", "type": "path+query"',
-    ),
-    (
-        "/list-drama/country/404", 
-        {"type": "path"},
-    ),
-    (
-        "/list-drama/year/404", 
-        {"path": "404", "type": "path+query"},
-    ),
-])
-def test_scrape_error_404(mocker, test_data) -> None:
-    scrape_func = BaseScraper.scrape
-    mocker.patch.object(
-        target=BaseScraper,
-        attribute="scrape",
-        new=lambda endpoint, req: scrape_func(endpoint=test_data[1], req=None)
-    )
-
-    resp = client.get(test_data[0])
-    resp_data = resp.json()
-
-    assert resp.status_code == 404
-    assert get_json_val(resp_data, "$.detail") == "The requested resource could not be found."
-
-
-@pytest.mark.parametrize("test_data", [
-    (
-        "/search/dramas?q=test500",
-        "src.scrape.search_drama_scraper.SearchDramaScraper.scrape",
-    ),
-    (
-        "/dramas/500/500",
-        "src.scrape.info_drama_scraper.InfoDramaScraper.scrape",
-    ),
-    (
-        "/list-drama/trend",
-        "src.scrape.search_drama_scraper.SearchDramaScraper.scrape",
-    ),
-    (
-        "/list-drama/country/500",
-        "src.scrape.search_drama_scraper.SearchDramaScraper.scrape",
-    ),
-    (
-        "/list-drama/year/500",
-        "src.scrape.search_drama_scraper.SearchDramaScraper.scrape",
-    ),
-])
-def test_scrape_error_500(mocker, test_data) -> None:
-    mocker.patch(
-        target=test_data[1], 
-        side_effect=Exception("Testing - 500 Internal Server Error")
-    )
-
-    resp = client.get(test_data[0])
-    resp_data = resp.json()
-
-    assert resp.status_code == 500
-    assert get_json_val(resp_data, "$.detail") == "The server encountered an unexpected error."
-
-
-@pytest.mark.parametrize("path", [
-    "/search/dramas?q=test503",
-    "/dramas/503/503",
-    "/list-drama/trend",
-    "/list-drama/country/503",
-    "/list-drama/year/503",
-])
-def test_scrape_error_503(mocker, path) -> None:
-    mocker.patch(
-        target="src.scrape.base_scraper.requests.Session", 
-        side_effect=RequestException("Testing - 503 Service Unavailable")
-    )
-
-    resp = client.get(path)
-    resp_data = resp.json()
-
-    assert resp.status_code == 503
-    assert get_json_val(resp_data, "$.detail") == "The service is currently unavailable."

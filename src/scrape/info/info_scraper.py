@@ -63,10 +63,10 @@ class InfoScraper(BaseScraper):
 
         return poster.attrs["src"] if poster else None
 
-    def _get_production_year(self) -> Tuple[str]:
+    def _get_production_year(self) -> Tuple[str] | None:
         title_elem = self.detail_head.select_one("h2.p-content-detail__title a")
 
-        return Utils.create_filmarks_link(title_elem.attrs["href"]), title_elem.text
+        return (Utils.create_filmarks_link(title_elem.attrs["href"]), title_elem.text) if title_elem else None
 
     def _get_other_info(self, field: Tuple[str, str]) -> str | List[Dict[str, Any]] | None:
         if field not in Constants.OTHER_INFO:

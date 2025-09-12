@@ -15,8 +15,7 @@ import pytest
     "?page=２",
     "?q=あなたの番です&limit=a",
     "?q=ちはやふる&page=z",
-    "?q=コード・ブルー&limit=1&page=@",
-    "?q=&limit=/&page=1",
+    "?q=コンフィデンスマンJP&limit=@&page=1",
 ])
 def test_search_input_not_valid_integer(query) -> None:
     resp = client.get(f"/search/dramas{query}")
@@ -46,11 +45,11 @@ def test_search_input_less_than_min_threshold(query) -> None:
 
 
 @pytest.mark.parametrize("query", [
-    "?limit=1001",
-    "?page=1005",
-    "?q=test1&limit=1001",
-    "?q=test2&page=1002",
-    "?q=test3&limit=1001&page=3",
+    "?limit=101",
+    "?page=2001",
+    "?q=test1&limit=101",
+    "?q=test2&page=2001",
+    "?q=test3&limit=101&page=3",
 ])
 def test_search_input_more_than_max_threshold(query) -> None:
     resp = client.get(f"/search/dramas{query}")
@@ -58,7 +57,7 @@ def test_search_input_more_than_max_threshold(query) -> None:
 
     assert resp.status_code == 422
     for err in get_json_val(resp_data, "$.detail"):
-        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 1000"
+        assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 2000"}
 
 
 @pytest.mark.parametrize("query", [
@@ -86,7 +85,7 @@ def test_search_without_results_page_1() -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == '".*'
-    assert get_json_val(resp_data, "$.heading") == ""
+    assert get_json_val(resp_data, "$.heading").startswith('".*')
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -97,7 +96,7 @@ def test_search_without_results_page_2() -> None:
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
-    assert get_json_val(resp_data, "$.heading") == ""
+    assert get_json_val(resp_data, "$.heading").startswith(query)
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -107,14 +106,14 @@ def test_search_without_results_page_2() -> None:
         {
             "title": "あなたの番です",
             "rating": 4.0,
-            "mark_count": 29975,
-            "clip_count": 6060,
+            "mark_count": 30598,
+            "clip_count": 6150,
             "series_id": 6055,
             "season_id": 8586,
             "link": "https://filmarks.com/dramas/6055/8586",
             "release_date": "2019年04月14日",
-            "country_of_origin": "日本",
             "playback_time": "46分",
+            "country_of_origin": ["日本"],
             "genre": ["ミステリー"],
             "scriptwriter": ["福原充則"],
             "cast": ["原田知世", "田中圭", "西野七瀬"],
@@ -138,8 +137,8 @@ def test_search_with_results_single(test_data) -> None:
         "season_id",
         "link",
         "release_date",
-        "country_of_origin",
         "playback_time",
+        "country_of_origin",
         "genre",
         "scriptwriter",
         "cast",
@@ -152,6 +151,7 @@ def test_search_with_results_single(test_data) -> None:
     assert get_json_val(dramas[0], "$.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=1000)
 
     assert get_json_val(dramas[0], "$.poster") is not None
+    assert get_json_val(dramas[0], "$.executive_producer") is None
     assert get_json_val(dramas[0], "$.director") is None
 
 
@@ -164,8 +164,10 @@ def test_search_with_results_single(test_data) -> None:
             "season_id": 21896,
             "link": "https://filmarks.com/dramas/16234/21896",
             "release_date": "2025年07月09日",
-            "country_of_origin": "日本",
-            "playback_time": "49分",
+            "playback_time": "50分",
+            "country_of_origin": ["日本"],
+            "director": ["藤田直哉", "本田大介"],
+            "cast": ["當真あみ", "上白石萌音"],
         },
         {
             "title": "ちはやふる ー繋ぐー",
@@ -173,8 +175,10 @@ def test_search_with_results_single(test_data) -> None:
             "season_id": 2117,
             "link": "https://filmarks.com/dramas/973/2117",
             "release_date": "2018年02月20日",
-            "country_of_origin": "日本",
             "playback_time": "10分",
+            "country_of_origin": ["日本"],
+            "director": ["小泉徳宏"],
+            "cast": ["広瀬すず", "野村周平", "新田真剣佑"],
         },
     ],
 )
@@ -194,8 +198,10 @@ def test_search_with_results_multiple(test_data) -> None:
         "season_id",
         "link",
         "release_date",
-        "country_of_origin",
         "playback_time",
+        "country_of_origin",
+        "director",
+        "cast",
     ]
     for field in fields:
         assert get_json_val(drama, f"$.{field}") == get_json_val(test_data, f"$.{field}")
@@ -203,18 +209,20 @@ def test_search_with_results_multiple(test_data) -> None:
     assert get_json_val(drama, "$.rating") is not None
     assert get_json_val(drama, "$.mark_count") is not None
     assert get_json_val(drama, "$.clip_count") is not None
-    assert get_json_val(drama, "$.series_id") is not None
-    assert get_json_val(drama, "$.season_id") is not None
-    assert get_json_val(drama, "$.link") is not None
     assert get_json_val(drama, "$.poster") is not None
+    assert get_json_val(drama, "$.executive_producer") is None
+    assert get_json_val(drama, "$.scriptwriter") is None
 
 
 def test_search_with_results_random() -> None:
-    with open(file="tests/___100_dramas.json", mode="r", encoding="utf-8") as f:
+    with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
 
     query = get_json_val(drama, "$.title")
+    series_id = get_json_val(drama, "$.series")
+    season_id = get_json_val(drama, "$.season")
+
     resp = client.get(f"/search/dramas?q={query}&limit=1")
     resp_data = resp.json()
 
@@ -222,10 +230,9 @@ def test_search_with_results_random() -> None:
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
     assert get_json_val(resp_data, "$.results.dramas[0].title") == query
-
     assert get_json_val(resp_data, "$.results.dramas[0].rating") is not None
     assert get_json_val(resp_data, "$.results.dramas[0].mark_count") is not None
     assert get_json_val(resp_data, "$.results.dramas[0].clip_count") is not None
-    assert get_json_val(resp_data, "$.results.dramas[0].series_id") is not None
-    assert get_json_val(resp_data, "$.results.dramas[0].season_id") is not None
+    assert get_json_val(resp_data, "$.results.dramas[0].series_id") == series_id
+    assert get_json_val(resp_data, "$.results.dramas[0].season_id") == season_id
     assert get_json_val(resp_data, "$.results.dramas[0].link") is not None

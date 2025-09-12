@@ -57,7 +57,8 @@ class InfoDramaScraper(InfoScraper):
         if poster := self._get_poster():
             self.data["poster"] = poster
 
-        self.data["production_year_link"], self.data["production_year"] = self._get_production_year()
+        if production_year := self._get_production_year():
+            self.data["production_year_link"], self.data["production_year"] = production_year
         
         for field in self.OTHER_INFO_FIELDS:
             value = self._get_other_info(field)
