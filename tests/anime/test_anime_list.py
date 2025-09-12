@@ -136,10 +136,8 @@ def test_list_path_vars_not_valid_integer(var) -> None:
                 route = route.format(year=var)
             case "year_season":
                 route = route.format(year="2019", season_id=var)
-            case "country":
-                route = route.format(country_id=var)
-            case "genre":
-                route = route.format(genre_id=var)
+            case "company":
+                route = route.format(company_id=var)
             case "person":
                 route = route.format(person_id=var)
             case _:
