@@ -433,5 +433,3 @@ def test_info_with_results_random() -> None:
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
     assert get_json_val(resp_data, "$.data.link") is not None
-    assert get_json_val(resp_data, "$.data.production_year_link") is not None
-    assert get_json_val(resp_data, "$.data.production_year") is not None

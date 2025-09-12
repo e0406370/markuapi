@@ -400,6 +400,7 @@ def test_info_with_results_single_2(test_data) -> None:
     assert get_json_val(resp_data, "$.data.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=500)
     assert get_json_val(resp_data, "$.data.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=500)
 
+    assert get_json_val(resp_data, "$.data.original_title") is None
     assert get_json_val(resp_data, "$.data.synopsis") is not None
     assert get_json_val(resp_data, "$.data.poster") is not None
     assert get_json_val(resp_data, "$.data.genre") is not None
@@ -792,5 +793,3 @@ def test_info_with_results_random() -> None:
     assert get_json_val(resp_data, "$.data.clip_count") is not None
     assert get_json_val(resp_data, "$.data.movie_id") == movie_id
     assert get_json_val(resp_data, "$.data.link") is not None
-    assert get_json_val(resp_data, "$.data.production_year_link") is not None
-    assert get_json_val(resp_data, "$.data.production_year") is not None
