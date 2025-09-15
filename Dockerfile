@@ -27,6 +27,7 @@ ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY pyproject.toml ./pyproject.toml
 COPY src ./src
 
 ENTRYPOINT uvicorn src.api:api --host 0.0.0.0 --port ${PORT}
