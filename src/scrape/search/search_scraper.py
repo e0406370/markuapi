@@ -27,7 +27,7 @@ class SearchScraper(BaseScraper):
         }
 
     def get_logging(self, idx: int, text: str) -> str:
-        return f"[{idx} | Query: {self.search_query} | Heading: {self.search_heading} | Page: {self.page_number}] {text}"
+        return f"[{self.view}] [{idx} | Query: {self.search_query} | Heading: {self.search_heading} | Page: {self.page_number}] {text}"
 
     def _get_heading(self) -> str:
         selectors = ["h1.c-heading-1", "h1.c-page-title__title"]
@@ -37,18 +37,15 @@ class SearchScraper(BaseScraper):
 
         return ""
 
-    def _is_results_empty(self) -> bool:
+    def _is_results_empty(self) -> Tag | None:
         condition = self.soup.select_one("div.p-timeline__zero")
-        if condition: Logger.warn(self.get_logging(idx=0, text="一致する情報は見つかりませんでした。"))
+        if condition:
+            Logger.warn(self.get_logging(idx=0, text=condition.text))
 
         return condition
 
     def _get_results_container(self) -> ResultSet[Tag]:
-        container = self.soup.select_one(
-          "div.p-contents-grid"
-        ).select(
-          "div.js-cassette"
-        )
+        container = self.soup.select("div.p-contents-grid > div.js-cassette")
 
         return container
 
@@ -82,24 +79,24 @@ class SearchScraper(BaseScraper):
             Utils.raise_value_error("field", Constants.OTHER_INFO)
 
         if field == Constants.OTHER_INFO_GENRE:
-            title_elem = result.find("h4", class_="p-content-cassette__genre-title")
+            info_elem = result.find("h4", class_="p-content-cassette__genre-title")
 
         elif field == Constants.OTHER_INFO_DISTRIBUTOR:
-            title_elem = result.find("h4", class_="p-content-cassette__distributor-title")
+            info_elem = result.find("h4", class_="p-content-cassette__distributor-title")
 
         else:
-            title_elem = result.find("h4", class_="p-content-cassette__other-info-title", string=field[1])
+            info_elem = result.find("h4", class_="p-content-cassette__other-info-title", string=field[1])
 
         if field in Constants.OTHER_INFO_SINGLE:
-            return title_elem.find_next_sibling("span").text if title_elem else None
+            return info_elem.find_next_sibling("span").text if info_elem else None
 
         else:
-            return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+            return [name.text for name in info_elem.find_next_sibling("ul").find_all("a")] if info_elem else None
 
     def _get_person_info(self, result: Tag, field: Tuple[str, str]) -> List[str] | None:
         if field not in Constants.PERSON_INFO:
             Utils.raise_value_error("field", Constants.PERSON_INFO)
 
-        title_elem = result.find("h4", class_="p-content-cassette__people-list-term", string=field[1])
+        info_elem = result.find("h4", class_="p-content-cassette__people-list-term", string=field[1])
         
-        return [name.text for name in title_elem.find_next_sibling("ul").find_all("a")] if title_elem else None
+        return [name.text for name in info_elem.find_next_sibling("ul").find_all("a")] if info_elem else None

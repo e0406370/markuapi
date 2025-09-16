@@ -29,43 +29,40 @@ class SearchDramaScraper(SearchScraper):
 
         dramas = []
 
-        if self._is_results_empty():
-            self.search_results["dramas"] = dramas
-            return
+        if not self._is_results_empty():
+            results = self._get_results_container()
 
-        results = self._get_results_container()
+            for ctr, result in enumerate(results[:int(self.results_limit)]):
+                d = {}
 
-        for ctr, result in enumerate(results[:int(self.results_limit)]):
-            d = {}
+                d["title"] = self._get_title(result)
+                d["rating"] = self._get_rating(result)
 
-            d["title"] = self._get_title(result)
-            d["rating"] = self._get_rating(result)
+                data_mark = self._get_data_mark(result)
+                d["mark_count"] = data_mark.count
 
-            data_mark = self._get_data_mark(result)
-            d["mark_count"] = data_mark.count
+                data_clip = self._get_data_clip(result)
+                d["clip_count"] = data_clip.count
+                d["series_id"] = data_clip.drama_series_id
+                d["season_id"] = data_clip.drama_season_id
 
-            data_clip = self._get_data_clip(result)
-            d["clip_count"] = data_clip.count
-            d["series_id"] = data_clip.drama_series_id
-            d["season_id"] = data_clip.drama_season_id
+                d["link"] = Utils.create_filmarks_link(Endpoints.INFO_DRAMAS.value["path"].format(
+                    drama_series_id=data_clip.drama_series_id, 
+                    drama_season_id=data_clip.drama_season_id,
+                ))
 
-            d["link"] = Utils.create_filmarks_link(Endpoints.INFO_DRAMAS.value["path"].format(
-                drama_series_id=data_clip.drama_series_id, 
-                drama_season_id=data_clip.drama_season_id,
-            ))
+                if poster := self._get_poster(result):
+                    d["poster"] = poster
 
-            if poster := self._get_poster(result):
-                d["poster"] = poster
+                for field in self.OTHER_INFO_FIELDS:
+                    value = self._get_other_info(result, field)
+                    if value: d[field[0]] = value
 
-            for field in self.OTHER_INFO_FIELDS:
-                value = self._get_other_info(result, field)
-                if value: d[field[0]] = value
+                for field in self.PERSON_INFO_FIELDS:
+                    value = self._get_person_info(result, field)
+                    if value: d[field[0]] = value
 
-            for field in self.PERSON_INFO_FIELDS:
-                value = self._get_person_info(result, field)
-                if value: d[field[0]] = value
-
-            Logger.info(self.get_logging(idx=ctr + 1, text=str(d)))
-            dramas.append(d)
+                Logger.info(self.get_logging(idx=ctr + 1, text=d))
+                dramas.append(d)
 
         self.search_results["dramas"] = dramas
