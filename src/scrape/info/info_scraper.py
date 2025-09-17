@@ -30,7 +30,7 @@ class InfoScraper(BaseScraper):
         selectors = ["h2.p-content-detail__title > span", "h2.c-content-box-s__title"]
         for sel in selectors:
             if title := self.detail_head.select_one(sel):
-                return title.text
+                return title.find(string=True, recursive=False).text
 
     def _get_original_title(self) -> str | None:
         selectors = ["p.p-content-detail__original", "p.c-content-box-s__original"]
