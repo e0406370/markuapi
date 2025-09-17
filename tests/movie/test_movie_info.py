@@ -1,12 +1,12 @@
 from random import choice
-from tests.test_utils import client, get_json_val
+from tests.test_utils import client, get_json_val, get_reviews_last_page
 import json
 import pytest
 
 
 @pytest.mark.parametrize("path", [
     "abc"
-    "８０４２",
+    "１４３４８",
 ])
 def test_info_input_not_valid_integer(path) -> None:
     resp = client.get(f"/movies/{path}")
@@ -16,6 +16,46 @@ def test_info_input_not_valid_integer(path) -> None:
     for err in get_json_val(resp_data, "$.detail"):
         assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
 
+
+@pytest.mark.parametrize("path", [
+    ("abc", ""),
+    ("１４３４８", ""),
+    ("14348", "?page"),
+    ("14348", "?page="),
+    ("14348", "?page=def"),
+    ("14348", "?page=２"),
+])
+def test_review_input_not_valid_integer(path) -> None:
+    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
+
+
+@pytest.mark.parametrize("path", [
+    ("14348", "?page=0"),
+])
+def test_review_input_less_than_min_threshold(path) -> None:
+    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be greater than 0"
+
+
+@pytest.mark.parametrize("path", [
+    ("14348", "?page=2001"),
+])
+def test_review_input_more_than_max_threshold(path) -> None:
+    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 2000"
 
 @pytest.mark.parametrize(
     "test_data",
@@ -781,15 +821,131 @@ def test_info_with_results_random() -> None:
         test_data = json.load(f)
         movie = choice(test_data)
 
+    title = get_json_val(movie, "$.title")
     movie_id = get_json_val(movie, "$.id")
 
     resp = client.get(f"/movies/{movie_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
-    assert get_json_val(resp_data, "$.data.title") is not None
+    assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.rating") is not None
     assert get_json_val(resp_data, "$.data.mark_count") is not None
     assert get_json_val(resp_data, "$.data.clip_count") is not None
     assert get_json_val(resp_data, "$.data.movie_id") == movie_id
     assert get_json_val(resp_data, "$.data.link") is not None
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "バットマン ビギンズ",
+            "original_title": "Batman Begins",
+            "rating": 3.8,
+            "movie_id": 22767,
+            "link": "https://filmarks.com/movies/22767",
+            "reviews": {
+                "user": {
+                    "name": "shingo",
+                    "id": "ZR5DnIWz",
+                    "link": "https://filmarks.com/users/ZR5DnIWz",
+                },
+                "review": {
+                    "date": "2012/08/11 12:01",
+                    "rating": 3.8,
+                    "id": 230,
+                    "link": "https://filmarks.com/movies/22767/reviews/230",
+                    "contents": "ダークナイトライジングに向けて復習。物語がバラバラしてる印象なんだけど、敵が悪としてではなくて自分たちの信じる正義を原理的に実行する人たちとして描かれてるのがよかった。",
+                },
+            },
+        },
+    ],
+)
+def test_review_with_results_full(test_data) -> None:
+    movie_id = get_json_val(test_data, "$.movie_id")
+
+    slug = f"movies/{movie_id}"
+    last_page = get_reviews_last_page(slug)
+
+    resp = client.get(f"{slug}/reviews?page={last_page}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+
+    info_fields = [
+        "title",
+        "rating",
+    ]
+    for field in info_fields:
+        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+
+    review_fields = [
+        "user.name",
+        "user.id",
+        "user.link",
+        "review.date",
+        "review.rating",
+        "review.id",
+        "review.link",
+        "review.contents"
+    ]
+    for field in review_fields:
+        assert get_json_val(resp_data, f"$.data.reviews[-1].{field}") == get_json_val(test_data, f"$.reviews.{field}")
+
+    assert get_json_val(resp_data, "$.data.link") == f"{get_json_val(test_data, "$.link")}?page={last_page}"
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+def test_review_with_results() -> None:
+    title = "細い目"
+    original_title = "SEPET／Chinese Eyes"
+    movie_id = 27402
+
+    resp = client.get(f"/movies/{movie_id}/reviews")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.original_title") == original_title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+def test_review_without_results() -> None:
+    title = "細い目"
+    original_title = "SEPET／Chinese Eyes"
+    movie_id = 27402
+
+    resp = client.get(f"/movies/{movie_id}/reviews?page=50")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.original_title") == original_title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) == 0
+
+
+def test_review_with_results_random() -> None:
+    with open(file="tests/movie/100_movies.json", mode="r", encoding="utf-8") as f:
+        test_data = json.load(f)
+        movie = choice(test_data)
+
+    title = get_json_val(movie, "$.title")
+    movie_id = get_json_val(movie, "$.id")
+
+    resp = client.get(f"/movies/{movie_id}/reviews")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0

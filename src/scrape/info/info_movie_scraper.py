@@ -74,8 +74,6 @@ class InfoMovieScraper(InfoScraper):
         self.data["movie_id"] = self.movie_id
         self.data["link"] = self._get_link()
 
-        self.data["page"] = self.page_number
-
         if (condition := self._is_reviews_empty()):
             self.data["reviews"] = []
             Logger.warn(self.get_logging(id=[self.movie_id], text=condition.text))

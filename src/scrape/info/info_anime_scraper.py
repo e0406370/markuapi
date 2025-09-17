@@ -83,8 +83,6 @@ class InfoAnimeScraper(InfoScraper):
         self.data["series_id"] = self.series_id
         self.data["season_id"] = self.season_id
         self.data["link"] = self._get_link()
-        
-        self.data["page"] = self.page_number
 
         if (condition := self._is_reviews_empty()):
             self.data["reviews"] = []

@@ -1,15 +1,15 @@
 from random import choice
-from tests.test_utils import client, get_json_val
+from tests.test_utils import client, get_json_val, get_reviews_last_page
 import json
 import pytest
 
 
 @pytest.mark.parametrize("path", [
     "abc/xyz",
-    "6055/t",
-    "hi/8586",
-    "８０４２/11683",
-    "8042/１１６８３",
+    "2592/t",
+    "hi/3304",
+    "２５９２/3304",
+    "2592/３３０４",
 ])
 def test_info_input_not_valid_integer(path) -> None:
     resp = client.get(f"/animes/{path}")
@@ -18,6 +18,50 @@ def test_info_input_not_valid_integer(path) -> None:
     assert resp.status_code == 422
     for err in get_json_val(resp_data, "$.detail"):
         assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
+
+
+@pytest.mark.parametrize("path", [
+    ("abc/xyz", ""),
+    ("2592/t", ""),
+    ("hi/3304", ""),
+    ("２５９２/3304", ""),
+    ("2592/３３０４", ""),
+    ("2592/3304", "?page"),
+    ("2592/3304", "?page="),
+    ("2592/3304", "?page=def"),
+    ("2592/3304", "?page=２"),
+])
+def test_review_input_not_valid_integer(path) -> None:
+    resp = client.get(f"/animes/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
+
+
+@pytest.mark.parametrize("path", [
+    ("2592/3304", "?page=0"),
+])
+def test_review_input_less_than_min_threshold(path) -> None:
+    resp = client.get(f"/animes/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be greater than 0"
+
+
+@pytest.mark.parametrize("path", [
+    ("2592/3304", "?page=2001"),
+])
+def test_review_input_more_than_max_threshold(path) -> None:
+    resp = client.get(f"/animes/{path[0]}/reviews{path[1]}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 422
+    for err in get_json_val(resp_data, "$.detail"):
+        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 2000"
 
 
 @pytest.mark.parametrize(
@@ -419,6 +463,7 @@ def test_info_with_results_random() -> None:
         test_data = json.load(f)
         anime = choice(test_data)
 
+    title = get_json_val(anime, "$.title")
     series_id = get_json_val(anime, "$.series")
     season_id = get_json_val(anime, "$.season")
 
@@ -426,10 +471,133 @@ def test_info_with_results_random() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
-    assert get_json_val(resp_data, "$.data.title") is not None
+    assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.rating") is not None
     assert get_json_val(resp_data, "$.data.mark_count") is not None
     assert get_json_val(resp_data, "$.data.clip_count") is not None
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
     assert get_json_val(resp_data, "$.data.link") is not None
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "DEATH NOTE",
+            "rating": 4.3,
+            "series_id": 1533,
+            "season_id": 2046,
+            "link": "https://filmarks.com/animes/1533/2046",
+            "reviews": {
+                "user": {
+                    "name": "ChameleonBaby",
+                    "id": "Nick575",
+                    "link": "https://filmarks.com/users/Nick575",
+                },
+                "review": {
+                    "date": "2020/11/20 19:29",
+                    "rating": 4,
+                    "id": 292787,
+                    "link": "https://filmarks.com/animes/1533/2046/reviews/292787",
+                    "contents": "原作が素晴らしいが、アニメ化も素晴らしかった。 特にシブタクの人気が圧倒的。 数々のMAD素材にもなったことから、当時のニコニコ動画文化に根強く浸透している。",
+                },
+            },
+        },
+    ],
+)
+def test_review_with_results_full(test_data) -> None:
+    series_id = get_json_val(test_data, "$.series_id")
+    season_id = get_json_val(test_data, "$.season_id")
+
+    slug = f"animes/{series_id}/{season_id}"
+    last_page = get_reviews_last_page(slug)
+
+    resp = client.get(f"{slug}/reviews?page={last_page}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+
+    info_fields = [
+        "title",
+        "rating",
+    ]
+    for field in info_fields:
+        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+
+    review_fields = [
+        "user.name",
+        "user.id",
+        "user.link",
+        "review.date",
+        "review.rating",
+        "review.id",
+        "review.link",
+        "review.contents"
+    ]
+    for field in review_fields:
+        assert get_json_val(resp_data, f"$.data.reviews[-1].{field}") == get_json_val(test_data, f"$.reviews.{field}")
+
+    assert get_json_val(resp_data, "$.data.link") == f"{get_json_val(test_data, "$.link")}?page={last_page}"
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+def test_review_with_results() -> None:
+    title = "ラグラッツ シーズン1"
+    original_title = "Rugrats Season 1"
+    series_id = 3980
+    season_id = 5380
+
+    resp = client.get(f"/animes/{series_id}/{season_id}/reviews")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.original_title") == original_title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+def test_review_without_results() -> None:
+    title = "ラグラッツ シーズン1"
+    original_title = "Rugrats Season 1"
+    series_id = 3980
+    season_id = 5380
+
+    resp = client.get(f"/animes/{series_id}/{season_id}/reviews?page=10")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.original_title") == original_title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) == 0
+
+
+def test_review_with_results_random() -> None:
+    with open(file="tests/anime/100_animes.json", mode="r", encoding="utf-8") as f:
+        test_data = json.load(f)
+        anime = choice(test_data)
+
+    title = get_json_val(anime, "$.title")
+    series_id = get_json_val(anime, "$.series")
+    season_id = get_json_val(anime, "$.season")
+
+    resp = client.get(f"/animes/{series_id}/{season_id}/reviews")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.title") == title
+    assert get_json_val(resp_data, "$.data.rating") is not None
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert get_json_val(resp_data, "$.data.link") is not None
+    assert len(get_json_val(resp_data, "$.data.reviews")) > 0

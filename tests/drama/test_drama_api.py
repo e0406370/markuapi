@@ -11,6 +11,8 @@ import pytest
     "/dramas",
     "/dramas/1",
     "/dramas//1",
+    "/dramas/1//reviews",
+    "/dramas//1/reviews",
     "/list-drama",
     "/list-drama/vod",
     "/list-drama/year/2010s/2019",
@@ -30,6 +32,7 @@ def test_invalid_endpoint_base(path) -> None:
 
 @pytest.mark.parametrize("path", [
     "/dramas/9999999999/9999999999",
+    "/dramas/9999999999/9999999999/reviews",
     "/list-drama/vod/invalid_vod",
     "/list-drama/year/999s",
     "/list-drama/year/999",
@@ -60,6 +63,10 @@ def test_invalid_endpoint_filmarks(path) -> None:
         {"path": "dramas/{drama_series_id}/{drama_season_id}"},
     ),
     (
+        "/dramas/6055/8586/reviews",
+        {"path": "dramas/{drama_series_id}/{drama_season_id}/reviews", "type": "path"},
+    ),
+    (
         "/list-drama/trend",
         {"path": "list-drama/trend", "type": "query"},
     ),
@@ -72,7 +79,7 @@ def test_invalid_endpoint_filmarks(path) -> None:
         {"path": "list-drama/year/{year}s", "type": "path+query", "view": "drama"},
     ),
     (
-        "/list-drama/year/2020",
+        "/list-drama/year/2025",
         {"path": "list-drama/year/{year}", "type": "path+query", "view": "drama"},
     ),
     (
@@ -114,6 +121,10 @@ def test_scrape_error_404_not_found(mocker, test_data) -> None:
     ),
     (
         "/dramas/500/500",
+        "src.scrape.info.info_drama_scraper.InfoDramaScraper.scrape",
+    ),
+    (
+        "/dramas/500/500/reviews",
         "src.scrape.info.info_drama_scraper.InfoDramaScraper.scrape",
     ),
     (
@@ -165,6 +176,7 @@ def test_scrape_error_500_server_error(mocker, test_data) -> None:
 @pytest.mark.parametrize("path", [
     "/search/dramas?q=test503",
     "/dramas/503/503",
+    "/dramas/503/503/reviews",
     "/list-drama/trend",
     "/list-drama/vod/503_vod",
     "/list-drama/year/503s",
@@ -188,6 +200,7 @@ def test_scrape_error_503_service_unavailable_session(mocker, path) -> None:
 
 
 @pytest.mark.parametrize("path", [
+    "/dramas/6055/8586/reviews?page=9999999999999999999",
     "/list-drama/trend?page=999999999999999999",
     "/list-drama/vod/prime_video?page=999999999999999999",
     "/list-drama/year/2020s?page=999999999999999999",

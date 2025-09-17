@@ -9,6 +9,7 @@ import pytest
 
 @pytest.mark.parametrize("path", [
     "/movies",
+    "/movies//reviews",
     "/list-movie",
     "/list-movie/vod",
     "/list-movie/award",
@@ -31,6 +32,7 @@ def test_invalid_endpoint_base(path) -> None:
 
 @pytest.mark.parametrize("path", [
     "/movies/9999999999",
+    "/movies/9999999999/reviews",
     "/list-movie/vod/invalid_vod",
     "/list-movie/award/9999999999",
     "/list-movie/year/999s",
@@ -62,6 +64,10 @@ def test_invalid_endpoint_filmarks(path) -> None:
     (
         "/movies/14348",
         {"path": "movies/{movie_id}"},
+    ),
+    (
+        "/movies/14348/reviews",
+        {"path": "movies/{movie_id}/reviews", "type": "path"},
     ),
     (
         "/list-movie/now",
@@ -145,6 +151,10 @@ def test_scrape_error_404_not_found(mocker, test_data) -> None:
         "src.scrape.info.info_movie_scraper.InfoMovieScraper.scrape",
     ),
     (
+        "/movies/500/reviews",
+        "src.scrape.info.info_movie_scraper.InfoMovieScraper.scrape",
+    ),
+    (
         "/list-movie/now",
         "src.scrape.search.search_movie_scraper.SearchMovieScraper.scrape",
     ),
@@ -217,6 +227,7 @@ def test_scrape_error_500_server_error(mocker, test_data) -> None:
 @pytest.mark.parametrize("path", [
     "/search/movies?q=test503",
     "/movies/503",
+    "/movies/503/reviews",
     "/list-movie/now",
     "/list-movie/coming-soon",
     "/list-movie/opening-this-week",
@@ -246,6 +257,7 @@ def test_scrape_error_503_service_unavailable_session(mocker, path) -> None:
 
 
 @pytest.mark.parametrize("path", [
+    "/movies/14348/reviews?page=9999999999999999999",
     "/list-movie/now?page=999999999999999999",
     "/list-movie/coming-soon?page=999999999999999999",
     "/list-movie/opening-this-week?page=999999999999999999",

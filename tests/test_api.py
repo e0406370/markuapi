@@ -20,6 +20,7 @@ def test_api_routes() -> None:
     defined_routes = {
         "/search/animes",
         "/animes/{anime_series_id}/{anime_season_id}",
+        "/animes/{anime_series_id}/{anime_season_id}/reviews",
         "/list-anime/trend",
         "/list-anime/vod/{vod_name}",
         "/list-anime/year/{year_series}s",
@@ -30,6 +31,7 @@ def test_api_routes() -> None:
         "/list-anime/person/{person_id}",
         "/search/dramas",
         "/dramas/{drama_series_id}/{drama_season_id}",
+        "/dramas/{drama_series_id}/{drama_season_id}/reviews",
         "/list-drama/trend",
         "/list-drama/vod/{vod_name}",
         "/list-drama/year/{year_series}s",
@@ -40,6 +42,7 @@ def test_api_routes() -> None:
         "/list-drama/person/{person_id}",
         "/search/movies",
         "/movies/{movie_id}",
+        "/movies/{movie_id}/reviews",
         "/list-movie/now",
         "/list-movie/coming-soon",
         "/list-movie/opening-this-week",
