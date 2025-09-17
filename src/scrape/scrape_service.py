@@ -26,7 +26,6 @@ def search_scrape(endpoint: Dict[str, str], req: Request, message: str) -> Dict[
                 Utils.raise_value_error(item="view", group=Constants.VIEWS)
 
         scraper.set_search_results()
-
         return scraper.get_response()
 
     except HTTPException:
@@ -54,7 +53,33 @@ def info_scrape(endpoint: Dict[str, str], req: Request, message: str) -> Dict[st
                 Utils.raise_value_error(item="view", group=Constants.VIEWS)
 
         scraper.set_info_data()
+        return scraper.get_response()
 
+    except HTTPException:
+        raise
+
+    except Exception:
+        Logger.exception(message)
+
+        raise CustomException.server_error()
+
+
+def review_scrape(endpoint: Dict[str, str], req: Request, message: str) -> Dict[str, Any]:
+    try:
+        match endpoint.get("view", ""):
+            case Constants.VIEW_ANIME:
+                scraper = InfoAnimeScraper.scrape(endpoint, req)
+
+            case Constants.VIEW_DRAMA:
+                scraper = InfoDramaScraper.scrape(endpoint, req)
+
+            case Constants.VIEW_MOVIE:
+                scraper = InfoMovieScraper.scrape(endpoint, req)
+
+            case _:
+                Utils.raise_value_error(item="view", group=Constants.VIEWS)
+
+        scraper.set_review_data()
         return scraper.get_response()
 
     except HTTPException:

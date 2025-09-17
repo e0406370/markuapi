@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
-from src.scrape.scrape_service import info_scrape, search_scrape
+from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
 from src.utility.endpoints import Endpoints
 from src.utility.models import SearchParams
 from typing import Annotated, Any, Dict
@@ -30,7 +30,21 @@ def info_movies(
     return info_scrape(
         endpoint=Endpoints.INFO_MOVIES.value,
         req=req,
-        message=f"Failed to retrieve movie information with ID: {movie_id}.",
+        message=f"Failed to retrieve information for movie with ID: {movie_id}.",
+    )
+
+
+@router.get("/movies/{movie_id}/reviews")
+def review_movies(
+    movie_id: int,
+    search_params: Annotated[SearchParams, Depends()],
+    req: Request
+) -> Dict[str, Any]:
+
+    return review_scrape(
+        endpoint=Endpoints.REVIEW_MOVIES.value,
+        req=req,
+        message=f"Failed to retrieve reviews for movie with ID: {movie_id}.",
     )
 
 

@@ -30,9 +30,6 @@ class InfoDramaScraper(InfoScraper):
         self.series_id = int(self.params.get("drama_series_id"))
         self.season_id = int(self.params.get("drama_season_id"))
 
-    def get_logging(self) -> str:
-        return f"[Drama] [Series ID: {self.series_id}, Season ID: {self.season_id}] {self.data}"
-
     def set_info_data(self) -> None:
         self.data["title"] = self._get_title()
 
@@ -68,4 +65,26 @@ class InfoDramaScraper(InfoScraper):
             value = self._get_person_info(field)
             if value: self.data[field[0]] = value
 
-        Logger.info(self.get_logging())
+        Logger.info(self.get_logging(id=[self.series_id, self.season_id], text=self.data))
+        
+    def set_review_data(self) -> None:
+        self.data["title"] = self._get_title()
+
+        if original_title := self._get_original_title():
+            self.data["original_title"] = original_title
+
+        self.data["rating"] = self._get_rating()
+
+        self.data["series_id"] = self.series_id
+        self.data["season_id"] = self.season_id
+        self.data["link"] = self._get_link()
+
+        self.data["page"] = self.page_number
+
+        if (condition := self._is_reviews_empty()):
+            self.data["reviews"] = []
+            Logger.warn(self.get_logging(id=[self.series_id, self.season_id], text=condition.text))
+
+        else:
+            self.data["reviews"] = self._get_review_info()
+            Logger.info(self.get_logging(id=[self.series_id, self.season_id], text=self.data))

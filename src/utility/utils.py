@@ -97,6 +97,15 @@ class Constants:
 
 class Utils:
     @staticmethod
+    def raise_value_error(item: str, group: Set) -> None:
+        options = ", ".join(f"'{i}'" for i in group)
+        raise ValueError(f"'{item}' can only be one of these: {options}")
+
+    @staticmethod
+    def get_scrape_date() -> datetime:
+        return datetime.now(timezone.utc).isoformat(sep=" ", timespec="seconds")
+
+    @staticmethod
     def create_filmarks_link(url: str) -> str:
         return urljoin(base=Constants.FILMARKS_BASE, url=url)
 
@@ -106,9 +115,8 @@ class Utils:
 
         other_info["name"] = name
 
-        link = Utils.create_filmarks_link(link)
         other_info["id"] = int(link.split("/")[-1])
-        other_info["link"] = link
+        other_info["link"] = Utils.create_filmarks_link(link)
 
         return other_info
 
@@ -119,17 +127,27 @@ class Utils:
         person_info["name"] = name
         if character: person_info["character"] = character
 
-        link = Utils.create_filmarks_link(link)
-        person_info["people_id"] = int(link.split("/")[-1])
-        person_info["link"] = link
+        person_info["id"] = int(link.split("/")[-1])
+        person_info["link"] = Utils.create_filmarks_link(link)
 
         return person_info
 
     @staticmethod
-    def raise_value_error(item: str, group: Set) -> None:
-        options = ", ".join(f"'{i}'" for i in group)
-        raise ValueError(f"'{item}' can only be one of these: {options}")
+    def create_review_info(user_name: str, user_link: str, review_date: str, review_rating: str, review_link: str, review_contents: str) -> Dict[str, str]:
+        review_info = {}
 
-    @staticmethod
-    def get_scrape_date() -> datetime:
-        return datetime.now(timezone.utc).isoformat(sep=" ", timespec="seconds")
+        user = {}
+        user["name"] = user_name
+        user["id"] = user_link.split("/")[-1]
+        user["link"] = Utils.create_filmarks_link(user_link)
+        review_info["user"] = user
+
+        review = {}
+        review["date"] = review_date
+        review["rating"] = review_rating
+        review["id"] = int(review_link.split("/")[-1])
+        review["link"] = Utils.create_filmarks_link(review_link)
+        if review_contents: review["contents"] = review_contents
+        review_info["review"] = review
+
+        return review_info

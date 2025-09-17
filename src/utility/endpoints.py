@@ -18,6 +18,12 @@ class Endpoints(Enum):
         "view": Constants.VIEW_ANIME,
     }
 
+    REVIEW_ANIMES: Dict[str, str] = {
+        "path": "animes/{anime_series_id}/{anime_season_id}",
+        "type": Constants.TYPE_COMBINED,
+        "view": Constants.VIEW_ANIME,
+    }
+
     LIST_ANIMES_TRENDING: Dict[str, str] = {
         "path": "list-anime/trend",
         "type": Constants.TYPE_QUERY,
@@ -78,6 +84,12 @@ class Endpoints(Enum):
         "view": Constants.VIEW_DRAMA,
     }
 
+    REVIEW_DRAMAS: Dict[str, str] = {
+        "path": "dramas/{drama_series_id}/{drama_season_id}",
+        "type": Constants.TYPE_COMBINED,
+        "view": Constants.VIEW_DRAMA,
+    }
+
     LIST_DRAMAS_TRENDING: Dict[str, str] = {
         "path": "list-drama/trend",
         "type": Constants.TYPE_QUERY,
@@ -135,6 +147,12 @@ class Endpoints(Enum):
     INFO_MOVIES: Dict[str, str] = {
         "path": "movies/{movie_id}",
         "type": Constants.TYPE_PATH,
+        "view": Constants.VIEW_MOVIE,
+    }
+
+    REVIEW_MOVIES: Dict[str, str] = {
+        "path": "movies/{movie_id}",
+        "type": Constants.TYPE_COMBINED,
         "view": Constants.VIEW_MOVIE,
     }
 
