@@ -40,7 +40,7 @@ class Constants:
     OTHER_INFO_SCREENING_DATE = ("screening_date", "上映日：")
     OTHER_INFO_PLAYBACK_TIME = ("playback_time", "再生時間：")
     OTHER_INFO_SCREENING_TIME = ("screening_time", "上映時間：")
-    OTHER_INFO_COUNTRY_OF_ORIGIN = ("country_of_origin", "製作国：")
+    OTHER_INFO_COUNTRY_OF_ORIGIN = ("country_of_origin", "製作国・地域：")
     OTHER_INFO_PRODUCTION_COMPANY = ("production_company", "制作会社：")
     OTHER_INFO_GENRE = ("genre", "ジャンル：")
     OTHER_INFO_DISTRIBUTOR = ("distributor", "配給：")
