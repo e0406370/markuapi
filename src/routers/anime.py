@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
 from src.utility.endpoints import Endpoint
-from src.utility.models import ReviewParams, SearchParams
+from src.utility.models import ReviewParams, ListParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
@@ -52,7 +52,7 @@ def review_animes(
 
 @router.get("/list-anime/trend", tags=["anime"], summary="Fetch currently trending animes")
 def list_animes_trending(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -66,7 +66,7 @@ def list_animes_trending(
 @router.get("/list-anime/vod/{vod_name}", tags=["anime"], summary="Fetch animes available on a specific VOD service")
 def list_animes_vod(
     vod_name: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -80,7 +80,7 @@ def list_animes_vod(
 @router.get("/list-anime/year/{year_series}s", tags=["anime"], summary="Fetch animes released in a specific decade")
 def list_animes_year_series(
     year_series: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -94,7 +94,7 @@ def list_animes_year_series(
 @router.get("/list-anime/year/{year}", tags=["anime"], summary="Fetch animes released in a specific year")
 def list_animes_year_specific(
     year: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -111,7 +111,7 @@ def list_animes_year_specific(
 def list_animes_year_season(
     year: int,
     season_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -125,7 +125,7 @@ def list_animes_year_season(
 @router.get("/list-anime/company/{company_id}", tags=["anime"], summary="Fetch animes associated with a specific production company")
 def list_animes_company(
     company_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -139,7 +139,7 @@ def list_animes_company(
 @router.get("/list-anime/tag/{tag}", tags=["anime"], summary="Fetch animes categorised under a specific tag")
 def list_animes_tag(
     tag: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -153,7 +153,7 @@ def list_animes_tag(
 @router.get("/list-anime/person/{person_id}", tags=["anime"], summary="Fetch animes linked to a specific person")
 def list_animes_person(
     person_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
 from src.utility.endpoints import Endpoint
-from src.utility.models import ReviewParams, SearchParams
+from src.utility.models import ReviewParams, ListParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
@@ -52,7 +52,7 @@ def review_dramas(
 
 @router.get("/list-drama/trend", tags=["drama"], summary="Fetch currently trending dramas")
 def list_dramas_trending(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -66,7 +66,7 @@ def list_dramas_trending(
 @router.get("/list-drama/vod/{vod_name}", tags=["drama"], summary="Fetch dramas available on a specific VOD service")
 def list_dramas_vod(
     vod_name: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -80,7 +80,7 @@ def list_dramas_vod(
 @router.get("/list-drama/year/{year_series}s", tags=["drama"], summary="Fetch dramas released in a specific decade")
 def list_dramas_year_series(
     year_series: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -94,7 +94,7 @@ def list_dramas_year_series(
 @router.get("/list-drama/year/{year}", tags=["drama"], summary="Fetch dramas released in a specific year")
 def list_dramas_year_specific(
     year: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -110,7 +110,7 @@ def list_dramas_year_specific(
 @router.get("/list-drama/country/{country_id}", tags=["drama"], summary="Fetch dramas from a specific country")
 def list_dramas_country(
     country_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -124,7 +124,7 @@ def list_dramas_country(
 @router.get("/list-drama/genre/{genre_id}", tags=["drama"], summary="Fetch dramas categorised under a specific genre")
 def list_dramas_genre(
     genre_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -138,7 +138,7 @@ def list_dramas_genre(
 @router.get("/list-drama/tag/{tag}", tags=["drama"], summary="Fetch dramas categorised under a specific tag")
 def list_dramas_tag(
     tag: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -152,7 +152,7 @@ def list_dramas_tag(
 @router.get("/list-drama/person/{person_id}", tags=["drama"], summary="Fetch dramas linked to a specific person")
 def list_dramas_person(
     person_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 

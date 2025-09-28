@@ -1,7 +1,7 @@
 from pydantic import Field
 from requests.exceptions import RequestException
 from src.api import api
-from src.utility.models import ReviewParams, SearchParams
+from src.utility.models import ListParams, ReviewParams, SearchParams
 from tests.test_utils import client, get_json_val
 import pytest
 
@@ -163,6 +163,7 @@ def test_scrape_error_503_service_unavailable_filmarks(path, caplog) -> None:
         page: int = Field(1, gt=0)
     api.dependency_overrides[SearchParams] = CustomParams
     api.dependency_overrides[ReviewParams] = CustomParams
+    api.dependency_overrides[ListParams] = CustomParams
 
     resp = client.get(path)
     resp_data = resp.json()
@@ -173,3 +174,4 @@ def test_scrape_error_503_service_unavailable_filmarks(path, caplog) -> None:
 
     del api.dependency_overrides[SearchParams]
     del api.dependency_overrides[ReviewParams]
+    del api.dependency_overrides[ListParams]

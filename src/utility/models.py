@@ -36,10 +36,16 @@ class MovieDataMark(Struct):
     count: int
 
 
+class SearchParams(BaseModel):
+    q: str = ""
+    limit: int = Field(10, gt=0, le=100)
+    page: int = Field(1, gt=0, le=10000)
+
+
 class ReviewParams(BaseModel):
     page: int = Field(1, gt=0, le=10000)
 
 
-class SearchParams(BaseModel):
+class ListParams(BaseModel):
     limit: int = Field(10, gt=0, le=100)
     page: int = Field(1, gt=0, le=10000)

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
 from src.utility.endpoints import Endpoint
-from src.utility.models import ReviewParams, SearchParams
+from src.utility.models import ReviewParams, ListParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
@@ -50,7 +50,7 @@ def review_movies(
 
 @router.get("/list-movie/now", tags=["movie"], summary="Fetch movies that are currently screening")
 def list_movies_currently_screening(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -63,7 +63,7 @@ def list_movies_currently_screening(
 
 @router.get("/list-movie/coming-soon", tags=["movie"], summary="Fetch movies that are coming soon")
 def list_movies_coming_soon(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -76,7 +76,7 @@ def list_movies_coming_soon(
 
 @router.get("/list-movie/opening-this-week", tags=["movie"], summary="Fetch movies that are opening this week")
 def list_movies_opening_this_week(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -89,7 +89,7 @@ def list_movies_opening_this_week(
 
 @router.get("/list-movie/trend", tags=["movie"], summary="Fetch currently trending movies")
 def list_movies_trending(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -103,7 +103,7 @@ def list_movies_trending(
 @router.get("/list-movie/vod/{vod_name}", tags=["movie"], summary="Fetch movies available on a specific VOD service")
 def list_movies_vod(
     vod_name: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -117,7 +117,7 @@ def list_movies_vod(
 @router.get("/list-movie/award/{award_id}", tags=["movie"], summary="Fetch movies that received a specific award")
 def list_movies_award(
     award_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -131,7 +131,7 @@ def list_movies_award(
 @router.get("/list-movie/year/{year_series}s", tags=["movie"], summary="Fetch movies released in a specific decade")
 def list_movies_year_series(
     year_series: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -145,7 +145,7 @@ def list_movies_year_series(
 @router.get("/list-movie/year/{year}", tags=["movie"], summary="Fetch movies released in a specific year")
 def list_movies_year_specific(
     year: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -161,7 +161,7 @@ def list_movies_year_specific(
 @router.get("/list-movie/country/{country_id}", tags=["movie"], summary="Fetch movies from a specific country")
 def list_movies_country(
     country_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -175,7 +175,7 @@ def list_movies_country(
 @router.get("/list-movie/genre/{genre_id}", tags=["movie"], summary="Fetch movies categorised under a specific genre")
 def list_movies_genre(
     genre_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -189,7 +189,7 @@ def list_movies_genre(
 @router.get("/list-movie/distributor/{distributor_id}", tags=["movie"], summary="Fetch movies associated with a specific distributor")
 def list_movies_distributor(
     distributor_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -203,7 +203,7 @@ def list_movies_distributor(
 @router.get("/list-movie/series/{series_id}", tags=["movie"], summary="Fetch movies categorised under a specific series")
 def list_movies_series(
     series_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -217,7 +217,7 @@ def list_movies_series(
 @router.get("/list-movie/tag/{tag}", tags=["movie"], summary="Fetch movies categorised under a specific tag")
 def list_movies_tag(
     tag: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
@@ -231,7 +231,7 @@ def list_movies_tag(
 @router.get("/list-movie/person/{person_id}", tags=["movie"], summary="Fetch movies linked to a specific person")
 def list_movies_person(
     person_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
