@@ -1,28 +1,28 @@
 from bs4 import BeautifulSoup
 from src.scrape.info.info_scraper import InfoScraper
 from src.utility.lib import Logger
-from src.utility.utils import Constants
-from typing import Dict, List, Tuple
+from src.utility.utils import OtherInfo, PersonInfo, ViewType
+from typing import Dict, List
 
 
 class InfoMovieScraper(InfoScraper):
-    OTHER_INFO_FIELDS: List[Tuple[str, str]] = [
-        Constants.OTHER_INFO_SCREENING_DATE,
-        Constants.OTHER_INFO_SCREENING_TIME,
-        Constants.OTHER_INFO_COUNTRY_OF_ORIGIN,
-        Constants.OTHER_INFO_GENRE,
-        Constants.OTHER_INFO_DISTRIBUTOR,
+    OTHER_INFO_FIELDS: List[OtherInfo] = [
+        OtherInfo.SCREENING_DATE,
+        OtherInfo.SCREENING_TIME,
+        OtherInfo.COUNTRY_OF_ORIGIN,
+        OtherInfo.GENRE,
+        OtherInfo.DISTRIBUTOR,
     ]
 
-    PERSON_INFO_FIELDS: List[Tuple[str, str]] = [
-        Constants.PERSON_INFO_CREATOR,
-        Constants.PERSON_INFO_DIRECTOR,
-        Constants.PERSON_INFO_SCRIPTWRITER,
-        Constants.PERSON_INFO_ARTIST,
-        Constants.PERSON_INFO_CAST,
+    PERSON_INFO_FIELDS: List[PersonInfo] = [
+        PersonInfo.CREATOR,
+        PersonInfo.DIRECTOR,
+        PersonInfo.SCRIPTWRITER,
+        PersonInfo.ARTIST,
+        PersonInfo.CAST,
     ]
 
-    def __init__(self, soup: BeautifulSoup, params: Dict, view: str) -> None:
+    def __init__(self, soup: BeautifulSoup, params: Dict, view: ViewType) -> None:
         super().__init__(soup, params, view)
 
         self.movie_id = int(self.params.get("movie_id"))
@@ -47,19 +47,22 @@ class InfoMovieScraper(InfoScraper):
         self.data["movie_id"] = self.movie_id
         self.data["link"] = self._get_link()
 
+        if official_site := self._get_official_site():
+            self.data["official_site"] = official_site
+
         if poster := self._get_poster():
             self.data["poster"] = poster
 
         if production_year := self._get_production_year():
             self.data["production_year_link"], self.data["production_year"] = production_year
-        
+
         for field in self.OTHER_INFO_FIELDS:
             value = self._get_other_info(field)
-            if value: self.data[field[0]] = value
+            if value: self.data[field.key] = value
 
         for field in self.PERSON_INFO_FIELDS:
             value = self._get_person_info(field)
-            if value: self.data[field[0]] = value
+            if value: self.data[field.key] = value
 
         Logger.info(self.get_logging(id=[self.movie_id], text=self.data))
         

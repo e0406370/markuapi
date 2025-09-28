@@ -3,12 +3,12 @@ from bs4.element import ResultSet, Tag
 from msgspec import Struct
 from src.scrape.base_scraper import BaseScraper
 from src.utility.lib import Logger, MsgSpecJSONResponse
-from src.utility.utils import Constants, Utils
-from typing import Any, Dict, List, Tuple
+from src.utility.utils import OtherInfo, PersonInfo, Utils, ViewType
+from typing import Any, Dict, List
 
 
 class SearchScraper(BaseScraper):
-    def __init__(self, soup: BeautifulSoup, params: Dict, view: str) -> None:
+    def __init__(self, soup: BeautifulSoup, params: Dict, view: ViewType) -> None:
         super().__init__(soup, params, view)
 
         self.results_limit = self.params.get("limit", 10)
@@ -27,7 +27,7 @@ class SearchScraper(BaseScraper):
         }
 
     def get_logging(self, idx: int, text: str) -> str:
-        return f"[{self.view}] [{idx} | Query: {self.search_query} | Heading: {self.search_heading} | Page: {self.page_number}] {text}"
+        return f"[{self.view.value}] [{idx} | Query: {self.search_query} | Heading: {self.search_heading} | Page: {self.page_number}] {text}"
 
     def _get_heading(self) -> str:
         selectors = ["h1.c-heading-1", "h1.c-page-title__title"]
@@ -58,45 +58,33 @@ class SearchScraper(BaseScraper):
         return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self, result: Tag) -> Struct:
-        if self.view not in Constants.MARKS:
-            Utils.raise_value_error("view", Constants.VIEWS)
-
-        return MsgSpecJSONResponse.parse(content=result.attrs["data-mark"], type=Constants.MARKS[self.view])
+        return MsgSpecJSONResponse.parse(content=result.attrs["data-mark"], type=self.view.mark)
 
     def _get_data_clip(self, result: Tag) -> Struct:
-        if self.view not in Constants.CLIPS:
-            Utils.raise_value_error("view", Constants.VIEWS)
-
-        return MsgSpecJSONResponse.parse(content=result.attrs["data-clip"], type=Constants.CLIPS[self.view])
+        return MsgSpecJSONResponse.parse(content=result.attrs["data-clip"], type=self.view.clip)
 
     def _get_poster(self, result: Tag) -> str | None:
         poster = result.select_one("div.c2-poster-m > img")
 
         return poster.attrs["src"] if poster else None
 
-    def _get_other_info(self, result: Tag, field: Tuple[str, str]) -> str | None:
-        if field not in Constants.OTHER_INFO:
-            Utils.raise_value_error("field", Constants.OTHER_INFO)
-
-        if field == Constants.OTHER_INFO_GENRE:
+    def _get_other_info(self, result: Tag, field: OtherInfo) -> str | List[str] | None:
+        if field == OtherInfo.GENRE:
             info_elem = result.find("h4", class_="p-content-cassette__genre-title")
 
-        elif field == Constants.OTHER_INFO_DISTRIBUTOR:
+        elif field == OtherInfo.DISTRIBUTOR:
             info_elem = result.find("h4", class_="p-content-cassette__distributor-title")
 
         else:
-            info_elem = result.find("h4", class_="p-content-cassette__other-info-title", string=field[1])
+            info_elem = result.find("h4", class_="p-content-cassette__other-info-title", string=field.title)
 
-        if field in Constants.OTHER_INFO_SINGLE:
+        if field in OtherInfo.single_fields():
             return info_elem.find_next_sibling("span").text if info_elem else None
 
         else:
             return [name.text for name in info_elem.find_next_sibling("ul").find_all("a")] if info_elem else None
 
-    def _get_person_info(self, result: Tag, field: Tuple[str, str]) -> List[str] | None:
-        if field not in Constants.PERSON_INFO:
-            Utils.raise_value_error("field", Constants.PERSON_INFO)
-
-        info_elem = result.find("h4", class_="p-content-cassette__people-list-term", string=field[1])
+    def _get_person_info(self, result: Tag, field: PersonInfo) -> List[str] | None:
+        info_elem = result.find("h4", class_="p-content-cassette__people-list-term", string=field.title)
         
         return [name.text for name in info_elem.find_next_sibling("ul").find_all("a")] if info_elem else None

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
-from src.utility.endpoints import Endpoints
-from src.utility.models import SearchParams
+from src.utility.endpoints import Endpoint
+from src.utility.models import ReviewParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
@@ -15,7 +15,7 @@ def search_movies(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.SEARCH_MOVIES.value,
+        endpoint=Endpoint.SEARCH_MOVIES,
         req=req,
         message="Failed to search movies.",
     )
@@ -28,7 +28,7 @@ def info_movies(
 ) -> Dict[str, Any]:
 
     return info_scrape(
-        endpoint=Endpoints.INFO_MOVIES.value,
+        endpoint=Endpoint.INFO_MOVIES,
         req=req,
         message=f"Failed to retrieve information for movie with ID: {movie_id}.",
     )
@@ -37,12 +37,12 @@ def info_movies(
 @router.get("/movies/{movie_id}/reviews")
 def review_movies(
     movie_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    review_params: Annotated[ReviewParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return review_scrape(
-        endpoint=Endpoints.REVIEW_MOVIES.value,
+        endpoint=Endpoint.REVIEW_MOVIES,
         req=req,
         message=f"Failed to retrieve reviews for movie with ID: {movie_id}.",
     )
@@ -55,7 +55,7 @@ def list_movies_currently_screening(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_NOW.value,
+        endpoint=Endpoint.LIST_MOVIES_NOW,
         req=req,
         message="Failed to fetch currently screening movies.",
     )
@@ -68,7 +68,7 @@ def list_movies_coming_soon(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_COMING.value,
+        endpoint=Endpoint.LIST_MOVIES_COMING,
         req=req,
         message="Failed to fetch upcoming movies.",
     )
@@ -81,7 +81,7 @@ def list_movies_opening_this_week(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_UPCOMING.value,
+        endpoint=Endpoint.LIST_MOVIES_UPCOMING,
         req=req,
         message="Failed to fetch movies opening this week.",
     )
@@ -94,7 +94,7 @@ def list_movies_trending(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_TRENDING.value,
+        endpoint=Endpoint.LIST_MOVIES_TRENDING,
         req=req,
         message="Failed to fetch trending movies.",
     )
@@ -108,7 +108,7 @@ def list_movies_vod(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_VOD.value,
+        endpoint=Endpoint.LIST_MOVIES_VOD,
         req=req,
         message=f"Failed to fetch movies from VOD service: {vod_name}.",
     )
@@ -122,7 +122,7 @@ def list_movies_award(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_AWARD.value,
+        endpoint=Endpoint.LIST_MOVIES_AWARD,
         req=req,
         message=f"Failed to fetch movies with award ID: {award_id}.",
     )
@@ -136,7 +136,7 @@ def list_movies_year_series(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_YEAR_SERIES.value,
+        endpoint=Endpoint.LIST_MOVIES_YEAR_SERIES,
         req=req,
         message=f"Failed to fetch movies from year series: {year_series}s.",
     )
@@ -152,7 +152,7 @@ def list_movies_year_specific(
     req.path_params["year_series"] = floor(year / 10) * 10
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_YEAR_SPECIFIC.value,
+        endpoint=Endpoint.LIST_MOVIES_YEAR_SPECIFIC,
         req=req,
         message=f"Failed to fetch movies from year: {year}.",
     )
@@ -166,7 +166,7 @@ def list_movies_country(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_COUNTRY.value,
+        endpoint=Endpoint.LIST_MOVIES_COUNTRY,
         req=req,
         message=f"Failed to fetch movies with country ID: {country_id}.",
     )
@@ -180,7 +180,7 @@ def list_movies_genre(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_GENRE.value,
+        endpoint=Endpoint.LIST_MOVIES_GENRE,
         req=req,
         message=f"Failed to fetch movies with genre ID: {genre_id}.",
     )
@@ -194,7 +194,7 @@ def list_movies_distributor(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_DISTRIBUTOR.value,
+        endpoint=Endpoint.LIST_MOVIES_DISTRIBUTOR,
         req=req,
         message=f"Failed to fetch movies with distributor ID: {distributor_id}.",
     )
@@ -208,7 +208,7 @@ def list_movies_series(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_SERIES.value,
+        endpoint=Endpoint.LIST_MOVIES_SERIES,
         req=req,
         message=f"Failed to fetch movies with series ID: {series_id}.",
     )
@@ -222,7 +222,7 @@ def list_movies_tag(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_TAG.value,
+        endpoint=Endpoint.LIST_MOVIES_TAG,
         req=req,
         message=f"Failed to fetch movies with tag: {tag}.",
     )
@@ -236,7 +236,7 @@ def list_movies_person(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_PERSON.value,
+        endpoint=Endpoint.LIST_MOVIES_PERSON,
         req=req,
         message=f"Failed to fetch movies with person ID: {person_id}.",
     )

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
-from src.utility.endpoints import Endpoints
-from src.utility.models import SearchParams
+from src.utility.endpoints import Endpoint
+from src.utility.models import ReviewParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
@@ -15,7 +15,7 @@ def search_dramas(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.SEARCH_DRAMAS.value,
+        endpoint=Endpoint.SEARCH_DRAMAS,
         req=req,
         message="Failed to search dramas.",
     )
@@ -29,7 +29,7 @@ def info_dramas(
 ) -> Dict[str, Any]:
 
     return info_scrape(
-        endpoint=Endpoints.INFO_DRAMAS.value,
+        endpoint=Endpoint.INFO_DRAMAS,
         req=req,
         message=f"Failed to retrieve information for drama with series ID: {drama_series_id} and season ID: {drama_season_id}.",
     )
@@ -39,12 +39,12 @@ def info_dramas(
 def review_dramas(
     drama_series_id: int,
     drama_season_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    review_params: Annotated[ReviewParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return review_scrape(
-        endpoint=Endpoints.REVIEW_DRAMAS.value,
+        endpoint=Endpoint.REVIEW_DRAMAS,
         req=req,
         message=f"Failed to retrieve reviews for drama with series ID: {drama_series_id} and season ID: {drama_season_id}.",
     )
@@ -57,7 +57,7 @@ def list_dramas_trending(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_TRENDING.value,
+        endpoint=Endpoint.LIST_DRAMAS_TRENDING,
         req=req,
         message="Failed to fetch trending dramas.",
     )
@@ -71,7 +71,7 @@ def list_dramas_vod(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_VOD.value,
+        endpoint=Endpoint.LIST_DRAMAS_VOD,
         req=req,
         message=f"Failed to fetch dramas from VOD service: {vod_name}.",
     )
@@ -85,7 +85,7 @@ def list_dramas_year_series(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_YEAR_SERIES.value,
+        endpoint=Endpoint.LIST_DRAMAS_YEAR_SERIES,
         req=req,
         message=f"Failed to fetch dramas from year series: {year_series}s.",
     )
@@ -101,7 +101,7 @@ def list_dramas_year_specific(
     req.path_params["year_series"] = floor(year / 10) * 10
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_YEAR_SPECIFIC.value,
+        endpoint=Endpoint.LIST_DRAMAS_YEAR_SPECIFIC,
         req=req,
         message=f"Failed to fetch dramas from year: {year}.",
     )
@@ -115,7 +115,7 @@ def list_dramas_country(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_COUNTRY.value,
+        endpoint=Endpoint.LIST_DRAMAS_COUNTRY,
         req=req,
         message=f"Failed to fetch dramas with country ID: {country_id}.",
     )
@@ -129,7 +129,7 @@ def list_dramas_genre(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_GENRE.value,
+        endpoint=Endpoint.LIST_DRAMAS_GENRE,
         req=req,
         message=f"Failed to fetch dramas with genre ID: {genre_id}.",
     )
@@ -143,7 +143,7 @@ def list_dramas_tag(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_TAG.value,
+        endpoint=Endpoint.LIST_DRAMAS_TAG,
         req=req,
         message=f"Failed to fetch dramas with tag: {tag}.",
     )
@@ -157,7 +157,7 @@ def list_dramas_person(
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_DRAMAS_PERSON.value,
+        endpoint=Endpoint.LIST_DRAMAS_PERSON,
         req=req,
         message=f"Failed to fetch dramas with person ID: {person_id}.",
     )

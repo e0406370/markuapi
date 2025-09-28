@@ -3,12 +3,12 @@ from bs4.element import Tag
 from msgspec import Struct
 from src.scrape.base_scraper import BaseScraper
 from src.utility.lib import MsgSpecJSONResponse
-from src.utility.utils import Constants, Utils
+from src.utility.utils import OtherInfo, PersonInfo, Utils, ViewType
 from typing import Any, Dict, List, Tuple
 
 
 class InfoScraper(BaseScraper):
-    def __init__(self, soup: BeautifulSoup, params: Dict, view: str) -> None:
+    def __init__(self, soup: BeautifulSoup, params: Dict, view: ViewType) -> None:
         super().__init__(soup, params, view)
 
         self.detail_head = self.soup.select_one("div.p-content-detail__head")
@@ -24,7 +24,7 @@ class InfoScraper(BaseScraper):
         }
 
     def get_logging(self, id: List[int], text: str) -> str:
-        return f"[{self.view}] [ID: {', '.join(str(i) for i in id)}] {text}"
+        return f"[{self.view.value}] [ID: {', '.join(str(i) for i in id)}] {text}"
 
     def _get_title(self) -> str:
         selectors = ["h2.p-content-detail__title > span", "h2.c-content-box-s__title"]
@@ -53,25 +53,24 @@ class InfoScraper(BaseScraper):
                 return float(rating) if rating != "-" else rating
 
     def _get_data_mark(self) -> Struct:
-        if self.view not in Constants.MARKS:
-            Utils.raise_value_error("view", Constants.VIEWS)
-
         selectors = ["div.c-content__counts > div.js-btn-mark", "div.c-content__actions > div.js-btn-mark"]
         for sel in selectors:
             if data_elem := self.detail_head.select_one(sel):
-                return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-mark"], type=Constants.MARKS[self.view])
+                return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-mark"], type=self.view.mark)
 
     def _get_data_clip(self) -> Struct:
-        if self.view not in Constants.CLIPS:
-            Utils.raise_value_error("view", Constants.VIEWS)
-
         selectors = ["div.c-content__counts > div.js-btn-clip", "div.c-content__actions > div.js-btn-clip"]
         for sel in selectors:
             if data_elem := self.detail_head.select_one(sel):
-                return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-clip"], type=Constants.CLIPS[self.view])
+                return MsgSpecJSONResponse.parse(content=data_elem.attrs["data-clip"], type=self.view.clip)
 
     def _get_link(self) -> str:
         return self.soup.select_one("link").attrs["href"]
+
+    def _get_official_site(self) -> str | None:
+        link = self.detail_head.select_one("li.p-content-detail-links__item--official > a")
+
+        return link.attrs["href"] if link else None
 
     def _get_poster(self) -> str | None:
         poster = self.detail_head.select_one("div.c2-poster-l > img")
@@ -83,20 +82,17 @@ class InfoScraper(BaseScraper):
 
         return (Utils.create_filmarks_link(production_year.attrs["href"]), int(production_year.text.replace("年", ""))) if production_year else None
 
-    def _get_other_info(self, field: Tuple[str, str]) -> str | List[Dict[str, Any]] | None:
-        if field not in Constants.OTHER_INFO:
-            Utils.raise_value_error("field", Constants.OTHER_INFO)
-
-        if field == Constants.OTHER_INFO_GENRE:
+    def _get_other_info(self, field: OtherInfo) -> str | List[str] | List[Dict[str, Any]] | None:
+        if field == OtherInfo.GENRE:
             info_elem = self.detail_head.select_one("h3.p-content-detail__genre-title")
 
         else:
-            info_elem = self.detail_head.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s.startswith(field[1]))
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s.startswith(field.title))
 
-        if field in Constants.OTHER_INFO_SINGLE:
-            return info_elem.text.replace(field[1], "") if info_elem else None
+        if field in OtherInfo.single_fields():
+            return info_elem.text.replace(field.title, "") if info_elem else None
 
-        elif self.view == Constants.VIEW_ANIME and field == Constants.OTHER_INFO_COUNTRY_OF_ORIGIN:
+        elif self.view == ViewType.ANIME and field == OtherInfo.COUNTRY_OF_ORIGIN:
             return [name.text for name in info_elem.find_next_sibling("ul").find_all("li")] if info_elem else None
 
         else:
@@ -109,11 +105,8 @@ class InfoScraper(BaseScraper):
                 in info_elem.find_next_sibling("ul").find_all("a")
             ] if info_elem else None
 
-    def _get_person_info(self, field: Tuple[str, str]) -> List[Dict[str, Any]] | None:
-        if field not in Constants.PERSON_INFO:
-            Utils.raise_value_error("field", Constants.PERSON_INFO)
-
-        if field == Constants.PERSON_INFO_CAST:
+    def _get_person_info(self, field: PersonInfo) -> List[Dict[str, Any]] | None:
+        if field == PersonInfo.CAST:
             info_elem = self.detail_head.select_one("div.p-people-list__casts")
 
             return [
@@ -127,7 +120,7 @@ class InfoScraper(BaseScraper):
             ] if info_elem else None
 
         else:
-            info_elem = self.detail_head.find("h3", class_="p-content-detail__people-list-term", string=field[1])
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__people-list-term", string=field.title)
 
             return [
                 Utils.create_person_info(
