@@ -1,16 +1,16 @@
-prime_video
-unext
-dmmtv
-rakutentv
-disneyplus
-fod
-telasa
-lemino
-abema
-hulu
-netflix
-wod
-animetimes
-roadstead
-jcom_stream
-tsutaya_discas
+prime_video,Prime Video
+unext,U-NEXT
+dmmtv,DMM TV
+rakutentv,Rakuten TV
+disneyplus,ディズニープラス
+fod,FOD
+telasa,TELASA
+lemino,Lemino
+abema,ABEMA
+hulu,Hulu
+netflix,Netflix
+wod,WOWOWオンデマンド
+animetimes,アニメタイムズ
+roadstead,Roadstead
+jcom_stream,J:COM STREAM
+tsutaya_discas,TSUTAYA DISCAS

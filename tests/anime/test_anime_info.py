@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val, get_reviews_last_page
+from tests.test_utils import client, get_json_val, get_reviews_last_page, ANIME_ENG
 import json
 import pytest
 
@@ -53,7 +53,7 @@ def test_review_input_less_than_min_threshold(path) -> None:
 
 
 @pytest.mark.parametrize("path", [
-    ("2592/3304", "?page=2001"),
+    ("2592/3304", "?page=10001"),
 ])
 def test_review_input_more_than_max_threshold(path) -> None:
     resp = client.get(f"/animes/{path[0]}/reviews{path[1]}")
@@ -61,7 +61,7 @@ def test_review_input_more_than_max_threshold(path) -> None:
 
     assert resp.status_code == 422
     for err in get_json_val(resp_data, "$.detail"):
-        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 2000"
+        assert get_json_val(err, "$.msg") == "Input should be less than or equal to 10000"
 
 
 @pytest.mark.parametrize(
@@ -70,8 +70,8 @@ def test_review_input_more_than_max_threshold(path) -> None:
         {
             "title": "デジモンアドベンチャー",
             "rating": 4.3,
-            "mark_count": 2284,
-            "clip_count": 578,
+            "mark_count": 2293,
+            "clip_count": 587,
             "series_id": 2592,
             "season_id": 3304,
             "link": "https://filmarks.com/animes/2592/3304",
@@ -188,7 +188,7 @@ def test_review_input_more_than_max_threshold(path) -> None:
         },
     ],
 )
-def test_info_with_results_single_1(test_data) -> None:
+def test_info_with_results_single_1(test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
@@ -198,6 +198,7 @@ def test_info_with_results_single_1(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert ANIME_ENG in caplog.text
 
     fields = [
         "title",
@@ -214,11 +215,12 @@ def test_info_with_results_single_1(test_data) -> None:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
-    assert get_json_val(resp_data, "$.data.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=500)
-    assert get_json_val(resp_data, "$.data.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=500)
+    assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
 
     assert get_json_val(resp_data, "$.data.original_title") is None
     assert get_json_val(resp_data, "$.data.synopsis") is not None
+    assert get_json_val(resp_data, "$.data.official_site") is None
     assert get_json_val(resp_data, "$.data.poster") is not None
     assert get_json_val(resp_data, "$.data.creator") is not None
     assert get_json_val(resp_data, "$.data.planner") is None
@@ -240,8 +242,8 @@ def test_info_with_results_single_1(test_data) -> None:
         {
             "title": "DEATH NOTE",
             "rating": 4.3,
-            "mark_count": 14514,
-            "clip_count": 3199,
+            "mark_count": 14633,
+            "clip_count": 3233,
             "series_id": 1533,
             "season_id": 2046,
             "link": "https://filmarks.com/animes/1533/2046",
@@ -303,7 +305,7 @@ def test_info_with_results_single_1(test_data) -> None:
         },
     ],
 )
-def test_info_with_results_single_2(test_data) -> None:
+def test_info_with_results_single_2(test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
@@ -313,6 +315,7 @@ def test_info_with_results_single_2(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert ANIME_ENG in caplog.text
 
     fields = [
         "title",
@@ -329,11 +332,12 @@ def test_info_with_results_single_2(test_data) -> None:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
-    assert get_json_val(resp_data, "$.data.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=500)
-    assert get_json_val(resp_data, "$.data.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=500)
+    assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
 
     assert get_json_val(resp_data, "$.data.original_title") is None
     assert get_json_val(resp_data, "$.data.synopsis") is not None
+    assert get_json_val(resp_data, "$.data.official_site") is None
     assert get_json_val(resp_data, "$.data.poster") is not None
     assert get_json_val(resp_data, "$.data.creator") is not None
     assert get_json_val(resp_data, "$.data.planner") is None
@@ -356,7 +360,7 @@ def test_info_with_results_single_2(test_data) -> None:
             "title": "アバター 伝説の少年アン：火の巻",
             "original_title": "Avatar: The Last Airbender：Fire",
             "rating": 4.5,
-            "mark_count": 74,
+            "mark_count": 75,
             "clip_count": 37,
             "series_id": 3691,
             "season_id": 4983,
@@ -412,7 +416,7 @@ def test_info_with_results_single_2(test_data) -> None:
         },
     ],
 )
-def test_info_with_results_single_3(test_data) -> None:
+def test_info_with_results_single_3(test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
@@ -422,6 +426,7 @@ def test_info_with_results_single_3(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert ANIME_ENG in caplog.text
 
     fields = [
         "title",
@@ -437,10 +442,11 @@ def test_info_with_results_single_3(test_data) -> None:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
-    assert get_json_val(resp_data, "$.data.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=500)
-    assert get_json_val(resp_data, "$.data.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=500)
+    assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
 
     assert get_json_val(resp_data, "$.data.synopsis") is not None
+    assert get_json_val(resp_data, "$.data.official_site") is None
     assert get_json_val(resp_data, "$.data.poster") is not None
     assert get_json_val(resp_data, "$.data.release_date") is None
     assert get_json_val(resp_data, "$.data.playback_time") is None
@@ -458,7 +464,7 @@ def test_info_with_results_single_3(test_data) -> None:
     assert get_json_val(resp_data, "$.data.artist") is None
 
 
-def test_info_with_results_random() -> None:
+def test_info_with_results_random(caplog) -> None:
     with open(file="tests/anime/100_animes.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         anime = choice(test_data)
@@ -471,6 +477,7 @@ def test_info_with_results_random() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert ANIME_ENG in caplog.text
     assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.rating") is not None
     assert get_json_val(resp_data, "$.data.mark_count") is not None
@@ -506,7 +513,7 @@ def test_info_with_results_random() -> None:
         },
     ],
 )
-def test_review_with_results_full(test_data) -> None:
+def test_review_with_results_full(test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
@@ -519,13 +526,7 @@ def test_review_with_results_full(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.data.series_id") == series_id
     assert get_json_val(resp_data, "$.data.season_id") == season_id
-
-    info_fields = [
-        "title",
-        "rating",
-    ]
-    for field in info_fields:
-        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+    assert ANIME_ENG in caplog.text
 
     review_fields = [
         "user.name",
@@ -540,11 +541,14 @@ def test_review_with_results_full(test_data) -> None:
     for field in review_fields:
         assert get_json_val(resp_data, f"$.data.reviews[-1].{field}") == get_json_val(test_data, f"$.reviews.{field}")
 
+    assert get_json_val(resp_data, "$.data.title") == get_json_val(test_data, "$.title")
+    assert get_json_val(resp_data, "$.data.original_title") is None
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.link") == f"{get_json_val(test_data, "$.link")}?page={last_page}"
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_with_results() -> None:
+def test_review_with_results(caplog) -> None:
     title = "ラグラッツ シーズン1"
     original_title = "Rugrats Season 1"
     series_id = 3980
@@ -554,6 +558,7 @@ def test_review_with_results() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert ANIME_ENG in caplog.text
     assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.original_title") == original_title
     assert get_json_val(resp_data, "$.data.rating") is not None
@@ -563,7 +568,7 @@ def test_review_with_results() -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_without_results() -> None:
+def test_review_without_results(caplog) -> None:
     title = "ラグラッツ シーズン1"
     original_title = "Rugrats Season 1"
     series_id = 3980
@@ -573,6 +578,7 @@ def test_review_without_results() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert ANIME_ENG in caplog.text
     assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.original_title") == original_title
     assert get_json_val(resp_data, "$.data.rating") is not None
@@ -582,7 +588,7 @@ def test_review_without_results() -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) == 0
 
 
-def test_review_with_results_random() -> None:
+def test_review_with_results_random(caplog) -> None:
     with open(file="tests/anime/100_animes.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         anime = choice(test_data)
@@ -595,6 +601,7 @@ def test_review_with_results_random() -> None:
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert ANIME_ENG in caplog.text
     assert get_json_val(resp_data, "$.data.title") == title
     assert get_json_val(resp_data, "$.data.rating") is not None
     assert get_json_val(resp_data, "$.data.series_id") == series_id

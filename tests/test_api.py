@@ -1,4 +1,5 @@
 from src.api import api
+from src.utility.endpoints import Endpoint
 from tests.test_utils import client, get_json_val
 
 
@@ -66,13 +67,15 @@ def test_api_routes() -> None:
         "/redoc",
     }
 
-    route_cnt = 0
+    seen_routes = set()
     for route in api.routes:
         if route.path not in special_routes:
             assert route.path in defined_routes
-            route_cnt += 1
+            assert route.path not in seen_routes
+            seen_routes.add(route.path)
 
-    assert route_cnt == len(defined_routes)
+    assert len(seen_routes) == len(defined_routes)
+    assert len(seen_routes) == len(Endpoint) + 1
 
 
 def test_index() -> None:
