@@ -1,6 +1,5 @@
 from msgspec import Struct
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Literal, TypedDict
+from pydantic import BaseModel, Field
 
 
 class AnimeDataClip(Struct):
@@ -38,12 +37,15 @@ class MovieDataMark(Struct):
 
 
 class SearchParams(BaseModel):
+    q: str = ""
     limit: int = Field(10, gt=0, le=100)
-    page: int = Field(1, gt=0, le=2000)
+    page: int = Field(1, gt=0, le=10000)
 
 
-class Endpoint(TypedDict):
-    __pydantic_config__ = ConfigDict(extra="forbid")
-    path: str
-    type: Literal["path", "query", "path+query"]
-    view: Literal["anime", "drama", "movie"]
+class ReviewParams(BaseModel):
+    page: int = Field(1, gt=0, le=10000)
+
+
+class ListParams(BaseModel):
+    limit: int = Field(10, gt=0, le=100)
+    page: int = Field(1, gt=0, le=10000)

@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val
+from tests.test_utils import client, get_json_val, DRAMA_JPN, DRAMA_ENG
 import json
 import pytest
 
@@ -46,9 +46,9 @@ def test_search_input_less_than_min_threshold(query) -> None:
 
 @pytest.mark.parametrize("query", [
     "?limit=101",
-    "?page=2001",
+    "?page=10001",
     "?q=test1&limit=101",
-    "?q=test2&page=2001",
+    "?q=test2&page=10001",
     "?q=test3&limit=101&page=3",
 ])
 def test_search_input_more_than_max_threshold(query) -> None:
@@ -57,7 +57,7 @@ def test_search_input_more_than_max_threshold(query) -> None:
 
     assert resp.status_code == 422
     for err in get_json_val(resp_data, "$.detail"):
-        assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 2000"}
+        assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 10000"}
 
 
 @pytest.mark.parametrize("query", [
@@ -68,17 +68,18 @@ def test_search_input_more_than_max_threshold(query) -> None:
     "?q=",
     "?q=&limit=1",
 ])
-def test_search_empty_query(query) -> None:
+def test_search_empty_query(query, caplog) -> None:
     resp = client.get(f"/search/dramas{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == ""
     assert get_json_val(resp_data, "$.heading") == ""
+    assert DRAMA_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
-def test_search_without_results_page_1() -> None:
+def test_search_without_results_page_1(caplog) -> None:
     query = '".*&^'
     resp = client.get(f"/search/dramas?q={query}")
     resp_data = resp.json()
@@ -86,10 +87,12 @@ def test_search_without_results_page_1() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == '".*'
     assert get_json_val(resp_data, "$.heading").startswith('".*')
+    assert DRAMA_JPN in get_json_val(resp_data, "$.heading")
+    assert DRAMA_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
-def test_search_without_results_page_2() -> None:
+def test_search_without_results_page_2(caplog) -> None:
     query = "ちはやふる"  # page 1 returns results, refer to 'test_search_with_results_multiple'
     resp = client.get(f"/search/dramas?q={query}&page=2")
     resp_data = resp.json()
@@ -97,6 +100,8 @@ def test_search_without_results_page_2() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert DRAMA_JPN in get_json_val(resp_data, "$.heading")
+    assert DRAMA_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.dramas")) == 0
 
 
@@ -106,8 +111,8 @@ def test_search_without_results_page_2() -> None:
         {
             "title": "あなたの番です",
             "rating": 4.0,
-            "mark_count": 30598,
-            "clip_count": 6150,
+            "mark_count": 30697,
+            "clip_count": 6178,
             "series_id": 6055,
             "season_id": 8586,
             "link": "https://filmarks.com/dramas/6055/8586",
@@ -120,7 +125,7 @@ def test_search_without_results_page_2() -> None:
         },
     ],
 )
-def test_search_with_results_single(test_data) -> None:
+def test_search_with_results_single(test_data, caplog) -> None:
     query = "あなたの番です"
     resp = client.get(f"/search/dramas?q={query}&limit=5")
     resp_data = resp.json()
@@ -129,6 +134,8 @@ def test_search_with_results_single(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert DRAMA_JPN in get_json_val(resp_data, "$.heading")
+    assert DRAMA_ENG in caplog.text
     assert len(dramas) == 5
 
     fields = [
@@ -147,8 +154,8 @@ def test_search_with_results_single(test_data) -> None:
         assert get_json_val(dramas[0], f"$.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(dramas[0], "$.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
-    assert get_json_val(dramas[0], "$.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=1000)
-    assert get_json_val(dramas[0], "$.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=1000)
+    assert get_json_val(dramas[0], "$.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(dramas[0], "$.clip_count") >= get_json_val(test_data, "$.clip_count")
 
     assert get_json_val(dramas[0], "$.poster") is not None
     assert get_json_val(dramas[0], "$.executive_producer") is None
@@ -182,7 +189,7 @@ def test_search_with_results_single(test_data) -> None:
         },
     ],
 )
-def test_search_with_results_multiple(test_data) -> None:
+def test_search_with_results_multiple(test_data, caplog) -> None:
     query = "ちはやふる"
     resp = client.get(f"/search/dramas?q={query}&page=1")
     resp_data = resp.json()
@@ -191,6 +198,8 @@ def test_search_with_results_multiple(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert DRAMA_JPN in get_json_val(resp_data, "$.heading")
+    assert DRAMA_ENG in caplog.text
 
     fields = [
         "title",
@@ -214,7 +223,7 @@ def test_search_with_results_multiple(test_data) -> None:
     assert get_json_val(drama, "$.scriptwriter") is None
 
 
-def test_search_with_results_random() -> None:
+def test_search_with_results_random(caplog) -> None:
     with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
@@ -229,6 +238,9 @@ def test_search_with_results_random() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert DRAMA_JPN in get_json_val(resp_data, "$.heading")
+    assert DRAMA_ENG in caplog.text
+
     assert get_json_val(resp_data, "$.results.dramas[0].title") == query
     assert get_json_val(resp_data, "$.results.dramas[0].rating") is not None
     assert get_json_val(resp_data, "$.results.dramas[0].mark_count") is not None

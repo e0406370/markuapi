@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val
+from tests.test_utils import client, get_json_val, ANIME_JPN, ANIME_ENG
 import json
 import pytest
 
@@ -46,9 +46,9 @@ def test_search_input_less_than_min_threshold(query) -> None:
 
 @pytest.mark.parametrize("query", [
     "?limit=101",
-    "?page=2001",
+    "?page=10001",
     "?q=test1&limit=101",
-    "?q=test2&page=2001",
+    "?q=test2&page=10001",
     "?q=test3&limit=101&page=3",
 ])
 def test_search_input_more_than_max_threshold(query) -> None:
@@ -57,7 +57,7 @@ def test_search_input_more_than_max_threshold(query) -> None:
 
     assert resp.status_code == 422
     for err in get_json_val(resp_data, "$.detail"):
-        assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 2000"}
+        assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 10000"}
 
 
 @pytest.mark.parametrize("query", [
@@ -68,17 +68,18 @@ def test_search_input_more_than_max_threshold(query) -> None:
     "?q=",
     "?q=&limit=1",
 ])
-def test_search_empty_query(query) -> None:
+def test_search_empty_query(query, caplog) -> None:
     resp = client.get(f"/search/animes{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == ""
     assert get_json_val(resp_data, "$.heading") == ""
+    assert ANIME_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.animes")) == 0
 
 
-def test_search_without_results_page_1() -> None:
+def test_search_without_results_page_1(caplog) -> None:
     query = '".*&^'
     resp = client.get(f"/search/animes?q={query}")
     resp_data = resp.json()
@@ -86,10 +87,12 @@ def test_search_without_results_page_1() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == '".*'
     assert get_json_val(resp_data, "$.heading").startswith('".*')
+    assert ANIME_JPN in get_json_val(resp_data, "$.heading")
+    assert ANIME_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.animes")) == 0
 
 
-def test_search_without_results_page_2() -> None:
+def test_search_without_results_page_2(caplog) -> None:
     query = "俺物語!!"  # page 1 returns results, refer to 'test_search_with_results_single'
     resp = client.get(f"/search/animes?q={query}&page=2")
     resp_data = resp.json()
@@ -97,6 +100,8 @@ def test_search_without_results_page_2() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert ANIME_JPN in get_json_val(resp_data, "$.heading")
+    assert ANIME_ENG in caplog.text
     assert len(get_json_val(resp_data, "$.results.animes")) == 0
 
 
@@ -106,8 +111,8 @@ def test_search_without_results_page_2() -> None:
         {
             "title": "俺物語!!",
             "rating": 3.9,
-            "mark_count": 5391,
-            "clip_count": 1049,
+            "mark_count": 5418,
+            "clip_count": 1051,
             "series_id": 603,
             "season_id": 1373,
             "link": "https://filmarks.com/animes/603/1373",
@@ -120,7 +125,7 @@ def test_search_without_results_page_2() -> None:
         },
     ],
 )
-def test_search_with_results_single(test_data) -> None:
+def test_search_with_results_single(test_data, caplog) -> None:
     query = "俺物語!!"
     resp = client.get(f"/search/animes?q={query}&limit=1")
     resp_data = resp.json()
@@ -129,6 +134,8 @@ def test_search_with_results_single(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert ANIME_JPN in get_json_val(resp_data, "$.heading")
+    assert ANIME_ENG in caplog.text
     assert len(animes) == 1
 
     fields = [
@@ -147,8 +154,8 @@ def test_search_with_results_single(test_data) -> None:
         assert get_json_val(animes[0], f"$.{field}") == get_json_val(test_data, f"$.{field}")
 
     assert get_json_val(animes[0], "$.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
-    assert get_json_val(animes[0], "$.mark_count") == pytest.approx(get_json_val(test_data, "$.mark_count"), abs=1000)
-    assert get_json_val(animes[0], "$.clip_count") == pytest.approx(get_json_val(test_data, "$.clip_count"), abs=1000)
+    assert get_json_val(animes[0], "$.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(animes[0], "$.clip_count") >= get_json_val(test_data, "$.clip_count")
 
     assert get_json_val(animes[0], "$.poster") is not None
     assert get_json_val(animes[0], "$.producer") is None
@@ -160,9 +167,6 @@ def test_search_with_results_single(test_data) -> None:
     [
         {
             "title": "のだめカンタービレ",
-            "rating": 4.1,
-            "mark_count": 2727,
-            "clip_count": 940,
             "series_id": 1342,
             "season_id": 1783,
             "link": "https://filmarks.com/animes/1342/1783",
@@ -173,9 +177,6 @@ def test_search_with_results_single(test_data) -> None:
         },
         {
             "title": "のだめカンタービレ 巴里編",
-            "rating": 4.2,
-            "mark_count": 1639,
-            "clip_count": 249,
             "series_id": 1342,
             "season_id": 1784,
             "link": "https://filmarks.com/animes/1342/1784",
@@ -186,9 +187,6 @@ def test_search_with_results_single(test_data) -> None:
         },
         {
             "title": "のだめカンタービレ フィナーレ",
-            "rating": 4.2,
-            "mark_count": 1656,
-            "clip_count": 306,
             "series_id": 1342,
             "season_id": 1785,
             "link": "https://filmarks.com/animes/1342/1785",
@@ -199,7 +197,7 @@ def test_search_with_results_single(test_data) -> None:
         },
     ],
 )
-def test_search_with_results_multiple(test_data) -> None:
+def test_search_with_results_multiple(test_data, caplog) -> None:
     query = "のだめカンタービレ"
     resp = client.get(f"/search/animes?q={query}&page=1")
     resp_data = resp.json()
@@ -208,6 +206,8 @@ def test_search_with_results_multiple(test_data) -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert ANIME_JPN in get_json_val(resp_data, "$.heading")
+    assert ANIME_ENG in caplog.text
 
     fields = [
         "title",
@@ -230,7 +230,7 @@ def test_search_with_results_multiple(test_data) -> None:
     assert get_json_val(anime, "$.executive_producer") is None
 
 
-def test_search_with_results_random() -> None:
+def test_search_with_results_random(caplog) -> None:
     with open(file="tests/anime/100_animes.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         anime = choice(test_data)
@@ -245,6 +245,9 @@ def test_search_with_results_random() -> None:
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.query") == query
     assert get_json_val(resp_data, "$.heading").startswith(query)
+    assert ANIME_JPN in get_json_val(resp_data, "$.heading")
+    assert ANIME_ENG in caplog.text
+
     assert get_json_val(resp_data, "$.results.animes[0].title") == query
     assert get_json_val(resp_data, "$.results.animes[0].rating") is not None
     assert get_json_val(resp_data, "$.results.animes[0].mark_count") is not None

@@ -1,4 +1,4 @@
-from tests.test_utils import client, get_json_val
+from tests.test_utils import client, get_json_val, MOVIE_JPN, MOVIE_ENG
 import json
 import pytest
 
@@ -110,9 +110,9 @@ def test_list_query_params_less_than_min_threshold(query) -> None:
 
 @pytest.mark.parametrize("query", [
     "?limit=101",
-    "?page=2001",
+    "?page=10001",
     "?limit=101&page=3",
-    "?limit=100&page=2001",
+    "?limit=100&page=10001",
 ])
 def test_list_query_params_more_than_max_threshold(query) -> None:
     for type, route in list_routes.items():
@@ -145,7 +145,7 @@ def test_list_query_params_more_than_max_threshold(query) -> None:
 
         assert resp.status_code == 422
         for err in get_json_val(resp_data, "$.detail"):
-            assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 2000"}
+            assert get_json_val(err, "$.msg") in {"Input should be less than or equal to 100", "Input should be less than or equal to 10000"}
 
 
 @pytest.mark.parametrize("var", [
@@ -182,7 +182,7 @@ def test_list_path_vars_not_valid_integer(var) -> None:
             assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
 
 
-def test_list_minimum_fields_present() -> None:
+def test_list_minimum_fields_present(caplog) -> None:
     for type, route in list_routes.items():
         match type:
             case "vod":
@@ -213,6 +213,8 @@ def test_list_minimum_fields_present() -> None:
 
         assert resp.status_code == 200
         for movie in get_json_val(resp_data, "$.results.movies"):
+            assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+            assert MOVIE_ENG in caplog.text
             assert get_json_val(movie, "$.title") is not None
             assert get_json_val(movie, "$.rating") is not None
             assert get_json_val(movie, "$.mark_count") is not None
@@ -221,15 +223,18 @@ def test_list_minimum_fields_present() -> None:
             assert get_json_val(movie, "$.link") is not None
 
 
-def test_list_vod_all_minimum_fields_present() -> None:
+def test_list_vod_all_minimum_fields_present(caplog) -> None:
     with open(file="tests/movie/movie_vod_name.txt", mode="r", encoding="utf-8") as f:
-        test_data = (line.strip() for line in f.readlines())
+        test_data = (tuple(line.strip().split(",")) for line in f.readlines())
 
-    for vod_name in test_data:
+    for vod_name, vod_title in test_data:
         resp = client.get(f"{list_routes["vod"].format(vod_name=vod_name)}?limit=1")
         resp_data = resp.json()
 
         assert resp.status_code == 200
+        assert get_json_val(resp_data, "$.heading").startswith(vod_title)
+        assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+        assert MOVIE_ENG in caplog.text
         assert get_json_val(resp_data, "$.results.movies[0].title") is not None
         assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
         assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -238,15 +243,18 @@ def test_list_vod_all_minimum_fields_present() -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-@pytest.mark.parametrize("award_id", [
-    "1",
-    "19",
+@pytest.mark.parametrize("award", [
+    ("1","アカデミー賞"),
+    ("19","日本アカデミー賞")
 ])
-def test_list_award_all_minimum_fields_present(award_id) -> None:
-    resp = client.get(f"{list_routes["award"].format(award_id=award_id)}?limit=1")
+def test_list_award_all_minimum_fields_present(award, caplog) -> None:
+    resp = client.get(f"{list_routes["award"].format(award_id=award[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.heading").startswith(award[1])
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -255,7 +263,7 @@ def test_list_award_all_minimum_fields_present(award_id) -> None:
     assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_year_series_all_minimum_fields_present() -> None:
+def test_list_year_series_all_minimum_fields_present(caplog) -> None:
     with open(file="tests/movie/movie_year_series.txt", mode="r", encoding="utf-8") as f:
         test_data = (line.strip() for line in f.readlines())
 
@@ -264,7 +272,9 @@ def test_list_year_series_all_minimum_fields_present() -> None:
         resp_data = resp.json()
 
         assert resp.status_code == 200
-        assert get_json_val(resp_data, "$.heading").startswith(year)
+        assert get_json_val(resp_data, "$.heading").startswith(f"{year}年代")
+        assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+        assert MOVIE_ENG in caplog.text
         assert get_json_val(resp_data, "$.results.movies[0].title") is not None
         assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
         assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -273,7 +283,7 @@ def test_list_year_series_all_minimum_fields_present() -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_year_specific_all_minimum_fields_present() -> None:
+def test_list_year_specific_all_minimum_fields_present(caplog) -> None:
     with open(file="tests/movie/movie_year_specific.txt", mode="r", encoding="utf-8") as f:
         test_data = (line.strip() for line in f.readlines())
 
@@ -282,7 +292,9 @@ def test_list_year_specific_all_minimum_fields_present() -> None:
         resp_data = resp.json()
 
         assert resp.status_code == 200
-        assert get_json_val(resp_data, "$.heading").startswith(year)
+        assert get_json_val(resp_data, "$.heading").startswith(f"{year}年")
+        assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+        assert MOVIE_ENG in caplog.text
         assert get_json_val(resp_data, "$.results.movies[0].title") is not None
         assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
         assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -291,7 +303,7 @@ def test_list_year_specific_all_minimum_fields_present() -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_country_all_minimum_fields_present() -> None:
+def test_list_country_all_minimum_fields_present(caplog) -> None:
     with open(file="tests/movie/movie_country_id.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
 
@@ -304,6 +316,8 @@ def test_list_country_all_minimum_fields_present() -> None:
 
         assert resp.status_code == 200
         assert get_json_val(resp_data, "$.heading").startswith(country_name)
+        assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+        assert MOVIE_ENG in caplog.text
         assert get_json_val(resp_data, "$.results.movies[0].title") is not None
         assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
         assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -312,15 +326,18 @@ def test_list_country_all_minimum_fields_present() -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-@pytest.mark.parametrize("genre_id", [
-    "17",
-    "903",
+@pytest.mark.parametrize("genre", [
+    ("17", "ホラー"),
+    ("903", "スリラー")
 ])
-def test_list_genre_all_minimum_fields_present(genre_id) -> None:
-    resp = client.get(f"{list_routes["genre"].format(genre_id=genre_id)}?limit=1")
+def test_list_genre_all_minimum_fields_present(genre, caplog) -> None:
+    resp = client.get(f"{list_routes["genre"].format(genre_id=genre[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.heading").startswith(f"{genre[1]}")
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -329,15 +346,18 @@ def test_list_genre_all_minimum_fields_present(genre_id) -> None:
     assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-@pytest.mark.parametrize("distributor_id", [
-    "502",
-    "503",
+@pytest.mark.parametrize("distributor", [
+    ("502", "東宝"),
+    ("503", "ワーナー・ブラザース")
 ])
-def test_list_distributor_all_minimum_fields_present(distributor_id) -> None:
-    resp = client.get(f"{list_routes["distributor"].format(distributor_id=distributor_id)}?limit=1")
+def test_list_distributor_all_minimum_fields_present(distributor, caplog) -> None:
+    resp = client.get(f"{list_routes["distributor"].format(distributor_id=distributor[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.heading").startswith(f"{distributor[1]}")
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -346,15 +366,18 @@ def test_list_distributor_all_minimum_fields_present(distributor_id) -> None:
     assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-@pytest.mark.parametrize("series_id", [
-    "1",
-    "76",
+@pytest.mark.parametrize("series", [
+    ("1", "ハリー・ポッター"),
+    ("76", "ちはやふる")
 ])
-def test_list_series_all_minimum_fields_present(series_id) -> None:
-    resp = client.get(f"{list_routes["series"].format(series_id=series_id)}?limit=1")
+def test_list_series_all_minimum_fields_present(series, caplog) -> None:
+    resp = client.get(f"{list_routes["series"].format(series_id=series[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.heading").startswith(f"{series[1]}")
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -367,12 +390,14 @@ def test_list_series_all_minimum_fields_present(series_id) -> None:
     "洋画",
     "邦画",
 ])
-def test_list_tag_all_minimum_fields_present(tag) -> None:
+def test_list_tag_all_minimum_fields_present(tag, caplog) -> None:
     resp = client.get(f"{list_routes["tag"].format(tag=tag)}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.heading").startswith(f"#{tag}")
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None
@@ -381,15 +406,18 @@ def test_list_tag_all_minimum_fields_present(tag) -> None:
     assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-@pytest.mark.parametrize("person_id", [
-    "25185",
-    "169314"
+@pytest.mark.parametrize("person", [
+    ("25185", "二宮和也"),
+    ("169314", "アン・ハサウェイ")
 ])
-def test_list_person_all_minimum_fields_present(person_id) -> None:
-    resp = client.get(f"{list_routes["person"].format(person_id=person_id)}?limit=1")
+def test_list_person_all_minimum_fields_present(person, caplog) -> None:
+    resp = client.get(f"{list_routes["person"].format(person_id=person[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.heading").startswith(f"{person[1]}")
+    assert MOVIE_JPN in get_json_val(resp_data, "$.heading")
+    assert MOVIE_ENG in caplog.text
     assert get_json_val(resp_data, "$.results.movies[0].title") is not None
     assert get_json_val(resp_data, "$.results.movies[0].rating") is not None
     assert get_json_val(resp_data, "$.results.movies[0].mark_count") is not None

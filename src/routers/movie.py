@@ -1,228 +1,242 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
-from src.scrape.scrape_service import info_scrape, search_scrape
-from src.utility.endpoints import Endpoints
-from src.utility.models import SearchParams
+from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
+from src.utility.endpoints import Endpoint
+from src.utility.models import ReviewParams, ListParams, SearchParams
 from typing import Annotated, Any, Dict
 
 router = APIRouter()
 
 
-@router.get("/search/movies")
+@router.get("/search/movies", tags=["movie"], summary="Search for movies")
 def search_movies(
     search_params: Annotated[SearchParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.SEARCH_MOVIES.value,
+        endpoint=Endpoint.SEARCH_MOVIES,
         req=req,
         message="Failed to search movies.",
     )
 
 
-@router.get("/movies/{movie_id}")
+@router.get("/movies/{movie_id}", tags=["movie"], summary="Retrieve information about a specific movie")
 def info_movies(
     movie_id: int,
     req: Request
 ) -> Dict[str, Any]:
 
     return info_scrape(
-        endpoint=Endpoints.INFO_MOVIES.value,
+        endpoint=Endpoint.INFO_MOVIES,
         req=req,
-        message=f"Failed to retrieve movie information with ID: {movie_id}.",
+        message=f"Failed to retrieve information for movie with ID: {movie_id}.",
     )
 
 
-@router.get("/list-movie/now")
+@router.get("/movies/{movie_id}/reviews", tags=["movie"], summary="Retrieve user reviews about a specific movie")
+def review_movies(
+    movie_id: int,
+    review_params: Annotated[ReviewParams, Depends()],
+    req: Request
+) -> Dict[str, Any]:
+
+    return review_scrape(
+        endpoint=Endpoint.REVIEW_MOVIES,
+        req=req,
+        message=f"Failed to retrieve reviews for movie with ID: {movie_id}.",
+    )
+
+
+@router.get("/list-movie/now", tags=["movie"], summary="Fetch movies that are currently screening")
 def list_movies_currently_screening(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_NOW.value,
+        endpoint=Endpoint.LIST_MOVIES_NOW,
         req=req,
         message="Failed to fetch currently screening movies.",
     )
 
 
-@router.get("/list-movie/coming-soon")
+@router.get("/list-movie/coming-soon", tags=["movie"], summary="Fetch movies that are coming soon")
 def list_movies_coming_soon(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_COMING.value,
+        endpoint=Endpoint.LIST_MOVIES_COMING,
         req=req,
         message="Failed to fetch upcoming movies.",
     )
 
 
-@router.get("/list-movie/opening-this-week")
+@router.get("/list-movie/opening-this-week", tags=["movie"], summary="Fetch movies that are opening this week")
 def list_movies_opening_this_week(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_UPCOMING.value,
+        endpoint=Endpoint.LIST_MOVIES_UPCOMING,
         req=req,
         message="Failed to fetch movies opening this week.",
     )
 
 
-@router.get("/list-movie/trend")
+@router.get("/list-movie/trend", tags=["movie"], summary="Fetch currently trending movies")
 def list_movies_trending(
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_TRENDING.value,
+        endpoint=Endpoint.LIST_MOVIES_TRENDING,
         req=req,
         message="Failed to fetch trending movies.",
     )
 
 
-@router.get("/list-movie/vod/{vod_name}")
+@router.get("/list-movie/vod/{vod_name}", tags=["movie"], summary="Fetch movies available on a specific VOD service")
 def list_movies_vod(
     vod_name: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_VOD.value,
+        endpoint=Endpoint.LIST_MOVIES_VOD,
         req=req,
         message=f"Failed to fetch movies from VOD service: {vod_name}.",
     )
 
 
-@router.get("/list-movie/award/{award_id}")
+@router.get("/list-movie/award/{award_id}", tags=["movie"], summary="Fetch movies that received a specific award")
 def list_movies_award(
     award_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_AWARD.value,
+        endpoint=Endpoint.LIST_MOVIES_AWARD,
         req=req,
         message=f"Failed to fetch movies with award ID: {award_id}.",
     )
 
 
-@router.get("/list-movie/year/{year_series}s")
+@router.get("/list-movie/year/{year_series}s", tags=["movie"], summary="Fetch movies released in a specific decade")
 def list_movies_year_series(
     year_series: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_YEAR_SERIES.value,
+        endpoint=Endpoint.LIST_MOVIES_YEAR_SERIES,
         req=req,
         message=f"Failed to fetch movies from year series: {year_series}s.",
     )
 
 
-@router.get("/list-movie/year/{year}")
+@router.get("/list-movie/year/{year}", tags=["movie"], summary="Fetch movies released in a specific year")
 def list_movies_year_specific(
     year: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     req.path_params["year_series"] = floor(year / 10) * 10
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_YEAR_SPECIFIC.value,
+        endpoint=Endpoint.LIST_MOVIES_YEAR_SPECIFIC,
         req=req,
         message=f"Failed to fetch movies from year: {year}.",
     )
 
 
-@router.get("/list-movie/country/{country_id}")
+@router.get("/list-movie/country/{country_id}", tags=["movie"], summary="Fetch movies from a specific country")
 def list_movies_country(
     country_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_COUNTRY.value,
+        endpoint=Endpoint.LIST_MOVIES_COUNTRY,
         req=req,
         message=f"Failed to fetch movies with country ID: {country_id}.",
     )
 
 
-@router.get("/list-movie/genre/{genre_id}")
+@router.get("/list-movie/genre/{genre_id}", tags=["movie"], summary="Fetch movies categorised under a specific genre")
 def list_movies_genre(
     genre_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_GENRE.value,
+        endpoint=Endpoint.LIST_MOVIES_GENRE,
         req=req,
         message=f"Failed to fetch movies with genre ID: {genre_id}.",
     )
 
 
-@router.get("/list-movie/distributor/{distributor_id}")
+@router.get("/list-movie/distributor/{distributor_id}", tags=["movie"], summary="Fetch movies associated with a specific distributor")
 def list_movies_distributor(
     distributor_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_DISTRIBUTOR.value,
+        endpoint=Endpoint.LIST_MOVIES_DISTRIBUTOR,
         req=req,
         message=f"Failed to fetch movies with distributor ID: {distributor_id}.",
     )
 
 
-@router.get("/list-movie/series/{series_id}")
+@router.get("/list-movie/series/{series_id}", tags=["movie"], summary="Fetch movies categorised under a specific series")
 def list_movies_series(
     series_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_SERIES.value,
+        endpoint=Endpoint.LIST_MOVIES_SERIES,
         req=req,
         message=f"Failed to fetch movies with series ID: {series_id}.",
     )
 
 
-@router.get("/list-movie/tag/{tag}")
+@router.get("/list-movie/tag/{tag}", tags=["movie"], summary="Fetch movies categorised under a specific tag")
 def list_movies_tag(
     tag: str,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_TAG.value,
+        endpoint=Endpoint.LIST_MOVIES_TAG,
         req=req,
         message=f"Failed to fetch movies with tag: {tag}.",
     )
 
 
-@router.get("/list-movie/person/{person_id}")
+@router.get("/list-movie/person/{person_id}", tags=["movie"], summary="Fetch movies linked to a specific person")
 def list_movies_person(
     person_id: int,
-    search_params: Annotated[SearchParams, Depends()],
+    list_params: Annotated[ListParams, Depends()],
     req: Request
 ) -> Dict[str, Any]:
 
     return search_scrape(
-        endpoint=Endpoints.LIST_MOVIES_PERSON.value,
+        endpoint=Endpoint.LIST_MOVIES_PERSON,
         req=req,
         message=f"Failed to fetch movies with person ID: {person_id}.",
     )

@@ -1,4 +1,5 @@
 from src.api import api
+from src.utility.endpoints import Endpoint
 from tests.test_utils import client, get_json_val
 
 
@@ -20,6 +21,7 @@ def test_api_routes() -> None:
     defined_routes = {
         "/search/animes",
         "/animes/{anime_series_id}/{anime_season_id}",
+        "/animes/{anime_series_id}/{anime_season_id}/reviews",
         "/list-anime/trend",
         "/list-anime/vod/{vod_name}",
         "/list-anime/year/{year_series}s",
@@ -30,6 +32,7 @@ def test_api_routes() -> None:
         "/list-anime/person/{person_id}",
         "/search/dramas",
         "/dramas/{drama_series_id}/{drama_season_id}",
+        "/dramas/{drama_series_id}/{drama_season_id}/reviews",
         "/list-drama/trend",
         "/list-drama/vod/{vod_name}",
         "/list-drama/year/{year_series}s",
@@ -40,6 +43,7 @@ def test_api_routes() -> None:
         "/list-drama/person/{person_id}",
         "/search/movies",
         "/movies/{movie_id}",
+        "/movies/{movie_id}/reviews",
         "/list-movie/now",
         "/list-movie/coming-soon",
         "/list-movie/opening-this-week",
@@ -63,13 +67,15 @@ def test_api_routes() -> None:
         "/redoc",
     }
 
-    route_cnt = 0
+    seen_routes = set()
     for route in api.routes:
         if route.path not in special_routes:
             assert route.path in defined_routes
-            route_cnt += 1
+            assert route.path not in seen_routes
+            seen_routes.add(route.path)
 
-    assert route_cnt == len(defined_routes)
+    assert len(seen_routes) == len(defined_routes)
+    assert len(seen_routes) == len(Endpoint) + 1
 
 
 def test_index() -> None:
