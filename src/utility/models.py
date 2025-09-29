@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import Any, Dict
 from msgspec import Struct
 from pydantic import BaseModel, Field
 
@@ -49,3 +51,15 @@ class ReviewParams(BaseModel):
 class ListParams(BaseModel):
     limit: int = Field(10, gt=0, le=100)
     page: int = Field(1, gt=0, le=10000)
+
+
+class SearchResponse(BaseModel):
+    query: str
+    heading: str
+    results: Dict[str, Any]
+    scrape_date: datetime
+
+
+class InfoResponse(BaseModel):
+    data: Dict[str, Any]
+    scrape_date: datetime
