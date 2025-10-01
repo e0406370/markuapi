@@ -1,6 +1,6 @@
 # STAGE 1: Builder image, used to build the virtual environment
 
-FROM python:3.13.2-bookworm as builder
+FROM python:3.12-bookworm as builder
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
@@ -21,7 +21,7 @@ RUN poetry install --no-interaction --no-root && rm -rf $POETRY_CACHE_DIR
 
 # STAGE 2: Runtime image, used to run the code in the virtual environment
 
-FROM python:3.13.2-slim-bookworm as runtime
+FROM python:3.12-slim-bookworm as runtime
 
 ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
