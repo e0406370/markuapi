@@ -13,7 +13,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'schedule' &&  github.event.workflow_run.event != 'pull_request'}}
+    if: ${{ false && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'schedule' &&  github.event.workflow_run.event != 'pull_request'}}
+    # deployment job is temporarily disabled since the API is no longer hosted on Render.
+
     steps:
       - name: Deploy application to Render
         run: |
