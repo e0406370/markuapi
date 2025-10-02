@@ -1,5 +1,5 @@
 [project]
-name = "markuapiz"
+name = "markuapi"
 version = "1.0.0"
 description = "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
 readme = "README.md"

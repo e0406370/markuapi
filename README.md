@@ -11,7 +11,7 @@ A web scraper API covering **info**, **list**, **review**, and **search** endpoi
 
 Base URL:
 ```sh
-https://markuapiz.onrender.com/
+https://markuapi.apn.leapcell.app
 ```
 
-Refer to the [Swagger UI](https://markuapiz.onrender.com/docs) for the complete API documentation.
+Refer to the [Swagger UI](https://markuapi.apn.leapcell.app/docs) for the complete API documentation.

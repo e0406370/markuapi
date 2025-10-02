@@ -349,7 +349,7 @@ wheels = [
 ]
 
 [[package]]
-name = "markuapiz"
+name = "markuapi"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
