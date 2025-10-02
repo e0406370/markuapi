@@ -94,10 +94,14 @@ class PersonInfo(Tuple[str, str], Enum):
 
 class Utils:
     FILMARKS_BASE = "https://filmarks.com/"
+    FILMARKS_REQUEST_HEADERS = {
+        "Referer": FILMARKS_BASE,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    }
 
     @staticmethod
     def get_scrape_date() -> datetime:
-        return datetime.now(timezone.utc).isoformat(sep=" ", timespec="seconds")
+        return datetime.now(timezone.utc).isoformat(sep=" ", timespec="microseconds")
 
     @staticmethod
     def create_filmarks_link(url: str) -> str:

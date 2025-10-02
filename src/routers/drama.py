@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
+from src.utility.config import Config
 from src.utility.endpoints import Endpoint
 from src.utility.models import InfoResponse, ReviewParams, ListParams, SearchParams, SearchResponse
+from src.utility.rediss import cache
 from typing import Annotated
 
 router = APIRouter()
 
 
 @router.get("/search/dramas", tags=["drama"], response_model=SearchResponse, summary="Search for dramas")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def search_dramas(
     search_params: Annotated[SearchParams, Depends()],
     req: Request
@@ -22,6 +25,7 @@ def search_dramas(
 
 
 @router.get("/dramas/{drama_series_id}/{drama_season_id}", tags=["drama"], response_model=InfoResponse, summary="Retrieve information about a specific drama")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def info_dramas(
     drama_series_id: int,
     drama_season_id: int,
@@ -36,6 +40,7 @@ def info_dramas(
 
 
 @router.get("/dramas/{drama_series_id}/{drama_season_id}/reviews", tags=["drama"], response_model=InfoResponse, summary="Retrieve user reviews about a specific drama")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def review_dramas(
     drama_series_id: int,
     drama_season_id: int,
@@ -51,6 +56,7 @@ def review_dramas(
 
 
 @router.get("/list-drama/trend", tags=["drama"], response_model=SearchResponse, summary="Fetch currently trending dramas")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_trending(
     list_params: Annotated[ListParams, Depends()],
     req: Request
@@ -64,6 +70,7 @@ def list_dramas_trending(
 
 
 @router.get("/list-drama/vod/{vod_name}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas available on a specific VOD service")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_vod(
     vod_name: str,
     list_params: Annotated[ListParams, Depends()],
@@ -78,6 +85,7 @@ def list_dramas_vod(
 
 
 @router.get("/list-drama/year/{year_series}s", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas released in a specific decade")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_year_series(
     year_series: int,
     list_params: Annotated[ListParams, Depends()],
@@ -92,6 +100,7 @@ def list_dramas_year_series(
 
 
 @router.get("/list-drama/year/{year}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas released in a specific year")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_year_specific(
     year: int,
     list_params: Annotated[ListParams, Depends()],
@@ -108,6 +117,7 @@ def list_dramas_year_specific(
 
 
 @router.get("/list-drama/country/{country_id}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas from a specific country")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_country(
     country_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -122,6 +132,7 @@ def list_dramas_country(
 
 
 @router.get("/list-drama/genre/{genre_id}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas categorised under a specific genre")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_genre(
     genre_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -136,6 +147,7 @@ def list_dramas_genre(
 
 
 @router.get("/list-drama/tag/{tag}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas categorised under a specific tag")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_tag(
     tag: str,
     list_params: Annotated[ListParams, Depends()],
@@ -150,6 +162,7 @@ def list_dramas_tag(
 
 
 @router.get("/list-drama/person/{person_id}", tags=["drama"], response_model=SearchResponse, summary="Fetch dramas linked to a specific person")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_person(
     person_id: int,
     list_params: Annotated[ListParams, Depends()],

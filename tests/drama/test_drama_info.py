@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val, get_reviews_last_page, DRAMA_ENG
+from tests.conftest import get_json_val, get_reviews_last_page, DRAMA_ENG
 import json
 import pytest
 
@@ -11,8 +11,8 @@ import pytest
     "６０５５/8586",
     "6055/８５８６",
 ])
-def test_info_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/dramas/{path}")
+def test_info_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -31,8 +31,8 @@ def test_info_input_not_valid_integer(path) -> None:
     ("6055/8586", "?page=def"),
     ("6055/8586", "?page=２"),
 ])
-def test_review_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -43,8 +43,8 @@ def test_review_input_not_valid_integer(path) -> None:
 @pytest.mark.parametrize("path", [
     ("6055/8586", "?page=0"),
 ])
-def test_review_input_less_than_min_threshold(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_less_than_min_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -55,8 +55,8 @@ def test_review_input_less_than_min_threshold(path) -> None:
 @pytest.mark.parametrize("path", [
     ("6055/8586", "?page=10001"),
 ])
-def test_review_input_more_than_max_threshold(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_more_than_max_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -157,11 +157,11 @@ def test_review_input_more_than_max_threshold(path) -> None:
         },
     ],
 )
-def test_info_with_results_single_1(test_data, caplog) -> None:
+def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -278,11 +278,11 @@ def test_info_with_results_single_1(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_2(test_data, caplog) -> None:
+def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -427,11 +427,11 @@ def test_info_with_results_single_2(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_3(test_data, caplog) -> None:
+def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -582,11 +582,11 @@ def test_info_with_results_single_3(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_4(test_data, caplog) -> None:
+def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -624,7 +624,7 @@ def test_info_with_results_single_4(test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.artist") is not None
 
 
-def test_info_with_results_random(caplog) -> None:
+def test_info_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
@@ -633,7 +633,7 @@ def test_info_with_results_random(caplog) -> None:
     series_id = get_json_val(drama, "$.series")
     season_id = get_json_val(drama, "$.season")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -673,14 +673,14 @@ def test_info_with_results_random(caplog) -> None:
         },
     ],
 )
-def test_review_with_results_full(test_data, caplog) -> None:
+def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
     slug = f"dramas/{series_id}/{season_id}"
     last_page = get_reviews_last_page(slug)
 
-    resp = client.get(f"{slug}/reviews?page={last_page}")
+    resp = client_nc.get(f"{slug}/reviews?page={last_page}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -708,13 +708,13 @@ def test_review_with_results_full(test_data, caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_with_results(caplog) -> None:
+def test_review_with_results(client_nc, caplog) -> None:
     title = "魔女ユヒ"
     original_title = "마녀유희"
     series_id = 11358
     season_id = 15763
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -728,13 +728,13 @@ def test_review_with_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_without_results(caplog) -> None:
+def test_review_without_results(client_nc, caplog) -> None:
     title = "魔女ユヒ"
     original_title = "마녀유희"
     series_id = 11358
     season_id = 15763
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews?page=5")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews?page=5")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -748,7 +748,7 @@ def test_review_without_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) == 0
 
 
-def test_review_with_results_random(caplog) -> None:
+def test_review_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
@@ -757,7 +757,7 @@ def test_review_with_results_random(caplog) -> None:
     series_id = get_json_val(drama, "$.series")
     season_id = get_json_val(drama, "$.season")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200

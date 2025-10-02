@@ -1,4 +1,4 @@
-from tests.test_utils import client, get_json_val, MOVIE_JPN, MOVIE_ENG
+from tests.conftest import get_json_val, MOVIE_JPN, MOVIE_ENG
 import json
 import pytest
 
@@ -32,7 +32,7 @@ list_routes = {
     "?limit=1&page=#",
     "?limit=@&page=1",
 ])
-def test_list_query_params_not_valid_integer(query) -> None:
+def test_list_query_params_not_valid_integer(client_nc, query) -> None:
     for type, route in list_routes.items():
         match type:
             case "vod":
@@ -58,7 +58,7 @@ def test_list_query_params_not_valid_integer(query) -> None:
             case _:
                 pass
 
-        resp = client.get(f"{route}{query}")
+        resp = client_nc.get(f"{route}{query}")
         resp_data = resp.json()
 
         assert resp.status_code == 422
@@ -74,7 +74,7 @@ def test_list_query_params_not_valid_integer(query) -> None:
     "?limit=-3&page=3",
     "?limit=1&page=0",
 ])
-def test_list_query_params_less_than_min_threshold(query) -> None:
+def test_list_query_params_less_than_min_threshold(client_nc, query) -> None:
     for type, route in list_routes.items():
         match type:
             case "vod":
@@ -100,7 +100,7 @@ def test_list_query_params_less_than_min_threshold(query) -> None:
             case _:
                 pass
 
-        resp = client.get(f"{route}{query}")
+        resp = client_nc.get(f"{route}{query}")
         resp_data = resp.json()
 
         assert resp.status_code == 422
@@ -114,7 +114,7 @@ def test_list_query_params_less_than_min_threshold(query) -> None:
     "?limit=101&page=3",
     "?limit=100&page=10001",
 ])
-def test_list_query_params_more_than_max_threshold(query) -> None:
+def test_list_query_params_more_than_max_threshold(client_nc, query) -> None:
     for type, route in list_routes.items():
         match type:
             case "vod":
@@ -140,7 +140,7 @@ def test_list_query_params_more_than_max_threshold(query) -> None:
             case _:
                 pass
 
-        resp = client.get(f"{route}{query}")
+        resp = client_nc.get(f"{route}{query}")
         resp_data = resp.json()
 
         assert resp.status_code == 422
@@ -152,7 +152,7 @@ def test_list_query_params_more_than_max_threshold(query) -> None:
     "１",
     "abc123",
 ])
-def test_list_path_vars_not_valid_integer(var) -> None:
+def test_list_path_vars_not_valid_integer(client_nc, var) -> None:
     for type, route in list_routes.items():
         match type:
             case "award":
@@ -174,7 +174,7 @@ def test_list_path_vars_not_valid_integer(var) -> None:
             case _:
                 continue
 
-        resp = client.get(f"{route}")
+        resp = client_nc.get(f"{route}")
         resp_data = resp.json()
 
         assert resp.status_code == 422
@@ -182,7 +182,7 @@ def test_list_path_vars_not_valid_integer(var) -> None:
             assert get_json_val(err, "$.msg") == "Input should be a valid integer, unable to parse string as an integer"
 
 
-def test_list_minimum_fields_present(caplog) -> None:
+def test_list_minimum_fields_present(client_nc, caplog) -> None:
     for type, route in list_routes.items():
         match type:
             case "vod":
@@ -208,7 +208,7 @@ def test_list_minimum_fields_present(caplog) -> None:
             case _:
                 pass
 
-        resp = client.get(f"{route}?limit=5")
+        resp = client_nc.get(f"{route}?limit=5")
         resp_data = resp.json()
 
         assert resp.status_code == 200
@@ -223,12 +223,12 @@ def test_list_minimum_fields_present(caplog) -> None:
             assert get_json_val(movie, "$.link") is not None
 
 
-def test_list_vod_all_minimum_fields_present(caplog) -> None:
+def test_list_vod_all_minimum_fields_present(client_nc, caplog) -> None:
     with open(file="tests/movie/movie_vod_name.txt", mode="r", encoding="utf-8") as f:
         test_data = (tuple(line.strip().split(",")) for line in f.readlines())
 
     for vod_name, vod_title in test_data:
-        resp = client.get(f"{list_routes["vod"].format(vod_name=vod_name)}?limit=1")
+        resp = client_nc.get(f"{list_routes["vod"].format(vod_name=vod_name)}?limit=1")
         resp_data = resp.json()
 
         assert resp.status_code == 200
@@ -247,8 +247,8 @@ def test_list_vod_all_minimum_fields_present(caplog) -> None:
     ("1","アカデミー賞"),
     ("19","日本アカデミー賞")
 ])
-def test_list_award_all_minimum_fields_present(award, caplog) -> None:
-    resp = client.get(f"{list_routes["award"].format(award_id=award[0])}?limit=1")
+def test_list_award_all_minimum_fields_present(client_nc, award, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["award"].format(award_id=award[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -263,12 +263,12 @@ def test_list_award_all_minimum_fields_present(award, caplog) -> None:
     assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_year_series_all_minimum_fields_present(caplog) -> None:
+def test_list_year_series_all_minimum_fields_present(client_nc, caplog) -> None:
     with open(file="tests/movie/movie_year_series.txt", mode="r", encoding="utf-8") as f:
         test_data = (line.strip() for line in f.readlines())
 
     for year in test_data:
-        resp = client.get(f"{list_routes["year_series"].format(year_series=year)}?limit=1")
+        resp = client_nc.get(f"{list_routes["year_series"].format(year_series=year)}?limit=1")
         resp_data = resp.json()
 
         assert resp.status_code == 200
@@ -283,12 +283,12 @@ def test_list_year_series_all_minimum_fields_present(caplog) -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_year_specific_all_minimum_fields_present(caplog) -> None:
+def test_list_year_specific_all_minimum_fields_present(client_nc, caplog) -> None:
     with open(file="tests/movie/movie_year_specific.txt", mode="r", encoding="utf-8") as f:
         test_data = (line.strip() for line in f.readlines())
 
     for year in test_data:
-        resp = client.get(f"{list_routes["year_specific"].format(year=year)}?limit=1")
+        resp = client_nc.get(f"{list_routes["year_specific"].format(year=year)}?limit=1")
         resp_data = resp.json()
 
         assert resp.status_code == 200
@@ -303,7 +303,7 @@ def test_list_year_specific_all_minimum_fields_present(caplog) -> None:
         assert get_json_val(resp_data, "$.results.movies[0].link") is not None
 
 
-def test_list_country_all_minimum_fields_present(caplog) -> None:
+def test_list_country_all_minimum_fields_present(client_nc, caplog) -> None:
     with open(file="tests/movie/movie_country_id.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
 
@@ -311,7 +311,7 @@ def test_list_country_all_minimum_fields_present(caplog) -> None:
         country_name = get_json_val(country, "$.jp")
         country_id = get_json_val(country, "$.id")
 
-        resp = client.get(f"{list_routes["country"].format(country_id=country_id)}?limit=1")
+        resp = client_nc.get(f"{list_routes["country"].format(country_id=country_id)}?limit=1")
         resp_data = resp.json()
 
         assert resp.status_code == 200
@@ -330,8 +330,8 @@ def test_list_country_all_minimum_fields_present(caplog) -> None:
     ("17", "ホラー"),
     ("903", "スリラー")
 ])
-def test_list_genre_all_minimum_fields_present(genre, caplog) -> None:
-    resp = client.get(f"{list_routes["genre"].format(genre_id=genre[0])}?limit=1")
+def test_list_genre_all_minimum_fields_present(client_nc, genre, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["genre"].format(genre_id=genre[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -350,8 +350,8 @@ def test_list_genre_all_minimum_fields_present(genre, caplog) -> None:
     ("502", "東宝"),
     ("503", "ワーナー・ブラザース")
 ])
-def test_list_distributor_all_minimum_fields_present(distributor, caplog) -> None:
-    resp = client.get(f"{list_routes["distributor"].format(distributor_id=distributor[0])}?limit=1")
+def test_list_distributor_all_minimum_fields_present(client_nc, distributor, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["distributor"].format(distributor_id=distributor[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -370,8 +370,8 @@ def test_list_distributor_all_minimum_fields_present(distributor, caplog) -> Non
     ("1", "ハリー・ポッター"),
     ("76", "ちはやふる")
 ])
-def test_list_series_all_minimum_fields_present(series, caplog) -> None:
-    resp = client.get(f"{list_routes["series"].format(series_id=series[0])}?limit=1")
+def test_list_series_all_minimum_fields_present(client_nc, series, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["series"].format(series_id=series[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -390,8 +390,8 @@ def test_list_series_all_minimum_fields_present(series, caplog) -> None:
     "洋画",
     "邦画",
 ])
-def test_list_tag_all_minimum_fields_present(tag, caplog) -> None:
-    resp = client.get(f"{list_routes["tag"].format(tag=tag)}?limit=1")
+def test_list_tag_all_minimum_fields_present(client_nc, tag, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["tag"].format(tag=tag)}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -410,8 +410,8 @@ def test_list_tag_all_minimum_fields_present(tag, caplog) -> None:
     ("25185", "二宮和也"),
     ("169314", "アン・ハサウェイ")
 ])
-def test_list_person_all_minimum_fields_present(person, caplog) -> None:
-    resp = client.get(f"{list_routes["person"].format(person_id=person[0])}?limit=1")
+def test_list_person_all_minimum_fields_present(client_nc, person, caplog) -> None:
+    resp = client_nc.get(f"{list_routes["person"].format(person_id=person[0])}?limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200
