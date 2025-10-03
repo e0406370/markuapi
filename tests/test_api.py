@@ -1,4 +1,5 @@
 import pytest
+from src.utility.config import Config
 from src.utility.endpoints import Endpoint
 from tests.conftest import get_json_val
 
@@ -154,6 +155,7 @@ def test_api_without_cache(client_nc, path) -> None:
     assert resp_1_scrape_date != resp_2_scrape_date
 
 
+@pytest.mark.skipif(not Config.REDIS_ENABLE_CACHE, reason="requires Redis")
 @pytest.mark.parametrize("path", [
     "/search/animes?q=デジモン",
     "/animes/2592/3304",
