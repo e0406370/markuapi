@@ -17,12 +17,27 @@
 
 ### API
 
-Base URL:
-```sh
-https://markuapi.apn.leapcell.app
-```
+#### Leapcell (Primary)
+- Base URL:
+  ```sh
+  https://markuapi.apn.leapcell.app
+  ```
 
-Refer to the [Swagger UI](https://markuapi.apn.leapcell.app/docs) for the complete API documentation.
+- Redis caching of responses is implemented.
+
+- [Swagger](https://markuapi.apn.leapcell.app/docs)
+
+#### Vercel (Secondary)
+- Base URL:
+  ```sh
+  https://markuapi.vercel.app
+  ```
+
+- Redis caching of responses is **NOT** implemented.
+
+- [Swagger](https://markuapi.vercel.app/docs)
+
+Refer to the Swagger UI for the complete API documentation.
 
 ---
 
