@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val, MOVIE_JPN, MOVIE_ENG
+from tests.conftest import get_json_val, MOVIE_JPN, MOVIE_ENG
 import json
 import pytest
 
@@ -17,8 +17,8 @@ import pytest
     "?q=ちはやふる&page=z",
     "?q=ラストマイル&limit=@&page=1",
 ])
-def test_search_input_not_valid_integer(query) -> None:
-    resp = client.get(f"/search/movies{query}")
+def test_search_input_not_valid_integer(client_nc, query) -> None:
+    resp = client_nc.get(f"/search/movies{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -35,8 +35,8 @@ def test_search_input_not_valid_integer(query) -> None:
     "?q=test2&page=-2",
     "?q=test3&limit=1&page=0",
 ])
-def test_search_input_less_than_min_threshold(query) -> None:
-    resp = client.get(f"/search/movies{query}")
+def test_search_input_less_than_min_threshold(client_nc, query) -> None:
+    resp = client_nc.get(f"/search/movies{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -51,8 +51,8 @@ def test_search_input_less_than_min_threshold(query) -> None:
     "?q=test2&page=10001",
     "?q=test3&limit=101&page=3",
 ])
-def test_search_input_more_than_max_threshold(query) -> None:
-    resp = client.get(f"/search/movies{query}")
+def test_search_input_more_than_max_threshold(client_nc, query) -> None:
+    resp = client_nc.get(f"/search/movies{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -68,8 +68,8 @@ def test_search_input_more_than_max_threshold(query) -> None:
     "?q=",
     "?q=&limit=1",
 ])
-def test_search_empty_query(query, caplog) -> None:
-    resp = client.get(f"/search/movies{query}")
+def test_search_empty_query(client_nc, query, caplog) -> None:
+    resp = client_nc.get(f"/search/movies{query}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -79,9 +79,9 @@ def test_search_empty_query(query, caplog) -> None:
     assert len(get_json_val(resp_data, "$.results.movies")) == 0
 
 
-def test_search_without_results_page_1(caplog) -> None:
+def test_search_without_results_page_1(client_nc, caplog) -> None:
     query = '".*&^'
-    resp = client.get(f"/search/movies?q={query}")
+    resp = client_nc.get(f"/search/movies?q={query}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -92,9 +92,9 @@ def test_search_without_results_page_1(caplog) -> None:
     assert len(get_json_val(resp_data, "$.results.movies")) == 0
 
 
-def test_search_without_results_page_2(caplog) -> None:
+def test_search_without_results_page_2(client_nc, caplog) -> None:
     query = "ちはやふる"  # page 1 returns results, refer to 'test_search_with_results_multiple'
-    resp = client.get(f"/search/movies?q={query}&page=2")
+    resp = client_nc.get(f"/search/movies?q={query}&page=2")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -126,9 +126,9 @@ def test_search_without_results_page_2(caplog) -> None:
         },
     ],
 )
-def test_search_with_results_single(test_data, caplog) -> None:
+def test_search_with_results_single(client_nc, test_data, caplog) -> None:
     query = "プラダを着た悪魔"
-    resp = client.get(f"/search/movies?q={query}&limit=1")
+    resp = client_nc.get(f"/search/movies?q={query}&limit=1")
     resp_data = resp.json()
     movies = get_json_val(resp_data, "$.results.movies")
 
@@ -197,9 +197,9 @@ def test_search_with_results_single(test_data, caplog) -> None:
         },
     ],
 )
-def test_search_with_results_multiple(test_data, caplog) -> None:
+def test_search_with_results_multiple(client_nc, test_data, caplog) -> None:
     query = "ちはやふる"
-    resp = client.get(f"/search/movies?q={query}&page=1&limit=3")
+    resp = client_nc.get(f"/search/movies?q={query}&page=1&limit=3")
     resp_data = resp.json()
     movie = next(m for m in get_json_val(resp_data, "$.results.movies") if get_json_val(m, "$.title") == get_json_val(test_data, "$.title"))
 
@@ -230,7 +230,7 @@ def test_search_with_results_multiple(test_data, caplog) -> None:
     assert get_json_val(movie, "$.distributor") is not None
 
 
-def test_search_with_results_random(caplog) -> None:
+def test_search_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/movie/100_movies.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         movie = choice(test_data)
@@ -238,7 +238,7 @@ def test_search_with_results_random(caplog) -> None:
     query = get_json_val(movie, "$.title")
     movie_id = get_json_val(movie, "$.id")
 
-    resp = client.get(f"/search/movies?q={query}&limit=1")
+    resp = client_nc.get(f"/search/movies?q={query}&limit=1")
     resp_data = resp.json()
 
     assert resp.status_code == 200

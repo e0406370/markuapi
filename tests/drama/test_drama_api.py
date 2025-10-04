@@ -1,8 +1,7 @@
 from pydantic import Field
 from requests.exceptions import RequestException
-from src.api import api
 from src.utility.models import ListParams, ReviewParams, SearchParams
-from tests.test_utils import client, get_json_val
+from tests.conftest import get_json_val
 import pytest
 
 
@@ -21,8 +20,8 @@ import pytest
     "/list-drama/tag",
     "/list-drama/person",
 ])
-def test_invalid_endpoint_base(path) -> None:
-    resp = client.get(path)
+def test_invalid_endpoint_base(client_nc, path) -> None:
+    resp = client_nc.get(path)
     resp_data = resp.json()
 
     assert resp.status_code == 404
@@ -40,8 +39,8 @@ def test_invalid_endpoint_base(path) -> None:
     "/list-drama/tag/invalid_tag",
     "/list-drama/person/9999999999",
 ])
-def test_invalid_endpoint_filmarks(path, caplog) -> None:
-    resp = client.get(path)
+def test_invalid_endpoint_filmarks(client_nc, path, caplog) -> None:
+    resp = client_nc.get(path)
     resp_data = resp.json()
 
     assert resp.status_code == 404
@@ -106,13 +105,13 @@ def test_invalid_endpoint_filmarks(path, caplog) -> None:
         "Failed to fetch dramas with person ID: 500."
     ),
 ])
-def test_scrape_error_500_server_error(mocker, test_data, caplog) -> None:
+def test_scrape_error_500_server_error(client_nc, mocker, test_data, caplog) -> None:
     mocker.patch(
         target=test_data[1],
         side_effect=Exception("Testing - 500 Internal Server Error"),
     )
 
-    resp = client.get(test_data[0])
+    resp = client_nc.get(test_data[0])
     resp_data = resp.json()
 
     assert resp.status_code == 500
@@ -134,13 +133,13 @@ def test_scrape_error_500_server_error(mocker, test_data, caplog) -> None:
     "/list-drama/tag/503_tag",
     "/list-drama/person/503",
 ])
-def test_scrape_error_503_service_unavailable_session(mocker, path, caplog) -> None:
+def test_scrape_error_503_service_unavailable_session(client_nc, mocker, path, caplog) -> None:
     mocker.patch(
         target="src.scrape.base_scraper.Session",
         side_effect=RequestException("Testing - 503 Service Unavailable"),
     )
 
-    resp = client.get(path)
+    resp = client_nc.get(path)
     resp_data = resp.json()
 
     assert resp.status_code == 503
@@ -159,21 +158,21 @@ def test_scrape_error_503_service_unavailable_session(mocker, path, caplog) -> N
     "/list-drama/tag/駄作?page=999999999999999999",
     "/list-drama/person/25499?page=999999999999999999",
 ])
-def test_scrape_error_503_service_unavailable_filmarks(path, caplog) -> None:
+def test_scrape_error_503_service_unavailable_filmarks(client_nc, path, caplog) -> None:
     class CustomParams():
         page: int = Field(1, gt=0)
-    api.dependency_overrides[SearchParams] = CustomParams
-    api.dependency_overrides[ReviewParams] = CustomParams
-    api.dependency_overrides[ListParams] = CustomParams
+    client_nc.app.dependency_overrides[SearchParams] = CustomParams
+    client_nc.app.dependency_overrides[ReviewParams] = CustomParams
+    client_nc.app.dependency_overrides[ListParams] = CustomParams
 
-    resp = client.get(path)
+    resp = client_nc.get(path)
     resp_data = resp.json()
 
     assert resp.status_code == 503
     assert get_json_val(resp_data, "$.detail") == "The service is currently unavailable."
     assert "Filmarks is temporarily unavailable" in caplog.text
 
-    del api.dependency_overrides[SearchParams]
-    del api.dependency_overrides[ReviewParams]
-    del api.dependency_overrides[ListParams]
+    del client_nc.app.dependency_overrides[SearchParams]
+    del client_nc.app.dependency_overrides[ReviewParams]
+    del client_nc.app.dependency_overrides[ListParams]
 

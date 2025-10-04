@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val, get_reviews_last_page, DRAMA_ENG
+from tests.conftest import get_json_val, get_reviews_last_page, DRAMA_ENG
 import json
 import pytest
 
@@ -11,8 +11,8 @@ import pytest
     "６０５５/8586",
     "6055/８５８６",
 ])
-def test_info_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/dramas/{path}")
+def test_info_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -31,8 +31,8 @@ def test_info_input_not_valid_integer(path) -> None:
     ("6055/8586", "?page=def"),
     ("6055/8586", "?page=２"),
 ])
-def test_review_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -43,8 +43,8 @@ def test_review_input_not_valid_integer(path) -> None:
 @pytest.mark.parametrize("path", [
     ("6055/8586", "?page=0"),
 ])
-def test_review_input_less_than_min_threshold(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_less_than_min_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -55,8 +55,8 @@ def test_review_input_less_than_min_threshold(path) -> None:
 @pytest.mark.parametrize("path", [
     ("6055/8586", "?page=10001"),
 ])
-def test_review_input_more_than_max_threshold(path) -> None:
-    resp = client.get(f"/dramas/{path[0]}/reviews{path[1]}")
+def test_review_input_more_than_max_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/dramas/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -157,11 +157,11 @@ def test_review_input_more_than_max_threshold(path) -> None:
         },
     ],
 )
-def test_info_with_results_single_1(test_data, caplog) -> None:
+def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -278,11 +278,11 @@ def test_info_with_results_single_1(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_2(test_data, caplog) -> None:
+def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -427,11 +427,11 @@ def test_info_with_results_single_2(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_3(test_data, caplog) -> None:
+def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -470,7 +470,161 @@ def test_info_with_results_single_3(test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.artist") is None
 
 
-def test_info_with_results_random(caplog) -> None:
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "ライオンの隠れ家",
+            "rating": 4.3,
+            "mark_count": 22509,
+            "clip_count": 9712,
+            "series_id": 15464,
+            "season_id": 20947,
+            "link": "https://filmarks.com/dramas/15464/20947",
+            "official_site": "https://www.tbs.co.jp/lionnokakurega_tbs/",
+            "production_year_link": "https://filmarks.com/list-drama/year/2020s/2024",
+            "production_year": 2024,
+            "release_date": "2024年10月11日",
+            "playback_time": "45分",
+            "country_of_origin": [
+                {
+                    "name": "日本",
+                    "id": 144,
+                    "link": "https://filmarks.com/list-drama/country/144",
+                }
+            ],
+            "cast": [
+                {
+                    "name": "柳楽優弥",
+                    "character": "小森洸人",
+                    "id": 126843,
+                    "link": "https://filmarks.com/people/126843",
+                },
+                {
+                    "name": "坂東龍汰",
+                    "character": "小森美路人",
+                    "id": 232034,
+                    "link": "https://filmarks.com/people/232034",
+                },
+                {
+                    "name": "佐藤大空",
+                    "character": "ライオン",
+                    "id": 346212,
+                    "link": "https://filmarks.com/people/346212",
+                },
+                {
+                    "name": "齋藤飛鳥",
+                    "character": "牧村美央",
+                    "id": 228276,
+                    "link": "https://filmarks.com/people/228276",
+                },
+                {
+                    "name": "岡崎体育",
+                    "character": "貞本洋太",
+                    "id": 242227,
+                    "link": "https://filmarks.com/people/242227",
+                },
+                {
+                    "name": "平井まさあき",
+                    "character": "船木真魚",
+                    "id": 288104,
+                    "link": "https://filmarks.com/people/288104",
+                },
+                {
+                    "name": "森優作",
+                    "character": "小野寺武宏",
+                    "id": 214961,
+                    "link": "https://filmarks.com/people/214961",
+                },
+                {
+                    "name": "でんでん",
+                    "character": "吉見寅吉",
+                    "id": 68951,
+                    "link": "https://filmarks.com/people/68951",
+                },
+                {
+                    "name": "岡山天音",
+                    "character": "Ｘ",
+                    "id": 123551,
+                    "link": "https://filmarks.com/people/123551",
+                },
+                {
+                    "name": "桜井ユキ",
+                    "character": "工藤楓",
+                    "id": 187543,
+                    "link": "https://filmarks.com/people/187543",
+                },
+                {
+                    "name": "柿澤勇人",
+                    "character": "高田快児",
+                    "id": 51020,
+                    "link": "https://filmarks.com/people/51020",
+                },
+                {
+                    "name": "入山法子",
+                    "character": "須賀野かすみ",
+                    "id": 94514,
+                    "link": "https://filmarks.com/people/94514",
+                },
+                {
+                    "name": "尾崎匠海",
+                    "character": "天音悠真",
+                    "id": 309828,
+                    "link": "https://filmarks.com/people/309828",
+                },
+                {
+                    "name": "向井理",
+                    "character": "橘祥吾",
+                    "id": 17519,
+                    "link": "https://filmarks.com/people/17519",
+                },
+            ],
+        },
+    ],
+)
+def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
+    series_id = get_json_val(test_data, "$.series_id")
+    season_id = get_json_val(test_data, "$.season_id")
+
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert DRAMA_ENG in caplog.text
+
+    fields = [
+        "title",
+        "link",
+        "official_site",
+        "production_year_link",
+        "production_year",
+        "release_date",
+        "playback_time",
+        "country_of_origin",
+        "cast",
+    ]
+    for field in fields:
+        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
+
+    assert get_json_val(resp_data, "$.data.synopsis") is None
+    assert get_json_val(resp_data, "$.data.poster") is not None
+    assert get_json_val(resp_data, "$.data.genre") is not None
+    assert get_json_val(resp_data, "$.data.creator") is None
+    assert get_json_val(resp_data, "$.data.planner") is None
+    assert get_json_val(resp_data, "$.data.producer") is None
+    assert get_json_val(resp_data, "$.data.executive_producer") is None
+    assert get_json_val(resp_data, "$.data.director") is None
+    assert get_json_val(resp_data, "$.data.scriptwriter") is not None
+    assert get_json_val(resp_data, "$.data.artist") is not None
+
+
+def test_info_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
@@ -479,7 +633,7 @@ def test_info_with_results_random(caplog) -> None:
     series_id = get_json_val(drama, "$.series")
     season_id = get_json_val(drama, "$.season")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -519,14 +673,14 @@ def test_info_with_results_random(caplog) -> None:
         },
     ],
 )
-def test_review_with_results_full(test_data, caplog) -> None:
+def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     series_id = get_json_val(test_data, "$.series_id")
     season_id = get_json_val(test_data, "$.season_id")
 
     slug = f"dramas/{series_id}/{season_id}"
     last_page = get_reviews_last_page(slug)
 
-    resp = client.get(f"{slug}/reviews?page={last_page}")
+    resp = client_nc.get(f"{slug}/reviews?page={last_page}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -554,13 +708,13 @@ def test_review_with_results_full(test_data, caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_with_results(caplog) -> None:
+def test_review_with_results(client_nc, caplog) -> None:
     title = "魔女ユヒ"
     original_title = "마녀유희"
     series_id = 11358
     season_id = 15763
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -574,13 +728,13 @@ def test_review_with_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_without_results(caplog) -> None:
+def test_review_without_results(client_nc, caplog) -> None:
     title = "魔女ユヒ"
     original_title = "마녀유희"
     series_id = 11358
     season_id = 15763
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews?page=5")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews?page=5")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -594,7 +748,7 @@ def test_review_without_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) == 0
 
 
-def test_review_with_results_random(caplog) -> None:
+def test_review_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/drama/100_dramas.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         drama = choice(test_data)
@@ -603,7 +757,7 @@ def test_review_with_results_random(caplog) -> None:
     series_id = get_json_val(drama, "$.series")
     season_id = get_json_val(drama, "$.season")
 
-    resp = client.get(f"/dramas/{series_id}/{season_id}/reviews")
+    resp = client_nc.get(f"/dramas/{series_id}/{season_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200

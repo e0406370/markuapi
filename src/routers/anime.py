@@ -1,18 +1,21 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
+from src.utility.config import Config
 from src.utility.endpoints import Endpoint
-from src.utility.models import ReviewParams, ListParams, SearchParams
-from typing import Annotated, Any, Dict
+from src.utility.models import InfoResponse, ReviewParams, ListParams, SearchParams, SearchResponse
+from src.utility.rediss import cache
+from typing import Annotated
 
 router = APIRouter()
 
 
-@router.get("/search/animes", tags=["anime"], summary="Search for animes")
+@router.get("/search/animes", tags=["anime"], response_model=SearchResponse, summary="Search for animes")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def search_animes(
     search_params: Annotated[SearchParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.SEARCH_ANIMES,
@@ -21,12 +24,13 @@ def search_animes(
     )
 
 
-@router.get("/animes/{anime_series_id}/{anime_season_id}", tags=["anime"], summary="Retrieve information about a specific anime")
+@router.get("/animes/{anime_series_id}/{anime_season_id}", tags=["anime"], response_model=InfoResponse, summary="Retrieve information about a specific anime")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def info_animes(
     anime_series_id: int,
     anime_season_id: int,
     req: Request
-) -> Dict[str, Any]:
+) -> InfoResponse:
 
     return info_scrape(
         endpoint=Endpoint.INFO_ANIMES,
@@ -35,13 +39,14 @@ def info_animes(
     )
 
 
-@router.get("/animes/{anime_series_id}/{anime_season_id}/reviews", tags=["anime"], summary="Retrieve user reviews about a specific anime")
+@router.get("/animes/{anime_series_id}/{anime_season_id}/reviews", tags=["anime"], response_model=InfoResponse, summary="Retrieve user reviews about a specific anime")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def review_animes(
     anime_series_id: int,
     anime_season_id: int,
     review_params: Annotated[ReviewParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> InfoResponse:
 
     return review_scrape(
         endpoint=Endpoint.REVIEW_ANIMES,
@@ -50,11 +55,12 @@ def review_animes(
     )
 
 
-@router.get("/list-anime/trend", tags=["anime"], summary="Fetch currently trending animes")
+@router.get("/list-anime/trend", tags=["anime"], response_model=SearchResponse, summary="Fetch currently trending animes")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_trending(
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_TRENDING,
@@ -63,12 +69,13 @@ def list_animes_trending(
     )
 
 
-@router.get("/list-anime/vod/{vod_name}", tags=["anime"], summary="Fetch animes available on a specific VOD service")
+@router.get("/list-anime/vod/{vod_name}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes available on a specific VOD service")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_vod(
     vod_name: str,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_VOD,
@@ -77,12 +84,13 @@ def list_animes_vod(
     )
 
 
-@router.get("/list-anime/year/{year_series}s", tags=["anime"], summary="Fetch animes released in a specific decade")
+@router.get("/list-anime/year/{year_series}s", tags=["anime"], response_model=SearchResponse, summary="Fetch animes released in a specific decade")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_year_series(
     year_series: int,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_YEAR_SERIES,
@@ -91,12 +99,13 @@ def list_animes_year_series(
     )
 
 
-@router.get("/list-anime/year/{year}", tags=["anime"], summary="Fetch animes released in a specific year")
+@router.get("/list-anime/year/{year}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes released in a specific year")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_year_specific(
     year: int,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     req.path_params["year_series"] = floor(year / 10) * 10
 
@@ -107,13 +116,14 @@ def list_animes_year_specific(
     )
 
 
-@router.get("/list-anime/year/{year}/{season_id}", tags=["anime"], summary="Fetch animes released in a specific year and season")
+@router.get("/list-anime/year/{year}/{season_id}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes released in a specific year and season")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_year_season(
     year: int,
     season_id: int,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_YEAR_SEASON,
@@ -122,12 +132,13 @@ def list_animes_year_season(
     )
 
 
-@router.get("/list-anime/company/{company_id}", tags=["anime"], summary="Fetch animes associated with a specific production company")
+@router.get("/list-anime/company/{company_id}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes associated with a specific production company")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_company(
     company_id: int,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_COMPANY,
@@ -136,12 +147,13 @@ def list_animes_company(
     )
 
 
-@router.get("/list-anime/tag/{tag}", tags=["anime"], summary="Fetch animes categorised under a specific tag")
+@router.get("/list-anime/tag/{tag}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes categorised under a specific tag")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_tag(
     tag: str,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_TAG,
@@ -150,12 +162,13 @@ def list_animes_tag(
     )
 
 
-@router.get("/list-anime/person/{person_id}", tags=["anime"], summary="Fetch animes linked to a specific person")
+@router.get("/list-anime/person/{person_id}", tags=["anime"], response_model=SearchResponse, summary="Fetch animes linked to a specific person")
+@cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_person(
     person_id: int,
     list_params: Annotated[ListParams, Depends()],
     req: Request
-) -> Dict[str, Any]:
+) -> SearchResponse:
 
     return search_scrape(
         endpoint=Endpoint.LIST_ANIMES_PERSON,

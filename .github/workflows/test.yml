@@ -13,9 +13,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+  
     strategy:
       matrix:
-        python-version: ["3.13"]
+        python-version: ["3.12"]
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
       - name: Checkout source branch
@@ -35,6 +47,11 @@ jobs:
 
       - name: Test with Pytest
         run: uv run coverage run -m pytest
+        env:
+          REDIS_ENABLE_CACHE: true
+          REDIS_FLUSH_CACHE: true
+          REDIS_TTL_CACHE: 900
+          REDIS_URL: redis://localhost:6379
 
       - name: Generate report with Coverage
         run: uv run coverage report -m

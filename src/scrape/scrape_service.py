@@ -23,8 +23,8 @@ def search_scrape(endpoint: Endpoint, req: Request, message: str) -> Dict[str, A
             case ViewType.MOVIE:
                 scraper = SearchMovieScraper.scrape(endpoint, req)
 
-            case _:
-                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")  # pragma: no cover
+            case _:  # pragma: no cover
+                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")
 
         scraper.set_search_results()
         return scraper.get_response()
@@ -49,8 +49,8 @@ def info_scrape(endpoint: Endpoint, req: Request, message: str) -> Dict[str, Any
             case ViewType.MOVIE:
                 scraper = InfoMovieScraper.scrape(endpoint, req)
 
-            case _:
-                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")  # pragma: no cover
+            case _:  # pragma: no cover
+                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")
 
         scraper.set_info_data()
         return scraper.get_response()
@@ -75,8 +75,8 @@ def review_scrape(endpoint: Endpoint, req: Request, message: str) -> Dict[str, A
             case ViewType.MOVIE:
                 scraper = InfoMovieScraper.scrape(endpoint, req)
 
-            case _:
-                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")  # pragma: no cover
+            case _:  # pragma: no cover
+                raise ValueError(f"Unexpected ViewType: {endpoint.value.view}")
 
         scraper.set_review_data()
         return scraper.get_response()

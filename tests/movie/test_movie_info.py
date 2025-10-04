@@ -1,5 +1,5 @@
 from random import choice
-from tests.test_utils import client, get_json_val, get_reviews_last_page, MOVIE_ENG
+from tests.conftest import get_json_val, get_reviews_last_page, MOVIE_ENG
 import json
 import pytest
 
@@ -8,8 +8,8 @@ import pytest
     "abc"
     "１４３４８",
 ])
-def test_info_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/movies/{path}")
+def test_info_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/movies/{path}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -25,8 +25,8 @@ def test_info_input_not_valid_integer(path) -> None:
     ("14348", "?page=def"),
     ("14348", "?page=２"),
 ])
-def test_review_input_not_valid_integer(path) -> None:
-    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+def test_review_input_not_valid_integer(client_nc, path) -> None:
+    resp = client_nc.get(f"/movies/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -37,8 +37,8 @@ def test_review_input_not_valid_integer(path) -> None:
 @pytest.mark.parametrize("path", [
     ("14348", "?page=0"),
 ])
-def test_review_input_less_than_min_threshold(path) -> None:
-    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+def test_review_input_less_than_min_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/movies/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -49,8 +49,8 @@ def test_review_input_less_than_min_threshold(path) -> None:
 @pytest.mark.parametrize("path", [
     ("14348", "?page=10001"),
 ])
-def test_review_input_more_than_max_threshold(path) -> None:
-    resp = client.get(f"/movies/{path[0]}/reviews{path[1]}")
+def test_review_input_more_than_max_threshold(client_nc, path) -> None:
+    resp = client_nc.get(f"/movies/{path[0]}/reviews{path[1]}")
     resp_data = resp.json()
 
     assert resp.status_code == 422
@@ -239,10 +239,10 @@ def test_review_input_more_than_max_threshold(path) -> None:
         },
     ],
 )
-def test_info_with_results_single_1(test_data, caplog) -> None:
+def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
     movie_id = get_json_val(test_data, "$.movie_id")
 
-    resp = client.get(f"/movies/{movie_id}")
+    resp = client_nc.get(f"/movies/{movie_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -416,10 +416,10 @@ def test_info_with_results_single_1(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_2(test_data, caplog) -> None:
+def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
     movie_id = get_json_val(test_data, "$.movie_id")
 
-    resp = client.get(f"/movies/{movie_id}")
+    resp = client_nc.get(f"/movies/{movie_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -783,10 +783,10 @@ def test_info_with_results_single_2(test_data, caplog) -> None:
         },
     ],
 )
-def test_info_with_results_single_3(test_data, caplog) -> None:
+def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     movie_id = get_json_val(test_data, "$.movie_id")
 
-    resp = client.get(f"/movies/{movie_id}")
+    resp = client_nc.get(f"/movies/{movie_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -822,7 +822,138 @@ def test_info_with_results_single_3(test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.artist") is None
 
 
-def test_info_with_results_random(caplog) -> None:
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "グランメゾン・パリ",
+            "rating": 3.8,
+            "mark_count": 29379,
+            "clip_count": 18394,
+            "movie_id": 116998,
+            "link": "https://filmarks.com/movies/116998",
+            "official_site": "https://grandmaison-project.jp",
+            "production_year_link": "https://filmarks.com/list/year/2020s/2024",
+            "production_year": 2024,
+            "screening_date": "2024年12月30日",
+            "screening_time": "117分",
+            "country_of_origin": [
+                {
+                    "name": "日本",
+                    "id": 144,
+                    "link": "https://filmarks.com/list/country/144",
+                }
+            ],
+            "cast": [
+                {
+                    "name": "木村拓哉",
+                    "character": "尾花夏樹",
+                    "id": 18417,
+                    "link": "https://filmarks.com/people/18417",
+                },
+                {
+                    "name": "鈴木京香",
+                    "character": "早見倫子",
+                    "id": 24282,
+                    "link": "https://filmarks.com/people/24282",
+                },
+                {
+                    "name": "オク・テギョン",
+                    "character": "リック・ユアン",
+                    "id": 193242,
+                    "link": "https://filmarks.com/people/193242",
+                },
+                {
+                    "name": "正門良規",
+                    "character": "小暮佑",
+                    "id": 244456,
+                    "link": "https://filmarks.com/people/244456",
+                },
+                {
+                    "name": "玉森裕太",
+                    "character": "平古祥平",
+                    "id": 127408,
+                    "link": "https://filmarks.com/people/127408",
+                },
+                {
+                    "name": "寛一郎",
+                    "character": "芹田公一",
+                    "id": 219445,
+                    "link": "https://filmarks.com/people/219445",
+                },
+                {
+                    "name": "吉谷彩子",
+                    "character": "松井萌絵",
+                    "id": 17247,
+                    "link": "https://filmarks.com/people/17247",
+                },
+                {
+                    "name": "中村アン",
+                    "character": "久住栞奈",
+                    "id": 210512,
+                    "link": "https://filmarks.com/people/210512",
+                },
+                {
+                    "name": "冨永愛",
+                    "character": "リンダ・真知子・リシャール",
+                    "id": 131180,
+                    "link": "https://filmarks.com/people/131180",
+                },
+                {
+                    "name": "及川光博",
+                    "character": "相沢瓶人",
+                    "id": 177749,
+                    "link": "https://filmarks.com/people/177749",
+                },
+                {
+                    "name": "沢村一樹",
+                    "character": "京野陸太郎",
+                    "id": 126120,
+                    "link": "https://filmarks.com/people/126120",
+                },
+            ],
+        },
+    ],
+)
+def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
+    movie_id = get_json_val(test_data, "$.movie_id")
+
+    resp = client_nc.get(f"/movies/{movie_id}")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+    assert MOVIE_ENG in caplog.text
+
+    fields = [
+        "title",
+        "link",
+        "official_site",
+        "production_year_link",
+        "production_year",
+        "screening_date",
+        "screening_time",
+        "country_of_origin",
+        "cast",
+    ]
+    for field in fields:
+        assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
+
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
+    assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
+
+    assert get_json_val(resp_data, "$.data.synopsis") is not None
+    assert get_json_val(resp_data, "$.data.poster") is not None
+    assert get_json_val(resp_data, "$.data.genre") is not None
+    assert get_json_val(resp_data, "$.data.distributor") is not None
+    assert get_json_val(resp_data, "$.data.creator") is None
+    assert get_json_val(resp_data, "$.data.director") is not None
+    assert get_json_val(resp_data, "$.data.scriptwriter") is not None
+    assert get_json_val(resp_data, "$.data.artist") is None
+
+
+def test_info_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/movie/100_movies.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         movie = choice(test_data)
@@ -830,7 +961,7 @@ def test_info_with_results_random(caplog) -> None:
     title = get_json_val(movie, "$.title")
     movie_id = get_json_val(movie, "$.id")
 
-    resp = client.get(f"/movies/{movie_id}")
+    resp = client_nc.get(f"/movies/{movie_id}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -869,13 +1000,13 @@ def test_info_with_results_random(caplog) -> None:
         },
     ],
 )
-def test_review_with_results_full(test_data, caplog) -> None:
+def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     movie_id = get_json_val(test_data, "$.movie_id")
 
     slug = f"movies/{movie_id}"
     last_page = get_reviews_last_page(slug)
 
-    resp = client.get(f"{slug}/reviews?page={last_page}")
+    resp = client_nc.get(f"{slug}/reviews?page={last_page}")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -902,12 +1033,12 @@ def test_review_with_results_full(test_data, caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_with_results(caplog) -> None:
+def test_review_with_results(client_nc, caplog) -> None:
     title = "細い目"
     original_title = "SEPET／Chinese Eyes"
     movie_id = 27402
 
-    resp = client.get(f"/movies/{movie_id}/reviews")
+    resp = client_nc.get(f"/movies/{movie_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -920,12 +1051,12 @@ def test_review_with_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
-def test_review_without_results(caplog) -> None:
+def test_review_without_results(client_nc, caplog) -> None:
     title = "細い目"
     original_title = "SEPET／Chinese Eyes"
     movie_id = 27402
 
-    resp = client.get(f"/movies/{movie_id}/reviews?page=50")
+    resp = client_nc.get(f"/movies/{movie_id}/reviews?page=50")
     resp_data = resp.json()
 
     assert resp.status_code == 200
@@ -938,7 +1069,7 @@ def test_review_without_results(caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) == 0
 
 
-def test_review_with_results_random(caplog) -> None:
+def test_review_with_results_random(client_nc, caplog) -> None:
     with open(file="tests/movie/100_movies.json", mode="r", encoding="utf-8") as f:
         test_data = json.load(f)
         movie = choice(test_data)
@@ -946,7 +1077,7 @@ def test_review_with_results_random(caplog) -> None:
     title = get_json_val(movie, "$.title")
     movie_id = get_json_val(movie, "$.id")
 
-    resp = client.get(f"/movies/{movie_id}/reviews")
+    resp = client_nc.get(f"/movies/{movie_id}/reviews")
     resp_data = resp.json()
 
     assert resp.status_code == 200

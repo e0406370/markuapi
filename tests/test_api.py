@@ -1,23 +1,28 @@
-from src.api import api
+import pytest
+from src.utility.config import Config
 from src.utility.endpoints import Endpoint
-from tests.test_utils import client, get_json_val
+from tests.conftest import get_json_val
 
 
-def test_api_title() -> None:
-    assert api.title == "MarkuAPI"
+def test_api_metadata(client_nc) -> None:
+    resp = client_nc.get("/openapi.json")
+    resp_data = resp.json()
+
+    assert get_json_val(resp_data, "$.openapi") == "3.1.0"
+    assert get_json_val(resp_data, "$.info.title") == "MarkuAPI"
+    assert get_json_val(resp_data, "$.info.summary") == "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
+    assert get_json_val(resp_data, "$.info.contact.name") == "e0406370"
+    assert get_json_val(resp_data, "$.info.contact.url") == "https://github.com/e0406370/markuapi"
+    assert get_json_val(resp_data, "$.info.version") == "1.1.0"
+    assert get_json_val(resp_data, "$.tags[0].name") == "anime"
+    assert get_json_val(resp_data, "$.tags[0].description") == "Endpoints for retrieving data from **[Filmarks Animes (フィルマークス・アニメ)](https://filmarks.com/animes)**"
+    assert get_json_val(resp_data, "$.tags[1].name") == "drama"
+    assert get_json_val(resp_data, "$.tags[1].description") == "Endpoints for retrieving data from **[Filmarks Dramas (フィルマークス・ドラマ)](https://filmarks.com/dramas)**"
+    assert get_json_val(resp_data, "$.tags[2].name") == "movie"
+    assert get_json_val(resp_data, "$.tags[2].description") == "Endpoints for retrieving data from **[Filmarks Movies (フィルマークス・映画)](https://filmarks.com)**"
 
 
-def test_api_version() -> None:
-    assert api.version == "1.0.0"
-
-
-def test_api_response() -> None:
-    resp = client.get("/")
-
-    assert resp.headers["content-type"] == "application/json"
-
-
-def test_api_routes() -> None:
+def test_api_routes(client_nc) -> None:
     defined_routes = {
         "/search/animes",
         "/animes/{anime_series_id}/{anime_season_id}",
@@ -66,9 +71,9 @@ def test_api_routes() -> None:
         "/docs/oauth2-redirect",
         "/redoc",
     }
-
     seen_routes = set()
-    for route in api.routes:
+
+    for route in client_nc.app.routes:
         if route.path not in special_routes:
             assert route.path in defined_routes
             assert route.path not in seen_routes
@@ -78,17 +83,239 @@ def test_api_routes() -> None:
     assert len(seen_routes) == len(Endpoint) + 1
 
 
-def test_index() -> None:
-    resp = client.get("/")
+def test_api_index(client_nc) -> None:
+    resp = client_nc.get("/")
     resp_data = resp.json()
 
+    assert resp.headers["content-type"] == "application/json"
     assert resp.status_code == 200
     assert get_json_val(resp_data, "$.detail") == "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
 
 
-def test_unknown() -> None:
-    resp = client.get("/unknown")
+def test_api_unknown(client_nc) -> None:
+    resp = client_nc.get("/unknown")
     resp_data = resp.json()
 
     assert resp.status_code == 404
     assert get_json_val(resp_data, "$.detail") == "Not Found"
+
+
+@pytest.mark.parametrize("path", [
+    "/search/animes?q=デジモン",
+    "/animes/2592/3304",
+    "/animes/2592/3304/reviews",
+    "/list-anime/trend",
+    "/list-anime/vod/prime_video",
+    "/list-anime/year/2020s",
+    "/list-anime/year/2025",
+    "/list-anime/year/2019/1",
+    "/list-anime/company/41",
+    "/list-anime/tag/駄作",
+    "/list-anime/person/274563",
+    "/search/dramas?q=あなたの番です",
+    "/dramas/6055/8586",
+    "/dramas/6055/8586/reviews",
+    "/list-drama/trend",
+    "/list-drama/vod/prime_video",
+    "/list-drama/year/2020s",
+    "/list-drama/year/2025",
+    "/list-drama/country/144",
+    "/list-drama/genre/9",
+    "/list-drama/tag/駄作",
+    "/list-drama/person/25499",
+    "/search/movies?q=ハリーポッター",
+    "/movies/14348",
+    "/movies/14348/reviews",
+    "/list-movie/now",
+    "/list-movie/coming-soon",
+    "/list-movie/opening-this-week",
+    "/list-movie/trend",
+    "/list-movie/vod/prime_video",
+    "/list-movie/award/19",
+    "/list-movie/year/2010s",
+    "/list-movie/year/2001",
+    "/list-movie/country/5",
+    "/list-movie/genre/903",
+    "/list-movie/distributor/503",
+    "/list-movie/series/1",
+    "/list-movie/tag/洋画",
+    "/list-movie/person/93709",
+])
+def test_api_without_cache(client_nc, path) -> None:
+    resp_1 = client_nc.get(path)
+    resp_1_data = resp_1.json()
+    resp_1_scrape_date = get_json_val(resp_1_data, "$.scrape_date")
+
+    resp_2 = client_nc.get(path)
+    resp_2_data = resp_2.json()
+    resp_2_scrape_date = get_json_val(resp_2_data, "$.scrape_date")
+
+    assert resp_1.status_code == resp_2.status_code == 200
+    assert resp_1_data != resp_2_data
+    assert resp_1_scrape_date != resp_2_scrape_date
+
+
+@pytest.mark.skipif(not Config.REDIS_ENABLE_CACHE, reason="requires Redis")
+@pytest.mark.parametrize("path", [
+    "/search/animes?q=デジモン",
+    "/animes/2592/3304",
+    "/animes/2592/3304/reviews",
+    "/list-anime/trend",
+    "/list-anime/vod/prime_video",
+    "/list-anime/year/2020s",
+    "/list-anime/year/2025",
+    "/list-anime/year/2019/1",
+    "/list-anime/company/41",
+    "/list-anime/tag/駄作",
+    "/list-anime/person/274563",
+    "/search/dramas?q=あなたの番です",
+    "/dramas/6055/8586",
+    "/dramas/6055/8586/reviews",
+    "/list-drama/trend",
+    "/list-drama/vod/prime_video",
+    "/list-drama/year/2020s",
+    "/list-drama/year/2025",
+    "/list-drama/country/144",
+    "/list-drama/genre/9",
+    "/list-drama/tag/駄作",
+    "/list-drama/person/25499",
+    "/search/movies?q=ハリーポッター",
+    "/movies/14348",
+    "/movies/14348/reviews",
+    "/list-movie/now",
+    "/list-movie/coming-soon",
+    "/list-movie/opening-this-week",
+    "/list-movie/trend",
+    "/list-movie/vod/prime_video",
+    "/list-movie/award/19",
+    "/list-movie/year/2010s",
+    "/list-movie/year/2001",
+    "/list-movie/country/5",
+    "/list-movie/genre/903",
+    "/list-movie/distributor/503",
+    "/list-movie/series/1",
+    "/list-movie/tag/洋画",
+    "/list-movie/person/93709",
+])
+def test_api_with_cache(client_c, path) -> None:
+    resp_1 = client_c.get(path)
+    resp_1_data = resp_1.json()
+    resp_1_scrape_date = get_json_val(resp_1_data, "$.scrape_date")
+
+    resp_2 = client_c.get(path)
+    resp_2_data = resp_2.json()
+    resp_2_scrape_date = get_json_val(resp_2_data, "$.scrape_date")
+
+    assert resp_1.status_code == resp_2.status_code == 200
+    assert resp_1_data == resp_2_data
+    assert resp_1_scrape_date == resp_2_scrape_date
+
+
+@pytest.mark.parametrize("path", [
+    "/search/animes?q=デジモン",
+    "/animes/2592/3304",
+    "/animes/2592/3304/reviews",
+    "/list-anime/trend",
+    "/list-anime/vod/prime_video",
+    "/list-anime/year/2020s",
+    "/list-anime/year/2025",
+    "/list-anime/year/2019/1",
+    "/list-anime/company/41",
+    "/list-anime/tag/駄作",
+    "/list-anime/person/274563",
+    "/search/dramas?q=あなたの番です",
+    "/dramas/6055/8586",
+    "/dramas/6055/8586/reviews",
+    "/list-drama/trend",
+    "/list-drama/vod/prime_video",
+    "/list-drama/year/2020s",
+    "/list-drama/year/2025",
+    "/list-drama/country/144",
+    "/list-drama/genre/9",
+    "/list-drama/tag/駄作",
+    "/list-drama/person/25499",
+    "/search/movies?q=ハリーポッター",
+    "/movies/14348",
+    "/movies/14348/reviews",
+    "/list-movie/now",
+    "/list-movie/coming-soon",
+    "/list-movie/opening-this-week",
+    "/list-movie/trend",
+    "/list-movie/vod/prime_video",
+    "/list-movie/award/19",
+    "/list-movie/year/2010s",
+    "/list-movie/year/2001",
+    "/list-movie/country/5",
+    "/list-movie/genre/903",
+    "/list-movie/distributor/503",
+    "/list-movie/series/1",
+    "/list-movie/tag/洋画",
+    "/list-movie/person/93709",
+])
+def test_api_with_cache_connection_error(client_c_conn_err, path) -> None:
+    resp_1 = client_c_conn_err.get(path)
+    resp_1_data = resp_1.json()
+    resp_1_scrape_date = get_json_val(resp_1_data, "$.scrape_date")
+
+    resp_2 = client_c_conn_err.get(path)
+    resp_2_data = resp_2.json()
+    resp_2_scrape_date = get_json_val(resp_2_data, "$.scrape_date")
+
+    assert resp_1.status_code == resp_2.status_code == 200
+    assert resp_1_data != resp_2_data
+    assert resp_1_scrape_date != resp_2_scrape_date
+
+
+@pytest.mark.parametrize("path", [
+    "/search/animes?q=デジモン",
+    "/animes/2592/3304",
+    "/animes/2592/3304/reviews",
+    "/list-anime/trend",
+    "/list-anime/vod/prime_video",
+    "/list-anime/year/2020s",
+    "/list-anime/year/2025",
+    "/list-anime/year/2019/1",
+    "/list-anime/company/41",
+    "/list-anime/tag/駄作",
+    "/list-anime/person/274563",
+    "/search/dramas?q=あなたの番です",
+    "/dramas/6055/8586",
+    "/dramas/6055/8586/reviews",
+    "/list-drama/trend",
+    "/list-drama/vod/prime_video",
+    "/list-drama/year/2020s",
+    "/list-drama/year/2025",
+    "/list-drama/country/144",
+    "/list-drama/genre/9",
+    "/list-drama/tag/駄作",
+    "/list-drama/person/25499",
+    "/search/movies?q=ハリーポッター",
+    "/movies/14348",
+    "/movies/14348/reviews",
+    "/list-movie/now",
+    "/list-movie/coming-soon",
+    "/list-movie/opening-this-week",
+    "/list-movie/trend",
+    "/list-movie/vod/prime_video",
+    "/list-movie/award/19",
+    "/list-movie/year/2010s",
+    "/list-movie/year/2001",
+    "/list-movie/country/5",
+    "/list-movie/genre/903",
+    "/list-movie/distributor/503",
+    "/list-movie/series/1",
+    "/list-movie/tag/洋画",
+    "/list-movie/person/93709",
+])
+def test_api_with_cache_server_error(client_c_serv_err, path) -> None:    
+    resp_1 = client_c_serv_err.get(path)
+    resp_1_data = resp_1.json()
+    resp_1_scrape_date = get_json_val(resp_1_data, "$.scrape_date")
+
+    resp_2 = client_c_serv_err.get(path)
+    resp_2_data = resp_2.json()
+    resp_2_scrape_date = get_json_val(resp_2_data, "$.scrape_date")
+
+    assert resp_1.status_code == resp_2.status_code == 200
+    assert resp_1_data != resp_2_data
+    assert resp_1_scrape_date != resp_2_scrape_date

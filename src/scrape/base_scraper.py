@@ -12,11 +12,6 @@ T = TypeVar("T", bound="BaseScraper")
 
 
 class BaseScraper:
-    headers = {
-        "Referer": Utils.FILMARKS_BASE,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-    }
-
     def __init__(self, soup: BeautifulSoup, params: Dict, view: ViewType) -> None:
         self.soup = soup
         self.params = params
@@ -43,7 +38,7 @@ class BaseScraper:
 
         try:
             with Session() as session:
-                resp = session.get(url=url, headers=BaseScraper.headers)
+                resp = session.get(url=url, headers=Utils.FILMARKS_REQUEST_HEADERS)
                 soup = BeautifulSoup(resp.text, "lxml")
 
                 cls._raise_if_page_service_unavailable(soup)
