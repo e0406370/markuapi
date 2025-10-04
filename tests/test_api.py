@@ -13,7 +13,7 @@ def test_api_metadata(client_nc) -> None:
     assert get_json_val(resp_data, "$.info.summary") == "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
     assert get_json_val(resp_data, "$.info.contact.name") == "e0406370"
     assert get_json_val(resp_data, "$.info.contact.url") == "https://github.com/e0406370/markuapi"
-    assert get_json_val(resp_data, "$.info.version") == "1.0.0"
+    assert get_json_val(resp_data, "$.info.version") == "1.1.0"
     assert get_json_val(resp_data, "$.tags[0].name") == "anime"
     assert get_json_val(resp_data, "$.tags[0].description") == "Endpoints for retrieving data from **[Filmarks Animes (フィルマークス・アニメ)](https://filmarks.com/animes)**"
     assert get_json_val(resp_data, "$.tags[1].name") == "drama"

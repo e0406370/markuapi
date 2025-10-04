@@ -1,11 +1,10 @@
 [project]
 name = "markuapi"
-version = "1.0.0"
+version = "1.1.0"
 description = "Web scraper API for Filmarks Animes, Filmarks Dramas, and Filmarks Movies."
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
-    "aiocron>=2.1",
     "beautifulsoup4>=4.13.4",
     "fastapi>=0.116.1",
     "fastapi-cache2>=0.2.2",
