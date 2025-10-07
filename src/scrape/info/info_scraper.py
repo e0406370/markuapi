@@ -83,11 +83,11 @@ class InfoScraper(BaseScraper):
         return (Utils.create_filmarks_link(production_year.attrs["href"]), int(production_year.text.replace("年", ""))) if production_year else None
 
     def _get_other_info(self, field: OtherInfo) -> str | List[str] | List[Dict[str, Any]] | None:
-        if field == OtherInfo.GENRE:
-            info_elem = self.detail_head.select_one("h3.p-content-detail__genre-title")
+        if field == OtherInfo.GENRE or field == OtherInfo.DISTRIBUTOR:
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__secondary-info-title", string=lambda s: s.startswith(field.title))
 
         else:
-            info_elem = self.detail_head.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s.startswith(field.title))
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__primary-info-title", string=lambda s: s.startswith(field.title))
 
         if field in OtherInfo.single_fields():
             return info_elem.text.replace(field.title, "") if info_elem else None
