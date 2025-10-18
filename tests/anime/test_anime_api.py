@@ -29,6 +29,7 @@ def test_invalid_endpoint_base(client_nc, path) -> None:
 @pytest.mark.parametrize("path", [
     "/animes/9999999999/9999999999",
     "/animes/9999999999/9999999999/reviews",
+    "/animes/9999999999/9999999999/reviews/9999999999",
     "/list-anime/vod/invalid_vod",
     "/list-anime/year/999s",
     "/list-anime/year/999",
@@ -61,6 +62,11 @@ def test_invalid_endpoint_filmarks(client_nc, path, caplog) -> None:
         "/animes/500/500/reviews",
         "src.scrape.info.info_anime_scraper.InfoAnimeScraper.scrape",
         "Failed to retrieve reviews for anime with series ID: 500 and season ID: 500."
+    ),
+    (
+        "/animes/500/500/reviews/500",
+        "src.scrape.info.info_anime_scraper.InfoAnimeScraper.scrape",
+        "Failed to retrieve review for anime with series ID: 500, season ID: 500, and review ID: 500."
     ),
     (
         "/list-anime/trend",
@@ -122,6 +128,7 @@ def test_scrape_error_500_server_error(client_nc, mocker, test_data, caplog) -> 
     "/search/animes?q=test503",
     "/animes/503/503",
     "/animes/503/503/reviews",
+    "/animes/503/503/reviews/503",
     "/list-anime/trend",
     "/list-anime/vod/503_vod",
     "/list-anime/year/503s",

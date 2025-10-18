@@ -468,177 +468,51 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     "test_data",
     [
         {
-            "title": "ドラゴンボールDAIMA",
-            "rating": 3.7,
-            "mark_count": 2119,
-            "clip_count": 1681,
-            "series_id": 4304,
-            "season_id": 5798,
-            "link": "https://filmarks.com/animes/4304/5798",
-            "official_site": "https://dragonballdaima.com/",
-            "production_year_link": "https://filmarks.com/list-anime/year/2020s/2024",
-            "production_year": 2024,
-            "release_date": "2024年10月11日",
-            "playback_time": "24分",
+            "title": "タコピーの原罪",
+            "rating": 4.1,
+            "mark_count": 15740,
+            "clip_count": 6837,
+            "series_id": 4809,
+            "season_id": 6518,
+            "link": "https://filmarks.com/animes/4809/6518",
+            "official_site": "https://www.tbs.co.jp/anime/takopi_project/",
+            "production_year_link": "https://filmarks.com/list-anime/year/2020s/2025",
+            "production_year": 2025,
+            "release_date": "2025年06月28日",
+            "playback_time": "25分",
             "country_of_origin": ["日本"],
             "production_company": [
                 {
-                    "name": "東映アニメーション",
-                    "id": 41,
-                    "link": "https://filmarks.com/list-anime/company/41",
+                    "name": "ENISHIYA",
+                    "id": 1152,
+                    "link": "https://filmarks.com/list-anime/company/1152"
                 }
             ],
             "cast": [
                 {
-                    "name": "野沢雅子",
-                    "character": "孫悟空（ミニ）",
-                    "id": 186719,
-                    "link": "https://filmarks.com/people/186719",
+                    "name": "間宮くるみ",
+                    "character": "タコピー",
+                    "id": 220117,
+                    "link": "https://filmarks.com/people/220117"
                 },
                 {
-                    "name": "小林由美子",
-                    "character": "界王神（ミニ）",
-                    "id": 208464,
-                    "link": "https://filmarks.com/people/208464",
+                    "name": "上田麗奈",
+                    "character": "しずか",
+                    "id": 192831,
+                    "link": "https://filmarks.com/people/192831"
                 },
                 {
-                    "name": "内山昂輝",
-                    "character": "グロリオ",
-                    "id": 195165,
-                    "link": "https://filmarks.com/people/195165",
+                    "name": "小原好美",
+                    "character": "まりな\t",
+                    "id": 220426,
+                    "link": "https://filmarks.com/people/220426"
                 },
                 {
-                    "name": "ファイルーズあい",
-                    "character": "パンジ",
-                    "id": 263130,
-                    "link": "https://filmarks.com/people/263130",
-                },
-                {
-                    "name": "森久保祥太郎",
-                    "character": "ゴマー",
-                    "id": 11386,
-                    "link": "https://filmarks.com/people/11386",
-                },
-                {
-                    "name": "榎木淳弥",
-                    "character": "デゲス",
-                    "id": 207207,
-                    "link": "https://filmarks.com/people/207207",
-                },
-                {
-                    "name": "日笠陽子",
-                    "character": "ドクター・アリンス",
-                    "id": 60508,
-                    "link": "https://filmarks.com/people/60508",
-                },
-                {
-                    "name": "中原麻衣",
-                    "character": "ブルマ（ミニ）",
-                    "id": 203624,
-                    "link": "https://filmarks.com/people/203624",
-                },
-                {
-                    "name": "三野雄大",
-                    "character": "ベジータ（ミニ）",
-                    "id": 338759,
-                    "link": "https://filmarks.com/people/338759",
-                },
-                {
-                    "name": "山口智広",
-                    "character": "ピッコロ（ミニ）",
-                    "id": 285590,
-                    "link": "https://filmarks.com/people/285590",
-                },
-                {
-                    "name": "金田アキ",
-                    "character": "クリリン（ミニ）",
-                    "id": 261431,
-                    "link": "https://filmarks.com/people/261431",
-                },
-                {
-                    "name": "加隈亜衣",
-                    "character": "チチ（ミニ）",
-                    "id": 204901,
-                    "link": "https://filmarks.com/people/204901",
-                },
-                {
-                    "name": "金光宣明",
-                    "character": "亀仙人（ミニ）",
-                    "id": 221653,
-                    "link": "https://filmarks.com/people/221653",
-                },
-                {
-                    "name": "代永翼",
-                    "character": "トランクス（ミニ）",
-                    "id": 194769,
-                    "link": "https://filmarks.com/people/194769",
-                },
-                {
-                    "name": "後藤恵里菜",
-                    "character": "デンデ（ミニ）",
-                    "id": 303130,
-                    "link": "https://filmarks.com/people/303130",
-                },
-                {
-                    "name": "斉藤貴美子",
-                    "character": "ミスター・ポポ（ミニ）",
-                    "id": 223025,
-                    "link": "https://filmarks.com/people/223025",
-                },
-                {
-                    "name": "半田裕典",
-                    "character": "キビト（ミニ）",
-                    "id": 350013,
-                    "link": "https://filmarks.com/people/350013",
-                },
-                {
-                    "name": "櫻井トオル",
-                    "character": "ミスター・サタン（ミニ）",
-                    "id": 274168,
-                    "link": "https://filmarks.com/people/274168",
-                },
-                {
-                    "name": "安室志穂",
-                    "character": "魔人ブウ（ミニ）",
-                    "id": 350014,
-                    "link": "https://filmarks.com/people/350014",
-                },
-                {
-                    "name": "関智一",
-                    "character": "魔人クウ",
-                    "id": 9579,
-                    "link": "https://filmarks.com/people/9579",
-                },
-                {
-                    "name": "三宅健太",
-                    "character": "タマガミ・ナンバー・スリー",
-                    "id": 115581,
-                    "link": "https://filmarks.com/people/115581",
-                },
-                {
-                    "name": "堀越真己",
-                    "character": "大魔女マーバ",
-                    "id": 187707,
-                    "link": "https://filmarks.com/people/187707",
-                },
-                {
-                    "name": "れいみ",
-                    "character": "ハイビス",
-                    "id": 303252,
-                    "link": "https://filmarks.com/people/303252",
-                },
-                {
-                    "name": "中博史",
-                    "character": "ネバ",
-                    "id": 216286,
-                    "link": "https://filmarks.com/people/216286",
-                },
-                {
-                    "name": "落合福嗣",
-                    "character": "魔人ドゥー",
-                    "id": 211346,
-                    "link": "https://filmarks.com/people/211346",
-                },
+                    "name": "永瀬アンナ",
+                    "character": "東",
+                    "id": 287199,
+                    "link": "https://filmarks.com/people/287199"
+                }
             ],
         },
     ],
@@ -684,7 +558,7 @@ def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.chief_director") is None
     assert get_json_val(resp_data, "$.data.director") is not None
     assert get_json_val(resp_data, "$.data.series_composer") is not None
-    assert get_json_val(resp_data, "$.data.scriptwriter") is not None
+    assert get_json_val(resp_data, "$.data.scriptwriter") is None
     assert get_json_val(resp_data, "$.data.character_original_designer") is None
     assert get_json_val(resp_data, "$.data.character_designer") is not None
     assert get_json_val(resp_data, "$.data.narrator") is None
@@ -773,6 +647,62 @@ def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.link") == f"{get_json_val(test_data, "$.link")}?page={last_page}"
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "DEATH NOTE",
+            "rating": 4.3,
+            "series_id": 1533,
+            "season_id": 2046,
+            "review_id": 292787,
+            "link": "https://filmarks.com/animes/1533/2046/reviews/292787",
+            "review": {
+                "user": {
+                    "name": "ChameleonBaby",
+                    "id": "Nick575",
+                    "link": "https://filmarks.com/users/Nick575",
+                },
+                "review": {
+                    "date": "2020/11/20 19:29",
+                    "rating": 4,
+                    "contents": "原作が素晴らしいが、アニメ化も素晴らしかった。 特にシブタクの人気が圧倒的。 数々のMAD素材にもなったことから、当時のニコニコ動画文化に根強く浸透している。",
+                },
+            },
+        },
+    ],
+)
+def test_review_with_results_specific(client_nc, test_data, caplog) -> None:
+    series_id = get_json_val(test_data, "$.series_id")
+    season_id = get_json_val(test_data, "$.season_id")
+    review_id = get_json_val(test_data, "$.review_id")
+
+    resp = client_nc.get(f"animes/{series_id}/{season_id}/reviews/292787")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert get_json_val(resp_data, "$.data.review_id") == review_id
+    assert ANIME_ENG in caplog.text
+
+    review_fields = [
+        "user.name",
+        "user.id",
+        "user.link",
+        "review.date",
+        "review.rating",
+        "review.contents"
+    ]
+    for field in review_fields:
+        assert get_json_val(resp_data, f"$.data.review.{field}") == get_json_val(test_data, f"$.review.{field}")
+
+    assert get_json_val(resp_data, "$.data.title") == get_json_val(test_data, "$.title")
+    assert get_json_val(resp_data, "$.data.original_title") is None
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(resp_data, "$.data.link") == get_json_val(test_data, "$.link")
 
 
 def test_review_with_results(client_nc, caplog) -> None:

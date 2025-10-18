@@ -55,6 +55,22 @@ def review_animes(
     )
 
 
+@router.get("/animes/{anime_series_id}/{anime_season_id}/reviews/{review_id}", tags=["anime"], response_model=InfoResponse, summary="Retrieve a specific user review about a specific anime")
+@cache(expire=Config.REDIS_TTL_CACHE)
+def review_specific_animes(
+    anime_series_id: int,
+    anime_season_id: int,
+    review_id: int,
+    req: Request
+) -> InfoResponse:
+
+    return review_scrape(
+        endpoint=Endpoint.REVIEW_SPECIFIC_ANIMES,
+        req=req,
+        message=f"Failed to retrieve review for anime with series ID: {anime_series_id}, season ID: {anime_season_id}, and review ID: {review_id}.",
+    )
+
+
 @router.get("/list-anime/trend", tags=["anime"], response_model=SearchResponse, summary="Fetch currently trending animes")
 @cache(expire=Config.REDIS_TTL_CACHE)
 def list_animes_trending(

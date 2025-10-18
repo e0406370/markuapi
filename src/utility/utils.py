@@ -122,14 +122,15 @@ class Utils:
         person_info = {}
 
         person_info["name"] = name
-        if character: person_info["character"] = character
+        if character:
+            person_info["character"] = character
         person_info["id"] = int(link.split("/")[-1])
         person_info["link"] = Utils.create_filmarks_link(link)
 
         return person_info
 
     @staticmethod
-    def create_review_info(user_name: str, user_link: str, review_date: str, review_rating: str, review_link: str, review_contents: str) -> Dict[str, Any]:
+    def create_review_info(user_name: str, user_link: str, review_date: str, review_rating: str, review_contents: str = "", review_link: str = "") -> Dict[str, Any]:
         review_info = {}
 
         user = {}
@@ -141,9 +142,11 @@ class Utils:
         review = {}
         review["date"] = review_date
         review["rating"] = review_rating
-        review["id"] = int(review_link.split("/")[-1])
-        review["link"] = Utils.create_filmarks_link(review_link)
-        if review_contents: review["contents"] = review_contents
+        if review_contents:
+            review["contents"] = review_contents
+        if review_link:
+            review["id"] = int(review_link.split("/")[-1])
+            review["link"] = Utils.create_filmarks_link(review_link)
         review_info["review"] = review
 
         return review_info
