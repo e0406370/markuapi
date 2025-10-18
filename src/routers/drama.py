@@ -55,6 +55,22 @@ def review_dramas(
     )
 
 
+@router.get("/dramas/{drama_series_id}/{drama_season_id}/reviews/{review_id}", tags=["drama"], response_model=InfoResponse, summary="Retrieve a specific user review about a specific drama")
+@cache(expire=Config.REDIS_TTL_CACHE)
+def review_specific_dramas(
+    drama_series_id: int,
+    drama_season_id: int,
+    review_id: int,
+    req: Request
+) -> InfoResponse:
+
+    return review_scrape(
+        endpoint=Endpoint.REVIEW_SPECIFIC_DRAMAS,
+        req=req,
+        message=f"Failed to retrieve review for drama with series ID: {drama_series_id}, season ID: {drama_season_id}, and review ID: {review_id}.",
+    )
+
+
 @router.get("/list-drama/trend", tags=["drama"], response_model=SearchResponse, summary="Fetch currently trending dramas")
 @cache(expire=Config.REDIS_TTL_CACHE)
 def list_dramas_trending(

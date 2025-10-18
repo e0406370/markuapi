@@ -28,6 +28,12 @@ class Endpoint(Enum):
         view=ViewType.ANIME
     )
 
+    REVIEW_SPECIFIC_ANIMES = EndpointModel(
+        path="animes/{anime_series_id}/{anime_season_id}/reviews/{review_id}",
+        type=EndpointType.PATH,
+        view=ViewType.ANIME
+    )
+
     LIST_ANIMES_TRENDING = EndpointModel(
         path="list-anime/trend",
         type=EndpointType.QUERY,
@@ -94,6 +100,12 @@ class Endpoint(Enum):
         view=ViewType.DRAMA
     )
 
+    REVIEW_SPECIFIC_DRAMAS = EndpointModel(
+        path="dramas/{drama_series_id}/{drama_season_id}/reviews/{review_id}",
+        type=EndpointType.PATH,
+        view=ViewType.DRAMA
+    )
+
     LIST_DRAMAS_TRENDING = EndpointModel(
         path="list-drama/trend",
         type=EndpointType.QUERY,
@@ -157,6 +169,12 @@ class Endpoint(Enum):
     REVIEW_MOVIES = EndpointModel(
         path="movies/{movie_id}",
         type=EndpointType.COMBINED,
+        view=ViewType.MOVIE
+    )
+
+    REVIEW_SPECIFIC_MOVIES = EndpointModel(
+        path="movies/{movie_id}/reviews/{review_id}",
+        type=EndpointType.PATH,
         view=ViewType.MOVIE
     )
 

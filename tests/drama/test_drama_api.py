@@ -31,6 +31,7 @@ def test_invalid_endpoint_base(client_nc, path) -> None:
 @pytest.mark.parametrize("path", [
     "/dramas/9999999999/9999999999",
     "/dramas/9999999999/9999999999/reviews",
+    "/dramas/9999999999/9999999999/reviews/9999999999",
     "/list-drama/vod/invalid_vod",
     "/list-drama/year/999s",
     "/list-drama/year/999",
@@ -63,6 +64,11 @@ def test_invalid_endpoint_filmarks(client_nc, path, caplog) -> None:
         "/dramas/500/500/reviews",
         "src.scrape.info.info_drama_scraper.InfoDramaScraper.scrape",
         "Failed to retrieve reviews for drama with series ID: 500 and season ID: 500."
+    ),
+    (
+        "/dramas/500/500/reviews/500",
+        "src.scrape.info.info_drama_scraper.InfoDramaScraper.scrape",
+        "Failed to retrieve review for drama with series ID: 500, season ID: 500, and review ID: 500."
     ),
     (
         "/list-drama/trend",
@@ -124,6 +130,7 @@ def test_scrape_error_500_server_error(client_nc, mocker, test_data, caplog) -> 
     "/search/dramas?q=test503",
     "/dramas/503/503",
     "/dramas/503/503/reviews",
+    "/dramas/503/503/reviews/503",
     "/list-drama/trend",
     "/list-drama/vod/503_vod",
     "/list-drama/year/503s",

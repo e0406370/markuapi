@@ -1033,6 +1033,58 @@ def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
 
 
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "バットマン ビギンズ",
+            "rating": 3.8,
+            "movie_id": 22767,
+            "review_id": 230,
+            "link": "https://filmarks.com/movies/22767/reviews/230",
+            "review": {
+                "user": {
+                    "name": "shingo",
+                    "id": "ZR5DnIWz",
+                    "link": "https://filmarks.com/users/ZR5DnIWz",
+                },
+                "review": {
+                    "date": "2012/08/11 12:01",
+                    "rating": 3.8,
+                    "contents": "ダークナイトライジングに向けて復習。物語がバラバラしてる印象なんだけど、敵が悪としてではなくて自分たちの信じる正義を原理的に実行する人たちとして描かれてるのがよかった。",
+                },
+            },
+        },
+    ],
+)
+def test_review_with_results_specific(client_nc, test_data, caplog) -> None:
+    movie_id = get_json_val(test_data, "$.movie_id")
+    review_id = get_json_val(test_data, "$.review_id")
+
+    resp = client_nc.get(f"movies/{movie_id}/reviews/230")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.movie_id") == movie_id
+    assert get_json_val(resp_data, "$.data.review_id") == review_id
+    assert MOVIE_ENG in caplog.text
+
+    review_fields = [
+        "user.name",
+        "user.id",
+        "user.link",
+        "review.date",
+        "review.rating",
+        "review.contents"
+    ]
+    for field in review_fields:
+        assert get_json_val(resp_data, f"$.data.review.{field}") == get_json_val(test_data, f"$.review.{field}")
+
+    assert get_json_val(resp_data, "$.data.title") == get_json_val(test_data, "$.title")
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(resp_data, "$.data.link") == get_json_val(test_data, "$.link")
+
+
 def test_review_with_results(client_nc, caplog) -> None:
     title = "細い目"
     original_title = "SEPET／Chinese Eyes"

@@ -31,6 +31,7 @@ def test_invalid_endpoint_base(client_nc, path) -> None:
 @pytest.mark.parametrize("path", [
     "/movies/9999999999",
     "/movies/9999999999/reviews",
+    "/movies/9999999999/reviews/9999999999",
     "/list-movie/vod/invalid_vod",
     "/list-movie/award/9999999999",
     "/list-movie/year/999s",
@@ -66,6 +67,11 @@ def test_invalid_endpoint_filmarks(client_nc, path, caplog) -> None:
         "/movies/500/reviews",
         "src.scrape.info.info_movie_scraper.InfoMovieScraper.scrape",
         "Failed to retrieve reviews for movie with ID: 500."
+    ),
+    (
+        "/movies/500/reviews/500",
+        "src.scrape.info.info_movie_scraper.InfoMovieScraper.scrape",
+        "Failed to retrieve review for movie with ID: 500 and review ID: 500."
     ),
     (
         "/list-movie/now",
@@ -157,6 +163,7 @@ def test_scrape_error_500_server_error(client_nc, mocker, test_data, caplog) -> 
     "/search/movies?q=test503",
     "/movies/503",
     "/movies/503/reviews",
+    "/movies/503/reviews/503",
     "/list-movie/now",
     "/list-movie/coming-soon",
     "/list-movie/opening-this-week",

@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 from src.scrape.info.info_scraper import InfoScraper
+from src.utility.endpoints import Endpoint
 from src.utility.lib import Logger
-from src.utility.utils import OtherInfo, PersonInfo, ViewType
+from src.utility.utils import OtherInfo, PersonInfo, Utils, ViewType
 from typing import Dict, List
 
 
@@ -29,6 +30,7 @@ class InfoDramaScraper(InfoScraper):
 
         self.series_id = int(self.params.get("drama_series_id"))
         self.season_id = int(self.params.get("drama_season_id"))
+        self.review_id = int(self.params.get("review_id", -1))
 
     def set_info_data(self) -> None:
         self.data["title"] = self._get_title()
@@ -80,12 +82,26 @@ class InfoDramaScraper(InfoScraper):
 
         self.data["series_id"] = self.series_id
         self.data["season_id"] = self.season_id
-        self.data["link"] = self._get_link()
+        if self.review_id != -1:
+            self.data["review_id"] = self.review_id
 
-        if (condition := self._is_reviews_empty()):
-            self.data["reviews"] = []
-            Logger.warn(self.get_logging(id=[self.series_id, self.season_id], text=condition.text))
+        self.data["link"] = Utils.create_filmarks_link(
+            Endpoint.REVIEW_SPECIFIC_DRAMAS.value.path.format(
+                drama_series_id=self.series_id, 
+                drama_season_id=self.season_id,
+                review_id = self.review_id
+            )
+        ) if self.review_id != -1 else self._get_link()
+
+        if self.review_id != -1:
+            self.data["review"] = self._get_review()
+            Logger.info(self.get_logging(id=[self.series_id, self.season_id, self.review_id], text=self.data))
 
         else:
-            self.data["reviews"] = self._get_review_info()
-            Logger.info(self.get_logging(id=[self.series_id, self.season_id], text=self.data))
+            if (condition := self._is_reviews_empty()):
+                self.data["reviews"] = []
+                Logger.warn(self.get_logging(id=[self.series_id, self.season_id], text=condition.text))
+
+            else:
+                self.data["reviews"] = self._get_review_info()
+                Logger.info(self.get_logging(id=[self.series_id, self.season_id], text=self.data))

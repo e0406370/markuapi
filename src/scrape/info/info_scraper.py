@@ -11,8 +11,8 @@ class InfoScraper(BaseScraper):
     def __init__(self, soup: BeautifulSoup, params: Dict, view: ViewType) -> None:
         super().__init__(soup, params, view)
 
-        self.detail_head = self.soup.select_one("div.p-content-detail__head")
-        self.detail_foot = self.soup.select_one("div.p-content-detail__foot")
+        self.detail_head = self.soup.select_one("div.p-content-detail__head") or self.soup.select_one("div.p-timeline-mark")
+        self.detail_foot = self.soup.select_one("div.p-content-detail__foot") or self.soup.select_one("div.p-profile__main")
 
         self.page_number = int(self.params.get("page", 1))
         self.data = {}
@@ -27,7 +27,7 @@ class InfoScraper(BaseScraper):
         return f"[{self.view.value}] [ID: {', '.join(str(i) for i in id)}] {text}"
 
     def _get_title(self) -> str:
-        selectors = ["h2.p-content-detail__title > span", "h2.c-content-box-s__title"]
+        selectors = ["h2.p-content-detail__title > span", "h2.c-content-box-s__title", "div.p-timeline-mark__title > a"]
         for sel in selectors:
             if title := self.detail_head.select_one(sel):
                 return title.find(string=True, recursive=False).text
@@ -46,7 +46,7 @@ class InfoScraper(BaseScraper):
         return synopsis.select_one("content-detail-synopsis").get(":outline").strip('"') if synopsis else None
 
     def _get_rating(self) -> float | str:
-        selectors = ["div.c2-rating-l__text", "div.c2-rating-m__text"]
+        selectors = ["div.c2-rating-l__text", "div.c2-rating-m__text", "div.c-rating__score"]
         for sel in selectors:
             if rating := self.detail_head.select_one(sel):
                 rating = rating.text
@@ -83,11 +83,11 @@ class InfoScraper(BaseScraper):
         return (Utils.create_filmarks_link(production_year.attrs["href"]), int(production_year.text.replace("年", ""))) if production_year else None
 
     def _get_other_info(self, field: OtherInfo) -> str | List[str] | List[Dict[str, Any]] | None:
-        if field == OtherInfo.GENRE:
-            info_elem = self.detail_head.select_one("h3.p-content-detail__genre-title")
+        if field == OtherInfo.GENRE or field == OtherInfo.DISTRIBUTOR:
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__secondary-info-title", string=lambda s: s.startswith(field.title))
 
         else:
-            info_elem = self.detail_head.find("h3", class_="p-content-detail__other-info-title", string=lambda s: s.startswith(field.title))
+            info_elem = self.detail_head.find("h3", class_="p-content-detail__primary-info-title", string=lambda s: s.startswith(field.title))
 
         if field in OtherInfo.single_fields():
             return info_elem.text.replace(field.title, "") if info_elem else None
@@ -135,6 +135,15 @@ class InfoScraper(BaseScraper):
         condition = self.detail_foot.select_one("div.p2-empty-reviews-message__text")
 
         return condition
+    
+    def _get_review(self) -> Dict[str, Any]:
+        return Utils.create_review_info(
+            user_name=self.detail_foot.select_one("h2.p-profile__name > a").text,
+            user_link=self.detail_foot.select_one("div.p-profile__content > a").attrs["href"],
+            review_date=self.detail_head.select_one("time.c-media__date").text,
+            review_rating=float(rating) if (rating := self.detail_head.select_one("div.c-rating__score").text) != "-" else rating,
+            review_contents=self.detail_head.select_one("div.p-mark-review").get_text(separator=" ", strip=True),
+        )
 
     def _get_review_info(self) -> List[Dict[str, Any]] | None:
         info_elem = self.detail_foot.select("div.p-mark")
@@ -145,8 +154,8 @@ class InfoScraper(BaseScraper):
                 user_link=review.select_one("div.c2-user-m > a").attrs["href"],
                 review_date=review.select_one("time.c-media__date").text,
                 review_rating=float(rating) if (rating := review.select_one("div.c2-rating-s__text").text) != "-" else rating,
+                review_contents= rev.get_text(separator=" ", strip=True) if (rev := review.select_one("div.p-mark-review")) else "",
                 review_link=review.select_one("div.c2-user-m__heading a").attrs["href"],
-                review_contents= rev.get_text(separator=" ", strip=True) if (rev := review.select_one("div.p-mark-review")) else ""
             )
             for review
             in info_elem

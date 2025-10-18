@@ -53,6 +53,21 @@ def review_movies(
     )
 
 
+@router.get("/movies/{movie_id}/reviews/{review_id}", tags=["movie"], response_model=InfoResponse, summary="Retrieve a specific user review about a specific movie")
+@cache(expire=Config.REDIS_TTL_CACHE)
+def review_specific_movies(
+    movie_id: int,
+    review_id: int,
+    req: Request
+) -> InfoResponse:
+
+    return review_scrape(
+        endpoint=Endpoint.REVIEW_SPECIFIC_MOVIES,
+        req=req,
+        message=f"Failed to retrieve review for movie with ID: {movie_id} and review ID: {review_id}.",
+    )
+
+
 @router.get("/list-movie/now", tags=["movie"], response_model=SearchResponse, summary="Fetch movies that are currently screening")
 @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_currently_screening(

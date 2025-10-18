@@ -474,18 +474,17 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     "test_data",
     [
         {
-            "title": "ライオンの隠れ家",
-            "rating": 4.3,
-            "mark_count": 22509,
-            "clip_count": 9712,
-            "series_id": 15464,
-            "season_id": 20947,
-            "link": "https://filmarks.com/dramas/15464/20947",
-            "official_site": "https://www.tbs.co.jp/lionnokakurega_tbs/",
-            "production_year_link": "https://filmarks.com/list-drama/year/2020s/2024",
-            "production_year": 2024,
-            "release_date": "2024年10月11日",
-            "playback_time": "45分",
+            "title": "ぼくたちん家",
+            "rating": 3.7,
+            "mark_count": 300,
+            "clip_count": 2034,
+            "series_id": 16808,
+            "season_id": 22629,
+            "link": "https://filmarks.com/dramas/16808/22629",
+            "official_site": "https://www.ntv.co.jp/bokutachinchi/",
+            "production_year_link": "https://filmarks.com/list-drama/year/2020s/2025",
+            "production_year": 2025,
+            "release_date": "2025年10月12日",
             "country_of_origin": [
                 {
                     "name": "日本",
@@ -495,89 +494,83 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
             ],
             "cast": [
                 {
-                    "name": "柳楽優弥",
-                    "character": "小森洸人",
-                    "id": 126843,
-                    "link": "https://filmarks.com/people/126843",
+                    "name": "及川光博",
+                    "character": "波多野玄一",
+                    "id": 177749,
+                    "link": "https://filmarks.com/people/177749"
                 },
                 {
-                    "name": "坂東龍汰",
-                    "character": "小森美路人",
-                    "id": 232034,
-                    "link": "https://filmarks.com/people/232034",
+                    "name": "手越祐也",
+                    "character": "作田索",
+                    "id": 29565,
+                    "link": "https://filmarks.com/people/29565"
                 },
                 {
-                    "name": "佐藤大空",
-                    "character": "ライオン",
-                    "id": 346212,
-                    "link": "https://filmarks.com/people/346212",
+                    "name": "白鳥玉季",
+                    "character": "楠ほたる",
+                    "id": 239988,
+                    "link": "https://filmarks.com/people/239988"
                 },
                 {
-                    "name": "齋藤飛鳥",
-                    "character": "牧村美央",
-                    "id": 228276,
-                    "link": "https://filmarks.com/people/228276",
+                    "name": "田中直樹",
+                    "character": "岡部成治",
+                    "id": 131931,
+                    "link": "https://filmarks.com/people/131931"
                 },
                 {
-                    "name": "岡崎体育",
-                    "character": "貞本洋太",
-                    "id": 242227,
-                    "link": "https://filmarks.com/people/242227",
+                    "name": "井之脇海",
+                    "character": "吉田亮太",
+                    "id": 66476,
+                    "link": "https://filmarks.com/people/66476"
                 },
                 {
-                    "name": "平井まさあき",
-                    "character": "船木真魚",
-                    "id": 288104,
-                    "link": "https://filmarks.com/people/288104",
+                    "name": "渋谷凪咲",
+                    "character": "百瀬まどか",
+                    "id": 221263,
+                    "link": "https://filmarks.com/people/221263"
                 },
                 {
-                    "name": "森優作",
-                    "character": "小野寺武宏",
-                    "id": 214961,
-                    "link": "https://filmarks.com/people/214961",
+                    "name": "久保田磨希",
+                    "character": "栗田美緒",
+                    "id": 14820,
+                    "link": "https://filmarks.com/people/14820"
                 },
                 {
-                    "name": "でんでん",
-                    "character": "吉見寅吉",
-                    "id": 68951,
-                    "link": "https://filmarks.com/people/68951",
+                    "name": "土居志央梨",
+                    "character": "松梅子",
+                    "id": 210783,
+                    "link": "https://filmarks.com/people/210783"
                 },
                 {
-                    "name": "岡山天音",
-                    "character": "Ｘ",
-                    "id": 123551,
-                    "link": "https://filmarks.com/people/123551",
+                    "name": "川口凉旺",
+                    "character": "藤沢辰哉",
+                    "id": 365881,
+                    "link": "https://filmarks.com/people/365881"
                 },
                 {
-                    "name": "桜井ユキ",
-                    "character": "工藤楓",
-                    "id": 187543,
-                    "link": "https://filmarks.com/people/187543",
+                    "name": "大谷亮平",
+                    "character": "鯉登裕太郎",
+                    "id": 158528,
+                    "link": "https://filmarks.com/people/158528"
                 },
                 {
-                    "name": "柿澤勇人",
-                    "character": "高田快児",
-                    "id": 51020,
-                    "link": "https://filmarks.com/people/51020",
+                    "name": "坂井真紀",
+                    "character": "井の頭今日子",
+                    "id": 7221,
+                    "link": "https://filmarks.com/people/7221"
                 },
                 {
-                    "name": "入山法子",
-                    "character": "須賀野かすみ",
-                    "id": 94514,
-                    "link": "https://filmarks.com/people/94514",
+                    "name": "光石研",
+                    "character": "市ヶ谷仁",
+                    "id": 135880,
+                    "link": "https://filmarks.com/people/135880"
                 },
                 {
-                    "name": "尾崎匠海",
-                    "character": "天音悠真",
-                    "id": 309828,
-                    "link": "https://filmarks.com/people/309828",
-                },
-                {
-                    "name": "向井理",
-                    "character": "橘祥吾",
-                    "id": 17519,
-                    "link": "https://filmarks.com/people/17519",
-                },
+                    "name": "麻生久美子",
+                    "character": "楠ともえ",
+                    "id": 6488,
+                    "link": "https://filmarks.com/people/6488"
+                }
             ],
         },
     ],
@@ -601,7 +594,6 @@ def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
         "production_year_link",
         "production_year",
         "release_date",
-        "playback_time",
         "country_of_origin",
         "cast",
     ]
@@ -612,7 +604,7 @@ def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
 
-    assert get_json_val(resp_data, "$.data.synopsis") is None
+    assert get_json_val(resp_data, "$.data.synopsis") is not None
     assert get_json_val(resp_data, "$.data.poster") is not None
     assert get_json_val(resp_data, "$.data.genre") is not None
     assert get_json_val(resp_data, "$.data.creator") is None
@@ -706,6 +698,62 @@ def test_review_with_results_full(client_nc, test_data, caplog) -> None:
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.link") == f"{get_json_val(test_data, "$.link")}?page={last_page}"
     assert len(get_json_val(resp_data, "$.data.reviews")) > 0
+
+
+@pytest.mark.parametrize(
+    "test_data",
+    [
+        {
+            "title": "のだめカンタービレ",
+            "rating": 4.2,
+            "series_id": 2767,
+            "season_id": 4530,
+            "review_id": 622799,
+            "link": "https://filmarks.com/dramas/2767/4530/reviews/622799",
+            "review": {
+                "user": {
+                    "name": "yumi",
+                    "id": "__yumyumyumi",
+                    "link": "https://filmarks.com/users/__yumyumyumi",
+                },
+                "review": {
+                    "date": "2018/06/16 08:15",
+                    "rating": 3.9,
+                    "contents": "クラシックを使用するドラマは見ていて飽きない。こんなにも恥を捨てた俳優さん達の演技が素晴らしい！",
+                },
+            },
+        },
+    ],
+)
+def test_review_with_results_specific(client_nc, test_data, caplog) -> None:
+    series_id = get_json_val(test_data, "$.series_id")
+    season_id = get_json_val(test_data, "$.season_id")
+    review_id = get_json_val(test_data, "$.review_id")
+
+    resp = client_nc.get(f"dramas/{series_id}/{season_id}/reviews/622799")
+    resp_data = resp.json()
+
+    assert resp.status_code == 200
+    assert get_json_val(resp_data, "$.data.series_id") == series_id
+    assert get_json_val(resp_data, "$.data.season_id") == season_id
+    assert get_json_val(resp_data, "$.data.review_id") == review_id
+    assert DRAMA_ENG in caplog.text
+
+    review_fields = [
+        "user.name",
+        "user.id",
+        "user.link",
+        "review.date",
+        "review.rating",
+        "review.contents"
+    ]
+    for field in review_fields:
+        assert get_json_val(resp_data, f"$.data.review.{field}") == get_json_val(test_data, f"$.review.{field}")
+
+    assert get_json_val(resp_data, "$.data.title") == get_json_val(test_data, "$.title")
+    assert get_json_val(resp_data, "$.data.original_title") is None
+    assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
+    assert get_json_val(resp_data, "$.data.link") == get_json_val(test_data, "$.link")
 
 
 def test_review_with_results(client_nc, caplog) -> None:
