@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from jsonpath_ng import parse
 from redis.exceptions import ConnectionError
 from requests import get
-from src.api import init_api
+from src.app import init_api
 from src.utility.utils import Utils
 from typing import Any, Optional
 import pytest

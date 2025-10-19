@@ -51,7 +51,7 @@ def init_api(enable_cache: bool, flush_cache: bool) -> FastAPI:
     return api
 
 
-api = init_api(
+app = init_api(
     enable_cache=Config.REDIS_ENABLE_CACHE,
     flush_cache=Config.REDIS_FLUSH_CACHE
 )
