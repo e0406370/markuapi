@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends, Request
 from math import floor
 from src.scrape.scrape_service import info_scrape, review_scrape, search_scrape
-from src.utility.config import Config
+# from src.utility.config import Config
 from src.utility.endpoints import Endpoint
 from src.utility.models import InfoResponse, ReviewParams, ListParams, SearchParams, SearchResponse
-from src.utility.rediss import cache
+# from src.utility.rediss import cache
 from typing import Annotated
 
 router = APIRouter()
 
 
 @router.get("/search/movies", tags=["movie"], response_model=SearchResponse, summary="Search for movies")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def search_movies(
     search_params: Annotated[SearchParams, Depends()],
     req: Request
@@ -25,7 +25,7 @@ def search_movies(
 
 
 @router.get("/movies/{movie_id}", tags=["movie"], response_model=InfoResponse, summary="Retrieve information about a specific movie")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def info_movies(
     movie_id: int,
     req: Request
@@ -39,7 +39,7 @@ def info_movies(
 
 
 @router.get("/movies/{movie_id}/reviews", tags=["movie"], response_model=InfoResponse, summary="Retrieve user reviews about a specific movie")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def review_movies(
     movie_id: int,
     review_params: Annotated[ReviewParams, Depends()],
@@ -54,7 +54,7 @@ def review_movies(
 
 
 @router.get("/movies/{movie_id}/reviews/{review_id}", tags=["movie"], response_model=InfoResponse, summary="Retrieve a specific user review about a specific movie")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def review_specific_movies(
     movie_id: int,
     review_id: int,
@@ -69,7 +69,7 @@ def review_specific_movies(
 
 
 @router.get("/list-movie/now", tags=["movie"], response_model=SearchResponse, summary="Fetch movies that are currently screening")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_currently_screening(
     list_params: Annotated[ListParams, Depends()],
     req: Request
@@ -83,7 +83,7 @@ def list_movies_currently_screening(
 
 
 @router.get("/list-movie/coming-soon", tags=["movie"], response_model=SearchResponse, summary="Fetch movies that are coming soon")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_coming_soon(
     list_params: Annotated[ListParams, Depends()],
     req: Request
@@ -97,7 +97,7 @@ def list_movies_coming_soon(
 
 
 @router.get("/list-movie/opening-this-week", tags=["movie"], response_model=SearchResponse, summary="Fetch movies that are opening this week")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_opening_this_week(
     list_params: Annotated[ListParams, Depends()],
     req: Request
@@ -111,7 +111,7 @@ def list_movies_opening_this_week(
 
 
 @router.get("/list-movie/trend", tags=["movie"], response_model=SearchResponse, summary="Fetch currently trending movies")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_trending(
     list_params: Annotated[ListParams, Depends()],
     req: Request
@@ -125,7 +125,7 @@ def list_movies_trending(
 
 
 @router.get("/list-movie/vod/{vod_name}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies available on a specific VOD service")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_vod(
     vod_name: str,
     list_params: Annotated[ListParams, Depends()],
@@ -140,7 +140,7 @@ def list_movies_vod(
 
 
 @router.get("/list-movie/award/{award_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies that received a specific award")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_award(
     award_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -155,7 +155,7 @@ def list_movies_award(
 
 
 @router.get("/list-movie/year/{year_series}s", tags=["movie"], response_model=SearchResponse, summary="Fetch movies released in a specific decade")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_year_series(
     year_series: int,
     list_params: Annotated[ListParams, Depends()],
@@ -170,7 +170,7 @@ def list_movies_year_series(
 
 
 @router.get("/list-movie/year/{year}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies released in a specific year")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_year_specific(
     year: int,
     list_params: Annotated[ListParams, Depends()],
@@ -187,7 +187,7 @@ def list_movies_year_specific(
 
 
 @router.get("/list-movie/country/{country_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies from a specific country")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_country(
     country_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -202,7 +202,7 @@ def list_movies_country(
 
 
 @router.get("/list-movie/genre/{genre_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies categorised under a specific genre")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_genre(
     genre_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -217,7 +217,7 @@ def list_movies_genre(
 
 
 @router.get("/list-movie/distributor/{distributor_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies associated with a specific distributor")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_distributor(
     distributor_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -232,7 +232,7 @@ def list_movies_distributor(
 
 
 @router.get("/list-movie/series/{series_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies categorised under a specific series")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_series(
     series_id: int,
     list_params: Annotated[ListParams, Depends()],
@@ -247,7 +247,7 @@ def list_movies_series(
 
 
 @router.get("/list-movie/tag/{tag}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies categorised under a specific tag")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_tag(
     tag: str,
     list_params: Annotated[ListParams, Depends()],
@@ -262,7 +262,7 @@ def list_movies_tag(
 
 
 @router.get("/list-movie/person/{person_id}", tags=["movie"], response_model=SearchResponse, summary="Fetch movies linked to a specific person")
-@cache(expire=Config.REDIS_TTL_CACHE)
+# @cache(expire=Config.REDIS_TTL_CACHE)
 def list_movies_person(
     person_id: int,
     list_params: Annotated[ListParams, Depends()],
