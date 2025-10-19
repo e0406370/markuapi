@@ -1,6 +1,6 @@
 # STAGE 1: Builder image, used to build the virtual environment
 
-FROM python:3.12-bookworm as builder
+FROM python:3.12-bookworm AS builder
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
@@ -21,7 +21,7 @@ RUN poetry install --no-interaction --no-root && rm -rf $POETRY_CACHE_DIR
 
 # STAGE 2: Runtime image, used to run the code in the virtual environment
 
-FROM python:3.12-slim-bookworm as runtime
+FROM python:3.12-slim-bookworm AS runtime
 
 ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
@@ -30,4 +30,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY pyproject.toml ./pyproject.toml
 COPY src ./src
 
-ENTRYPOINT uvicorn src.api:api --host 0.0.0.0 --port ${PORT}
+ENTRYPOINT ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
