@@ -6,6 +6,7 @@ tests/
 # files
 .gitignore
 .pytest.ini
+docker-compose.yml
 Dockerfile
 README.md
 uv.lock

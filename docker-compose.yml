@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8035:8080"
+    mem_limit: 1g
+    restart: on-failure
