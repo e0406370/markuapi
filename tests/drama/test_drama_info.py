@@ -548,6 +548,24 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/365881"
                 },
                 {
+                    "name": "大島美優",
+                    "character": "なっち",
+                    "id": 300696,
+                    "link": "https://filmarks.com/people/300696"
+                },
+                {
+                    "name": "星乃あんな",
+                    "character": "ばやしこ",
+                    "id": 331908,
+                    "link": "https://filmarks.com/people/331908"
+                },
+                {
+                    "name": "西浦心乃助",
+                    "character": "みょうが",
+                    "id": 367837,
+                    "link": "https://filmarks.com/people/367837"
+                },
+                {
                     "name": "大谷亮平",
                     "character": "鯉登裕太郎",
                     "id": 158528,
