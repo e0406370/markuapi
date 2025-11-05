@@ -4,14 +4,12 @@ dmmtv,DMM TV
 rakutentv,Rakuten TV
 disneyplus,ディズニープラス
 fod,FOD
-telasa,TELASA
 lemino,Lemino
+telasa,TELASA
 abema,ABEMA
 danime,dアニメストア
 hulu,Hulu
 netflix,Netflix
-jaiho,JAIHO
-thecinema,ザ・シネマメンバーズ
 wod,WOWOWオンデマンド
 animetimes,アニメタイムズ
 roadstead,Roadstead

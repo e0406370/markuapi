@@ -13,3 +13,5 @@ class Config:
     REDIS_PORT: str = os.getenv("REDIS_PORT", "6379")
     REDIS_USERNAME: str = os.getenv("REDIS_USERNAME", "")
     REDIS_PASSWORD: str = os.getenv("REDIS_PASSWORD", "")
+    
+    LOGGER_LEVEL: str = os.getenv("LOGGER_LEVEL", "INFO").upper()
