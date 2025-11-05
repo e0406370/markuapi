@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
+from src.utility.config import Config
 from typing import Any
 import logging
 import msgspec
@@ -36,11 +37,11 @@ class Logger:
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
-    handler.setLevel(logging.INFO)
+    handler.setLevel(Config.LOGGER_LEVEL)
 
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(Config.LOGGER_LEVEL)
 
     @classmethod
     def info(cls, message: str) -> None:

@@ -64,7 +64,7 @@ def lifespan_factory(enable_cache: bool, flush_cache: bool):
                 Logger.warn("Redis cache flushed on startup.")
 
             FastAPICache.init(backend=SafeRedisBackend(redis), prefix="fastapi-cache")
-            Logger.info("Redis caching enabled.")
+            Logger.warn("Redis caching enabled.")
 
         except ConnectionError:
             FastAPICache.init(backend=NoOpBackend())
