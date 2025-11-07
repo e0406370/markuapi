@@ -136,6 +136,19 @@ class Utils:
         return person_info
 
     @staticmethod
+    def create_episode_info(episode: str, title: str, link: str, outline: str = "") -> Dict[str, Any]:
+        episode_info = {}
+
+        episode_info["episode"] = int(episode)
+        episode_info["title"] = title
+        if outline:
+            episode_info["outline"] = outline
+        episode_info["id"] = int(link.split("/")[-1])
+        episode_info["link"] = Utils.create_filmarks_link(link)
+
+        return episode_info
+
+    @staticmethod
     def create_review_info(user_name: str, user_link: str, review_date: str, review_rating: str, review_contents: str = "", review_link: str = "") -> Dict[str, Any]:
         review_info = {}
 
