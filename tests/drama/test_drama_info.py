@@ -154,6 +154,14 @@ def test_review_input_more_than_max_threshold(client_nc, path) -> None:
                     "link": "https://filmarks.com/people/146784",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "#1",
+                    "id": 33060,
+                    "link": "https://filmarks.com/dramas/1137/2418/episodes/33060"
+                },
+            ],
         },
     ],
 )
@@ -182,6 +190,7 @@ def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -275,6 +284,14 @@ def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/85588",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "第1話",
+                    "id": 191817,
+                    "link": "https://filmarks.com/dramas/11358/15763/episodes/191817"
+                },
+            ],
         },
     ],
 )
@@ -302,6 +319,7 @@ def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -424,6 +442,14 @@ def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/127871",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "マイケル",
+                    "id": 3815,
+                    "link": "https://filmarks.com/dramas/88/335/episodes/3815"
+                },
+            ],
         },
     ],
 )
@@ -452,6 +478,7 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -590,6 +617,15 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/6488"
                 }
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "第1話",
+                    "outline": "「3000万円で、あなたを買います」――。心優しきゲイのおじさんを買ったのは、中3のトーヨコ中学生!?動物飼育員の波多野玄一、50歳。恋愛対象が男性の、いわゆるゲイのおじさん。アパートで動物たちと暮らす玄一は、ファミリーサイズのアイスを一緒に食べてくれる恋人がほしくなってパートナー相談所に通うものの、手応えはサッパリ。「やっぱり、ひとりでコツコツ食べます」と肩を落とす玄一に、相談所の百瀬（渋谷凪咲）が一言、「恋と革命です。『人間は、恋と革命のために生まれてきたのだ』。太宰の言葉です」――。一方、中学校教師の作田索は、ゲイなのに婚姻届を書いてみた。『夫となる人 吉田亮太。夫となる人 作田索』。受理されるはずもなく…。恋にも人生にも冷めきっていて、恋人との別れを決断する索。ひょんなことから索と出会った玄一は、他人事とは思えずに、「だったら家を買うってどうですか？人間は、恋と革命のために生まれてきたんです！家を『かすがい』にして、俺たちの恋愛にだって意味があることを証明しましょう！」。そんな玄一に、索の生徒・楠ほたるが突然、「3000万円あります。家欲しいんですよね。私、あなたを買います」。学校に行かずトーヨコ通いのほたるは、なぜか3000万円を隠し持っていて――！社会の隅っこでつながった3人の奇妙な生活。仲良しの不動産屋・岡部（田中直樹）、索の元恋人・吉田（井之脇海）、オンボロアパートのオーナー・井の頭（坂井真紀）、ほたるのロクデナシな父・市ヶ谷（光石研）、そして謎多き母・楠（麻生久美子）らを巻き込みながら、奇想天外な方向へ…！笑って、泣いて、笑っちゃう、奇妙なホーム＆ラブコメディー、開幕!!",
+                    "id": 293920,
+                    "link": "https://filmarks.com/dramas/16808/22629/episodes/293920"
+                },
+            ],
         },
     ],
 )
@@ -618,6 +654,7 @@ def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")

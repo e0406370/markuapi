@@ -185,6 +185,15 @@ def test_review_input_more_than_max_threshold(client_nc, path) -> None:
                     "link": "https://filmarks.com/people/214282",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "漂流？ 冒険の島！",
+                    "outline": "干ばつ。洪水。真夏に降る雪・・・。世界中がおかしかったその夏。日本からは見えるはずのないオーロラを目撃した太一たちは、オーロラの裂け目から飛来した謎の光に異世界へと連れ去られてしまう。すべてが未知のその世界で太一たちが最初に出会ったのは、自分たちを「待っていた」という奇妙な生物、デジタルモンスターだった。",
+                    "id": 73115,
+                    "link": "https://filmarks.com/animes/2592/3304/episodes/73115"
+                },
+            ],
         },
     ],
 )
@@ -214,6 +223,7 @@ def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -302,6 +312,14 @@ def test_info_with_results_single_1(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/275804",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "第1話",
+                    "id": 39867,
+                    "link": "https://filmarks.com/animes/1533/2046/episodes/39867"
+                },
+            ],
         },
     ],
 )
@@ -331,6 +349,7 @@ def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -413,6 +432,15 @@ def test_info_with_results_single_2(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/307449",
                 },
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "第1章 目覚め",
+                    "outline": "長い眠りから目覚めたアン。火の国の軍艦に乗っていることに気づき驚くが、それは仲間が乗っ取ったものだった。これまでの経緯を聞き、アンは死んだことになっていると知ってショックを受ける。サカの計画では、日食の時に火の国を奇襲するとのことだったが、アンは自分一人で戦うべきだと飛び出す。３年ぶりに火の国に戻ったズーコは父である王と再会。王はズーコがアバターを殺したと聞いて喜ぶが、ズーコはアンが生きているのではと思っていた。",
+                    "id": 114131,
+                    "link": "https://filmarks.com/animes/3691/4983/episodes/114131"
+                },
+            ],
         },
     ],
 )
@@ -441,6 +469,7 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")
@@ -514,6 +543,15 @@ def test_info_with_results_single_3(client_nc, test_data, caplog) -> None:
                     "link": "https://filmarks.com/people/287199"
                 }
             ],
+            "episodes": [
+                {
+                    "episode": 1,
+                    "title": "2016年のきみへ",
+                    "outline": "ハッピーを広めるため地球に降り立ったタコピーは、人間の女の子しずかと出会う。ピンチを救ってもらったタコピーは、不思議な力を持つハッピー道具で彼女のために奔走するのだが、しずかは笑顔すら見せない。どうやらその背景には学校のお友達とおうちの複雑な事情が関係しているようで……。",
+                    "id": 143599,
+                    "link": "https://filmarks.com/animes/4809/6518/episodes/143599"
+                },
+            ],
         },
     ],
 )
@@ -544,6 +582,7 @@ def test_info_with_results_single_4(client_nc, test_data, caplog) -> None:
     for field in fields:
         assert get_json_val(resp_data, f"$.data.{field}") == get_json_val(test_data, f"$.{field}")
 
+    assert get_json_val(test_data, "$.episodes[0]") in get_json_val(resp_data, "$.data.episodes")
     assert get_json_val(resp_data, "$.data.rating") == pytest.approx(get_json_val(test_data, "$.rating"), abs=0.5)
     assert get_json_val(resp_data, "$.data.mark_count") >= get_json_val(test_data, "$.mark_count")
     assert get_json_val(resp_data, "$.data.clip_count") >= get_json_val(test_data, "$.clip_count")

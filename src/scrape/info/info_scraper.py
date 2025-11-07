@@ -131,6 +131,20 @@ class InfoScraper(BaseScraper):
                 in info_elem.find_next_sibling("ul").find_all("li")
             ] if info_elem else None
 
+    def _get_episode_info(self) -> List[Dict[str, Any]] | None:
+        info_elem = self.detail_head.select("div.c2-episode-list-item")
+
+        return [
+            Utils.create_episode_info(
+                episode=episode.select_one("div.c2-episode-list-item__header-text-number").text,
+                title=episode.select_one("div.c2-episode-list-item__header-text-title").text,
+                outline=epi.text.replace("\n", "") if (epi := episode.select_one("div.c2-episode-list-item__outline-text")) else "",
+                link=episode.select_one("a").attrs["href"]
+            )
+            for episode
+            in info_elem
+        ] if info_elem else None
+
     def _is_reviews_empty(self) -> Tag | None:
         condition = self.detail_foot.select_one("div.p2-empty-reviews-message__text")
 
