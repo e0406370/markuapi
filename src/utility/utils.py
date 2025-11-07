@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 from enum import Enum
+from fastapi.datastructures import QueryParams
 from msgspec import Struct
 from src.utility.models import AnimeDataClip, AnimeDataMark, DramaDataClip, DramaDataMark, MovieDataClip, MovieDataMark
 from typing import Any, Dict, Set, Tuple
-from urllib.parse import urljoin
+from urllib.parse import unquote, urlencode, urljoin
 
 
 class EndpointType(str, Enum):
@@ -102,6 +103,11 @@ class Utils:
     @staticmethod
     def get_scrape_date() -> datetime:
         return datetime.now(timezone.utc).isoformat(sep=" ", timespec="microseconds")
+    
+    @staticmethod
+    def safe_encode(params: QueryParams) -> str:
+        params = {k: unquote(v) for k, v in params.items()}
+        return urlencode(params)
 
     @staticmethod
     def create_filmarks_link(url: str) -> str:
