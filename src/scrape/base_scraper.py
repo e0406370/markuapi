@@ -6,7 +6,6 @@ from src.utility.endpoints import Endpoint
 from src.utility.lib import CustomException, Logger
 from src.utility.utils import EndpointType, Utils, ViewType
 from typing import Dict, Type, TypeVar
-from urllib.parse import urlencode
 
 T = TypeVar("T", bound="BaseScraper")
 
@@ -23,7 +22,7 @@ class BaseScraper:
 
         if endpoint.type == EndpointType.QUERY:
             params = req.query_params
-            url = Utils.create_filmarks_link(endpoint.path + "?" + urlencode(params))
+            url = Utils.create_filmarks_link(endpoint.path + "?" + Utils.safe_encode(params))
 
         elif endpoint.type == EndpointType.PATH:
             params = req.path_params
@@ -31,7 +30,7 @@ class BaseScraper:
 
         elif endpoint.type == EndpointType.COMBINED:
             params = {**req.query_params, **req.path_params}
-            url = Utils.create_filmarks_link(endpoint.path.format(**req.path_params) + "?" + urlencode(req.query_params))
+            url = Utils.create_filmarks_link(endpoint.path.format(**req.path_params) + "?" + Utils.safe_encode(req.query_params))
 
         else:
             raise ValueError(f"Unexpected EndpointType: {endpoint.type}")  # pragma: no cover
