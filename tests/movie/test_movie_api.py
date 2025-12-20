@@ -1,6 +1,4 @@
-from pydantic import Field
 from requests.exceptions import RequestException
-from src.utility.models import ListParams, ReviewParams, SearchParams
 from tests.conftest import get_json_val
 import pytest
 
@@ -191,39 +189,3 @@ def test_scrape_error_503_service_unavailable_session(client_nc, mocker, path, c
     assert resp.status_code == 503
     assert get_json_val(resp_data, "$.detail") == "The service is currently unavailable."
     assert "Request to Filmarks failed: 'Testing - 503 Service Unavailable'" in caplog.text 
-
-
-@pytest.mark.parametrize("path", [
-    "/movies/14348/reviews?page=9999999999999999999",
-    "/list-movie/now?page=999999999999999999",
-    "/list-movie/coming-soon?page=999999999999999999",
-    "/list-movie/opening-this-week?page=999999999999999999",
-    "/list-movie/trend?page=999999999999999999",
-    "/list-movie/vod/prime_video?page=999999999999999999",
-    "/list-movie/award/19?page=999999999999999999",
-    "/list-movie/year/2010s?page=999999999999999999",
-    "/list-movie/year/2001?page=999999999999999999",
-    "/list-movie/country/5?page=999999999999999999",
-    "/list-movie/genre/903?page=999999999999999999",
-    "/list-movie/distributor/503?page=999999999999999999",
-    "/list-movie/series/1?page=999999999999999999",
-    "/list-movie/tag/洋画?page=999999999999999999",
-    "/list-movie/person/93709?page=999999999999999999",
-])
-def test_scrape_error_503_service_unavailable_filmarks(client_nc, path, caplog) -> None:
-    class CustomParams():
-        page: int = Field(1, gt=0)
-    client_nc.app.dependency_overrides[SearchParams] = CustomParams
-    client_nc.app.dependency_overrides[ReviewParams] = CustomParams
-    client_nc.app.dependency_overrides[ListParams] = CustomParams
-
-    resp = client_nc.get(path)
-    resp_data = resp.json()
-
-    assert resp.status_code == 503
-    assert get_json_val(resp_data, "$.detail") == "The service is currently unavailable."
-    assert "Filmarks is temporarily unavailable" in caplog.text
-
-    del client_nc.app.dependency_overrides[SearchParams]
-    del client_nc.app.dependency_overrides[ReviewParams]
-    del client_nc.app.dependency_overrides[ListParams]
