@@ -75,6 +75,8 @@ class InfoAnimeScraper(InfoScraper):
             value = self._get_person_info(field)
             if value: self.data[field.key] = value
 
+        self.data["episodes"] = self._get_episode_info()
+
         Logger.info(self.get_logging(id=[self.series_id, self.season_id], text=self.data))
 
     def set_review_data(self) -> None:
