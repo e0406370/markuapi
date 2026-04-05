@@ -23,3 +23,4 @@ class Config:
     )
     RATE_LIMIT: str = os.getenv("RATE_LIMIT", "5/minute")
     LOGTAIL_TOKEN: str = os.getenv("LOGTAIL_TOKEN", "")
+    LOGTAIL_HOST: str = os.getenv("LOGTAIL_HOST", "")

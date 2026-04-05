@@ -45,8 +45,9 @@ class Logger:
     logger.setLevel(Config.LOGGER_LEVEL)
     
     logtail_token = Config.LOGTAIL_TOKEN
-    if logtail_token:
-        logtail_handler = LogtailHandler(source_token=logtail_token)
+    logtail_host = Config.LOGTAIL_HOST
+    if logtail_token and logtail_host:
+        logtail_handler = LogtailHandler(source_token=logtail_token, host=logtail_host)
         logtail_handler.setFormatter(formatter)
         logtail_handler.setLevel(Config.LOGGER_LEVEL)
         logger.addHandler(logtail_handler)
