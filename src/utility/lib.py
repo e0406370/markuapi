@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
+from logtail import LogtailHandler
 from src.utility.config import Config
 from typing import Any
 import logging
@@ -42,6 +43,13 @@ class Logger:
     logger = logging.getLogger(__name__)
     logger.addHandler(handler)
     logger.setLevel(Config.LOGGER_LEVEL)
+    
+    logtail_token = Config.LOGTAIL_TOKEN
+    if logtail_token:
+        logtail_handler = LogtailHandler(source_token=logtail_token)
+        logtail_handler.setFormatter(formatter)
+        logtail_handler.setLevel(Config.LOGGER_LEVEL)
+        logger.addHandler(logtail_handler)
 
     @classmethod
     def info(cls, message: str) -> None:

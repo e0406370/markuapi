@@ -7,7 +7,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 from src.routers import anime, drama, index, movie
 from src.utility.config import Config
-from src.utility.lib import MsgSpecJSONResponse
+from src.utility.lib import Logger, MsgSpecJSONResponse
 from src.utility.rediss import lifespan_factory
 from tomllib import load
 
@@ -54,8 +54,15 @@ def init_api(enable_cache: bool, flush_cache: bool) -> FastAPI:
     async def block(request: Request, call_next):
         client_ip = request.client.host
         if client_ip in Config.BLOCKED:
+            Logger.warn(f"Blocked request from {client_ip} to {request.url.path}")
             return JSONResponse(status_code=403, content={"detail": "Forbidden"})
-        return await call_next(request)
+        
+        response = await call_next(request)
+        
+        if response.status_code == 429:
+            Logger.warn(f"Rate limit exceeded from {client_ip} to {request.url.path}")
+        
+        return response
 
     api.include_router(anime.router)
     api.include_router(drama.router)

@@ -30,4 +30,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY pyproject.toml ./pyproject.toml
 COPY src ./src
 
-ENTRYPOINT ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]

@@ -21,4 +21,5 @@ class Config:
         for ip in os.getenv("BLOCKED_IPS", "").split(",")
         if ip.strip()
     )
-    RATE_LIMIT: str = os.getenv("RATE_LIMIT", "30/minute")
+    RATE_LIMIT: str = os.getenv("RATE_LIMIT", "5/minute")
+    LOGTAIL_TOKEN: str = os.getenv("LOGTAIL_TOKEN", "")

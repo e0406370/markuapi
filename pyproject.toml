@@ -10,6 +10,7 @@ dependencies = [
     "fastapi>=0.116.1",
     "fastapi-cache2>=0.2.2",
     "httpx>=0.28.1",
+    "logtail-python>=0.3.2",
     "lxml>=6.0.0",
     "msgspec>=0.19.0",
     "uvicorn[standard]>=0.35.0",
