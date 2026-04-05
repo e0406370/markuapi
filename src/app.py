@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from src.routers import anime, drama, index, movie
 from src.utility.config import Config
 from src.utility.lib import MsgSpecJSONResponse
@@ -42,6 +43,13 @@ def init_api(enable_cache: bool, flush_cache: bool) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    
+    @api.middleware("http")
+    async def block(request: Request, call_next):
+        client_ip = request.client.host
+        if client_ip in Config.BLOCKED:
+            return JSONResponse(status_code=403, content={"detail": "Forbidden"})
+        return await call_next(request)
 
     api.include_router(anime.router)
     api.include_router(drama.router)
