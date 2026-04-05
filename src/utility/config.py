@@ -16,8 +16,9 @@ class Config:
 
     LOGGER_LEVEL: str = os.getenv("LOGGER_LEVEL", "INFO").upper()
     
-    BLOCKED: set = field(default_factory=lambda: {
+    BLOCKED: frozenset = frozenset(
         ip.strip()
         for ip in os.getenv("BLOCKED_IPS", "").split(",")
         if ip.strip()
-    })
+    )
+    RATE_LIMIT: str = os.getenv("RATE_LIMIT", "30/minute")
